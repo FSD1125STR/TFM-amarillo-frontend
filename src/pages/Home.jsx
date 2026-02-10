@@ -1,22 +1,21 @@
-import { useEffect, useState } from "react";
-import { api } from "../api/client";
+import Header from "../components/layout/Header";
+import Container from "../components/layout/Container";
+import Footer from "../components/layout/Footer";
+
+import NearbySection from "../components/home/NearbySection";
+import FeaturedSection from "../components/home/FeaturedSection";
+import TopCities from "../components/home/TopCities";
 
 export default function Home() {
-    const [data, setData] = useState(null)
-    const [error, setError] = useState("")
-
-    useEffect(() => {
-        api
-            .get("/health")
-            .then((res) => setData(res.data))
-            .catch((e) => setError(e.message))
-    }, [])
-    
-    return (
-        <div style={{ padding: 16 }}>
-            <h1>NEXTAPA</h1>
-            {error && <p style={{ color: "crimson" }}>Error: {error}</p>}
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
-    );
+  return (
+    <>
+      <Header />
+      <Container>
+        <NearbySection />
+        <FeaturedSection />
+        <TopCities />
+      </Container>
+      <Footer />
+    </>
+  );
 }
