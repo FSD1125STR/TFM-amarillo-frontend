@@ -7,7 +7,7 @@ export default function App() {
 
    return (
       <>
-         <div>
+      <div>
             <nav style={{ padding: 16 }}>
                <Link to="/">Home</Link>
             </nav>
