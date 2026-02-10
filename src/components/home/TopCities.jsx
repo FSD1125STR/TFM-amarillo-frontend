@@ -6,8 +6,7 @@ export default function TopCities() {
         {["Madrid", "Barcelona", "Sevilla"].map(city => (
           <button
             key={city}
-            className="px-4 py-2 bg-neutral-800 rounded-full"
-          >
+            className="px-4 py-2 bg-neutral-800 rounded-full">
             {city}
           </button>
         ))}
