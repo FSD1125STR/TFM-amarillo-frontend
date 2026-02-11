@@ -8,15 +8,15 @@ import FeaturedSection from "../components/home/FeaturedSection";
 import TopCities from "../components/home/TopCities";
 
 export default function Home() {
-  return (
-    <>
-      <Header />
-      <Container>
-        <NearbySection />
-        <FeaturedSection />
-        <TopCities />
-      </Container>
-      <Footer />
-    </>
-  );
+   return (
+      <>
+         <Header />
+         <Container>
+            <NearbySection />
+            <FeaturedSection />
+            <TopCities />
+         </Container>
+         <Footer />
+      </>
+   );
 }
