@@ -73,14 +73,8 @@ const authService = {
    * @returns {Promise<Object>} Datos del usuario registrado
    */
    async register(userData) {
-      try {
-         console.log('📤 Enviando registro a:', `${API_URL}/api/auth/register`);
-         console.log('📦 Datos:', userData);
-      
+      try {        
          const response = await api.post('/auth/register', userData);
-      
-         console.log('✅ Respuesta del servidor:', response.data);
-      
          return response.data;
       } catch (error) {
          console.error('❌ Error en registro:', error);
@@ -99,12 +93,7 @@ const authService = {
    */
    async login(credentials) {
       try {
-         console.log('📤 Enviando login a:', `${API_URL}/api/auth/login`);
-      
-         const response = await api.post('/auth/login', credentials);
-      
-         console.log('✅ Login exitoso:', response.data);
-      
+         const response = await api.post('/auth/login', credentials);    
          return response.data;
       } catch (error) {
          console.error('❌ Error en login:', error);
@@ -120,11 +109,7 @@ const authService = {
    */
    async logout() {
       try {
-         console.log('📤 Cerrando sesión...');
-      
-         await api.post('/auth/logout');
-      
-         console.log('✅ Sesión cerrada');
+         await api.post('/auth/logout');      
       } catch (error) {
          console.error('❌ Error en logout:', error);
          throw error;
@@ -139,16 +124,11 @@ const authService = {
    */
    async checkAuth() {
       try {
-         console.log('🔍 Verificando sesión...');
-      
          const response = await api.get('/auth/check-auth');
-      
-         console.log('✅ Usuario autenticado:', response.data);
-      
          return response.data;
       } catch (error) {
       // Si no hay sesión, devolvemos null en vez de lanzar error
-         console.log('ℹ️ No hay sesión activa');
+         console.error('ℹ️ No hay sesión activa');
          return null;
       }
    },
@@ -161,11 +141,7 @@ const authService = {
    */
    async forgotPassword(email) {
       try {
-         console.log('📤 Solicitando recuperación de contraseña para:', email);
-      
          await api.post('/auth/forgot-password', { email });
-      
-         console.log('✅ Email de recuperación enviado');
       } catch (error) {
          console.error('❌ Error al solicitar recuperación:', error);
          throw error;
@@ -180,11 +156,7 @@ const authService = {
    */
    async verifyEmail(token) {
       try {
-         console.log('📤 Verificando email con token...');
-      
          await api.get(`/auth/verify-email?token=${token}`);
-      
-         console.log('✅ Email verificado correctamente');
       } catch (error) {
          console.error('❌ Error al verificar email:', error);
          throw error;

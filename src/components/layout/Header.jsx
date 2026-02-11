@@ -57,13 +57,10 @@ export default function Header() {
    };
 
    return (
-      // Header con padding, espaciado vertical y ancho máximo centrado
       <header className="p-4 space-y-4 max-w-md mx-auto">
-         {/* Contenedor flex para el título y el área de autenticación */}
+      
          <div className="flex justify-between items-center">
-            {/* Logo/título de la aplicación - clickeable para volver al home */}
-            <h1 
-               className="text-2xl font-bold cursor-pointer hover:text-orange-400 transition-colors"
+            <h1 className="text-2xl font-bold cursor-pointer hover:text-orange-400 transition-colors"
                onClick={() => navigate('/')}
             >
                nexTapa
