@@ -94,7 +94,7 @@ export default function Footer() {
    return (
       // Footer fijado en la parte inferior con z-index alto para que esté siempre visible
       // Usa Tailwind para styling: fondo oscuro, borde superior, y posicionamiento fixed
-      <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50">
+      <footer className="p-4 max-w-3xl mx-auto">
          {/* Contenedor centrado con ancho máximo para mantener el diseño responsive */}
          <div className="max-w-md mx-auto flex justify-between px-6 py-3">
             {/* Iteramos sobre cada item del array para renderizar los botones */}

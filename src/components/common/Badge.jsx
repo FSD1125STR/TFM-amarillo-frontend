@@ -1,6 +1,12 @@
-export default function Badge({ children }) {
+export default function Badge({ children, variant = "primary", className = "" }) {
+  const variants = {
+    primary: "bg-orange-500 text-white",
+    feature: "bg-neutral-800 text-white",
+    outline: "bg-orange-500/20 text-orange-500"
+  };
+
   return (
-    <span className="bg-orange-500 text-xs px-2 py-1 rounded-full">
+    <span className={`text-xs px-3 py-1 rounded-full ${variants[variant]} ${className}`}>
       {children}
     </span>
   );

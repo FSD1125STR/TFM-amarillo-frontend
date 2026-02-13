@@ -57,7 +57,9 @@ export default function Header() {
    };
 
    return (
-      <header className="p-4 space-y-4 max-w-md mx-auto">
+      
+   <>
+      <header className="p-4 max-w-3xl mx-auto">
       
          <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold cursor-pointer hover:text-orange-400 transition-colors"
@@ -103,10 +105,13 @@ export default function Header() {
             Input reutilizable con placeholder descriptivo y estilo dark
             TODO: Implementar funcionalidad de búsqueda de establecimientos
          */}
-         <Input 
-            placeholder="Tu próxima tapa aquí..."
-            className="w-full px-4 py-3 rounded-xl bg-neutral-800" 
-         />
+         <br />
+         <div className="flex justify-center">
+            <div className="w-full max-w-3xl px-4">
+            <Input placeholder="Tu próxima tapa aquí..." />
+            </div>
+         </div>
       </header>
+   </>
    );
 }
