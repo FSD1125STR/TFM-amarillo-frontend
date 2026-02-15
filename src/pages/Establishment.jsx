@@ -7,6 +7,7 @@ import ActionButton from "../components/common/ActionButton";
 import Tag from "../components/common/Tag";
 import RatingBar from "../components/common/RatingBar";
 
+
 export default function Establishment() {
   const navigate = useNavigate();
 
