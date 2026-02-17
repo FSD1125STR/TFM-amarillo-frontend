@@ -9,14 +9,15 @@ import ActionButton from "../components/common/ActionButton";
 import Tag from "../components/common/Tag";
 import RatingBar from "../components/common/RatingBar";
 
-import { establishmentService } from "../services/api";
+import { establishmentService } from "../services/establishmentService.js";
+import { ItemGallery } from "../components/common/ItemGallery";
 
 
 export default function Establishment() {
    const navigate = useNavigate();
    const { id } = useParams(); //para obtener el id de los parametros de la bbdd
 
-   const [establishment, setEstablishment] = useState(null);
+   const [establishment, setEstablishment] = useState(null); //variable para guardar los datos que vienen de la bbdd
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
 
@@ -36,8 +37,7 @@ export default function Establishment() {
          const response = await establishmentService.getById(id);
          
          // Guardar los datos en el estado
-         setEstablishment(response.data);
-         
+         setEstablishment(response.data);         
          console.log(' Datos cargados:', response.data);
 
       } catch (err) {
@@ -135,7 +135,12 @@ export default function Establishment() {
                      className="h-20 w-32 object-cover rounded-lg shrink-0"
                   />
                ))}
+               
             </div>
+            {/* GALERÍA DE TAPAS */}
+            <Section title="Nuestras Tapas">
+               <ItemGallery establishmentId={establishment._id} />
+            </Section>
 
             <div className="grid grid-cols-3 gap-3 mt-6">
                <ActionButton label="Menu" />
@@ -186,6 +191,15 @@ export default function Establishment() {
                      {establishment.priceRange.toString().includes(' €') 
                         ? establishment.priceRange 
                         : `${establishment.priceRange}€`}
+                  </p>
+               </Section>
+            )}
+
+            {/* RANGO DE PRECIOS */}
+            {establishment.email && (
+               <Section title="Rango de precios">
+                  <p className="text-sm text-neutral-50">
+                     {establishment.email}
                   </p>
                </Section>
             )}
@@ -244,8 +258,7 @@ export default function Establishment() {
                   </div>
                </div>
             </Section>
-           
-    
+             
             <div className="mt-8 mb-6">
                <Button className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600 transition-colors">
                   Registrate Aqui

@@ -1,0 +1,75 @@
+
+//establishmentService.js - Servicio para manejar operaciones relacionadas con establecimientos en el frontend
+
+import { api } from './api';
+
+export const establishmentService = {
+   getAll: async (filters = {}) => {
+      try {
+         const params = new URLSearchParams();
+         if (filters.province) {params.append('province', filters.province);}
+         if (filters.city) {params.append('city', filters.city);}
+      
+         const queryString = params.toString();
+       
+         const url = `/establishment${queryString ? `?${queryString}` : ''}`;
+      
+         const response = await api.get(url);
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener establecimientos:', error);
+         throw error;
+      }
+   },
+
+   getById: async (id) => {
+      try {
+       
+         const response = await api.get(`/establishment/${id}`);
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener establecimiento:', error);
+         throw error;
+      }
+   },
+
+   getBySlug: async (slug) => {
+      try {
+         const response = await api.get(`/establishment/slug/${slug}`);
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener establecimiento por slug:', error);
+         throw error;
+      }
+   },
+
+   create: async (establishmentData) => {
+      try {
+         const response = await api.post('/establishment', establishmentData);
+         return response.data;
+      } catch (error) {
+         console.error('Error al crear establecimiento:', error);
+         throw error;
+      }
+   },
+
+   update: async (id, establishmentData) => {
+      try {
+         const response = await api.put(`/establishment/${id}`, establishmentData);
+         return response.data;
+      } catch (error) {
+         console.error('Error al actualizar establecimiento:', error);
+         throw error;
+      }
+   },
+
+   delete: async (id) => {
+      try {
+         const response = await api.delete(`/establishment/${id}`);
+         return response.data;
+      } catch (error) {
+         console.error('Error al eliminar establecimiento:', error);
+         throw error;
+      }
+   }
+};

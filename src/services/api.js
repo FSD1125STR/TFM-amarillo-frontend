@@ -1,54 +1,53 @@
 
+//api.js - Configuración de axios para el frontend, incluyendo interceptores para manejo de tokens y errores
 
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Configuración base de axios
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
-// Crear instancia de axios con configuración base
-const api = axios.create({
+export  const api = axios.create({
    baseURL: API_URL,
+   timeout: 10000,
    headers: {
       'Content-Type': 'application/json'
-   }
+   },
+   withCredentials: true // Para enviar cookies (JWT)
 });
 
-// Interceptor para manejar errores globalmente
-api.interceptors.response.use(
-   // Si la respuesta es exitosa, la devolvemos tal cual
-   response => response,
-   //Si no error
-   error => {
-      console.error(' Error en API:', error.response?.data || error.message);
+// Interceptor para requests (aquí añadiremos el token después)
+api.interceptors.request.use(
+   (config) => {
+      
+      return config;
+   },
+   (error) => {
       return Promise.reject(error);
    }
 );
 
-// ============================================
-// SERVICIO DE ESTABLECIMIENTOS
-// ============================================
-export const establishmentService = {
-  
-   // Obtener TODOS los establecimientos
-   getAll: async () => {
-      try {
-         const response = await api.get('/establishment');
-         return response.data; 
-        
-      }catch(error){
-         console.error('error al obterer los estableciminestos',error);
-      }
+// Interceptor para responses (manejo de errores centralizado)
+api.interceptors.response.use(
+   (response) => {
+      return response;
    },
-  
-   // Obtener UN establecimiento por ID
-   getById: async (id) => {
-      try {
-         const response = await api.get(`/establishment/${id}`);
-         return response.data; // { success: true, data: {...} }
-      } catch (error) {
-         console.error('error al obterer establecimiento por id',error);
+   (error) => {
+      if (error.response) {
+      // El servidor respondió con un código de error
+         console.error('Error de respuesta:', error.response.data);
+      
+         // Si es 401, podrías redirigir al login
+         if (error.response.status === 401) {
+            // window.location.href = '/login';
+         }
+      } else if (error.request) {
+      // La petición se hizo pero no hubo respuesta
+         console.error('Error de red:', error.request);
+      } else {
+      // Algo pasó al configurar la petición
+         console.error('Error:', error.message);
       }
+      return Promise.reject(error);
    }
-};
+);
 
-// Exportar también la instancia de axios por si la necesitas
-export default api;
