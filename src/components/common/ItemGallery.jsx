@@ -32,30 +32,43 @@ export const ItemGallery = ({ establishmentId }) => {
 
    return (
       <div className="
-      flex gap-2 mt-3
-      overflow-x-auto md:overflow-x-visible
-      scrollbar-none
-      md:grid md:grid-cols-4
-    ">
+   
+    flex gap-3 mt-3 
+    overflow-x-auto pb-4
+    snap-x snap-mandatory
+
+    
+    [&::-webkit-scrollbar]:h-2
+    [&::-webkit-scrollbar-track]:bg-neutral-100
+    [&::-webkit-scrollbar-track]:rounded-full
+    [&::-webkit-scrollbar-thumb]:bg-neutral-300
+    [&::-webkit-scrollbar-thumb]:rounded-full
+    
+    /* 3. Firefox Support */
+    [scrollbar-width:thin]
+    [scrollbar-color:#d4d4d4_#f5f5f5]
+  ">
          {items.map((item) => (
             <button
                key={item._id}
                onClick={() => navigate(`/items/${item._id}`)}
                className="
-            group relative shrink-0
-            w-[38vw] md:w-auto
-            aspect-square
-            overflow-hidden rounded-xl bg-neutral-100
-          "
+          group relative 
+          flex-none 
+          w-[45%] md:w-[calc(25%-12px)] 
+          snap-start
+          aspect-square
+          overflow-hidden rounded-xl bg-neutral-100
+        "
             >
                <img
                   src={item.mainImage || DEFAULT_IMAGE}
                   alt={item.name}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => { e.target.src = DEFAULT_IMAGE; }}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  onError={(e) => { e.currentTarget.src = DEFAULT_IMAGE; }}
                />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end">
-                  <p className="text-white text-xs font-medium p-2 line-clamp-1">
+               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                  <p className="text-white text-[10px] md:text-xs font-medium p-2 md:p-3 line-clamp-1 w-full text-left">
                      {item.name}
                   </p>
                </div>

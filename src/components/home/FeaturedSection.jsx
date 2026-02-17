@@ -1,3 +1,6 @@
+
+// FeaturedSection.jsx - Sección de tapas destacadas en la página de inicio
+
 import Card from "../common/Card";
 
 const items = [

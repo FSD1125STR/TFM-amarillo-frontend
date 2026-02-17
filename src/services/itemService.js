@@ -1,7 +1,7 @@
 //ItemService.js - Servicio para manejar operaciones relacionadas con items (tapas) en el frontend
 
 
-import { api } from './api';
+import { api } from './api';// Importamos la instancia de axios configurada en api.js
 
 export const itemService = {
    getByEstablishment: async (establishmentId, filters = {}) => {

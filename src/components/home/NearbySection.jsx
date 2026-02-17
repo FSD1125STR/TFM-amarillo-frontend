@@ -1,3 +1,6 @@
+
+// NearbySection.jsx - Sección de establecimientos cercanos en la página de inicio
+
 import Card from "../common/Card";
 import Badge from "../common/Badge";
 
