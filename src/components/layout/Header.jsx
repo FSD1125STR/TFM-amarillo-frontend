@@ -10,10 +10,10 @@ export default function Header() {
             <h1 className="text-2xl font-bold">nexTapa</h1>
             <Button className="px-4 py-2 rounded-full bg-orange-500">Login Up</Button>
          </div>
-          <div className="flex justify-center">
-             <div className="w-full max-w-3xl px-4">
-             <Input placeholder="Tu próxima tapa aquí..." />
-             </div>
+         <div className="flex justify-center">
+            <div className="w-full max-w-3xl px-4">
+               <Input placeholder="Tu próxima tapa aquí..." />
+            </div>
          </div>
       </header>
    );

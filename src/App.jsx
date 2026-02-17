@@ -11,7 +11,7 @@ export default function App() {
                <Route path="/establishment/:id" element={<Establishment />} />   
             </Routes>
          </BrowserRouter>
-    </>
-   )
+      </>
+   );
 
 }
