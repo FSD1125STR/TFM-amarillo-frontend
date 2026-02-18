@@ -13,7 +13,7 @@ import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 
 
-export default function Establishment() {
+export const Establishment = () => {
    const navigate = useNavigate();
    const { id } = useParams(); //para obtener el id de los parametros de la bbdd
 
@@ -267,4 +267,4 @@ export default function Establishment() {
          </Container>
       </div>
    );
-}
+};

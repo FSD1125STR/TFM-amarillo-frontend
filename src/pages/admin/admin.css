@@ -1,0 +1,201 @@
+
+
+/* ===== ADMIN PANEL - CORPORATE STYLE ===== */
+
+/* Layout */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: 240px;
+  background-color: #1e2a3a;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+}
+
+.admin-sidebar h1 {
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #2e3f54;
+  letter-spacing: 0.5px;
+}
+
+.admin-sidebar a {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #a0aec0;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.admin-sidebar a:hover {
+  background-color: #2e3f54;
+  color: #ffffff;
+}
+
+.admin-sidebar a.active {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* Main content */
+.admin-main {
+  margin-left: 240px;
+  flex: 1;
+  padding: 32px;
+}
+
+/* Page header */
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-page-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e2a3a;
+}
+
+/* Buttons */
+.admin-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.admin-btn-primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.admin-btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.admin-btn-warning {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.admin-btn-warning:hover {
+  background-color: #d97706;
+}
+
+.admin-btn-danger {
+  background-color: #ef4444;
+  color: white;
+}
+
+.admin-btn-danger:hover {
+  background-color: #dc2626;
+}
+
+/* Table */
+.admin-table-wrapper {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.admin-table thead {
+  background-color: #f8fafc;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.admin-table th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.admin-table td {
+  padding: 14px 16px;
+  color: #1e2a3a;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Badges */
+.admin-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.admin-badge-success {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.admin-badge-danger {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.admin-badge-warning {
+  background-color: #fef9c3;
+  color: #ca8a04;
+}
+
+/* Actions column */
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Loading & Error */
+.admin-loading {
+  color: #64748b;
+  font-size: 0.95rem;
+  padding: 16px;
+}
+
+.admin-error {
+  color: #dc2626;
+  font-size: 0.95rem;
+  padding: 16px;
+}

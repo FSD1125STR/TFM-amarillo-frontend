@@ -17,7 +17,6 @@ export const ItemGallery = ({ establishmentId }) => {
                available: true
             });
             setItems(response.data);
-            console.log('Item cargado:', response.data);
          } catch (err) {
             console.error('Error al cargar galería:', err);
          } finally {
