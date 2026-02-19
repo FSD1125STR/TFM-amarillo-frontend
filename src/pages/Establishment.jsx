@@ -1,5 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 import Container from "../components/layout/Container";
 import Section from "../components/layout/Section";
@@ -12,6 +14,9 @@ import RatingBar from "../components/common/RatingBar";
 import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 
+// TOKEN MAPBOX
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+
 
 export const Establishment = () => {
    const navigate = useNavigate();
@@ -20,6 +25,9 @@ export const Establishment = () => {
    const [establishment, setEstablishment] = useState(null); //variable para guardar los datos que vienen de la bbdd
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
+
+   const mapContainer = useRef(null);
+   const mapInstance = useRef(null);
 
    //  CARGAR DATOS CUANDO EL COMPONENTE SE MONTA
    useEffect(() => {
@@ -47,6 +55,37 @@ export const Establishment = () => {
          setLoading(false);
       }
    };
+
+   useEffect(() => {
+      if (
+         establishment?.location?.coordinates &&
+         mapContainer.current &&
+         !mapInstance.current
+      ) {
+         const [lng, lat] = establishment.location.coordinates;
+
+         const map = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: "mapbox://styles/mapbox/light-v11",
+            center: [lng, lat],
+            zoom: 15,
+         });
+
+         new mapboxgl.Marker({ color: "#f97316" })
+            .setLngLat([lng, lat])
+            .addTo(map);
+
+         mapInstance.current = map;
+      }
+
+      return () => {
+         if (mapInstance.current) {
+            mapInstance.current.remove();
+            mapInstance.current = null;
+         }
+      };
+   }, [establishment]);
+
    //  MIENTRAS CARGA, MOSTRAR UN LOADING
    if (loading) {
       return (
@@ -115,7 +154,9 @@ export const Establishment = () => {
                   {establishment.name}
                </h1>
                <p className="text-sm text-neutral-300">
-                  ⭐ {establishment.averageRating?.toFixed(1) || '0.0'} - {establishment.totalReviews || 0} reviews
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                  </svg>{establishment.averageRating?.toFixed(1) || '0.0'} - {establishment.totalReviews || 0} reviews
                </p>
             </div>
          </div>
@@ -204,39 +245,63 @@ export const Establishment = () => {
                </Section>
             )}
 
-            {/* UBICACION */}
-            <Section title="Ubicación">
-               <p className="text-sm text-neutral-400">
-                  {establishment.address?.street}<br />
-                  {establishment.address?.postalCode} {establishment.address?.city}, {establishment.address?.province}
-               </p>
-               
-               {/* MAPA CON COORDENADAS REALES */}
-               {establishment.location?.coordinates && (
-                  <div className="mt-3 rounded-xl overflow-hidden">
-                     <iframe
-                        width="100%"
-                        height="300"
-                        frameBorder="0"
-                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${establishment.location.coordinates[0]-0.01},${establishment.location.coordinates[1]-0.01},${establishment.location.coordinates[0]+0.01},${establishment.location.coordinates[1]+0.01}&layer=mapnik&marker=${establishment.location.coordinates[1]},${establishment.location.coordinates[0]}`}
-                        style={{ border: 0 }}
+            {/* UBICACIÓN */}
+               <Section title="Ubicación">
+                  {establishment.location?.coordinates && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-4">
+
+                  <div className="rounded-xl overflow-hidden shadow-md">
+                     <div
+                        ref={mapContainer}
+                        className="w-full h-75 md:h-full min-h-75"
                      />
                   </div>
-               )}
-            </Section>
+
+                  <div className="flex flex-col justify-center">
+                     <div className="bg-neutral-900/40 backdrop-blur-sm rounded-xl p-5 border border-neutral-800">
+                     <h3 className="text-lg font-semibold mb-3 text-white">
+                        Dirección
+                     </h3>
+                     <p className="text-sm text-neutral-300 leading-relaxed">
+                        {establishment.address?.street}<br />
+                        {establishment.address?.postalCode}{" "}
+                        {establishment.address?.city},{" "}
+                        {establishment.address?.province}
+                     </p>
+
+                  <div className="mt-4">
+                     <button
+                        onClick={() => {
+                           const [lng, lat] = establishment.location.coordinates;
+                           window.open(
+                           `https://www.google.com/maps?q=${lat},${lng}`, "_blank"
+                        );
+                     }}
+                     className="mt-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium"
+                  >
+                     Cómo llegar
+                     </button>
+                  </div>
+               </div>
+            </div>
+
+         </div>
+         )}
+         </Section>
+
 
             {/* HORARIOS */}
-            {establishment.schedule && Object.keys(establishment.schedule).length > 0 && (
-               <Section title="Horarios">
-                  {Object.entries(establishment.schedule).map(([day, hours]) => (
-                     <div key={day} className="flex justify-between text-sm mb-1">
-                        <span className="capitalize font-medium">{day}:</span>
-                        <span className="text-neutral-600">
+               {establishment.schedule && Object.keys(establishment.schedule).length > 0 && (
+                  <Section title="Horarios">
+                     {Object.entries(establishment.schedule).map(([day, hours]) => (
+                        <div key={day} className="flex justify-between text-sm mb-1">
+                           <span className="capitalize font-medium">{day}:</span>
+                           <span className="text-neutral-600">
                            {hours.open} - {hours.close}
-                        </span>
-                     </div>
-                  ))}
-               </Section>
+                           </span>
+                        </div>
+               ))}
+            </Section>
             )}
 
             {/* OPINIONES */}
