@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { establishmentService } from '../../services/establishmentService';
-import './admin.css';
+import './styles/admin.css';
 
 export const AdminEstablishments = () => {
    const [establishments, setEstablishments] = useState([]);
@@ -24,6 +24,21 @@ export const AdminEstablishments = () => {
          setError('Error loading establishments');
       } finally {
          setLoading(false);
+      }
+   };
+
+   const handleToggleActive = async (id, currentActive) => {
+      try {
+         if (currentActive) {
+            await establishmentService.delete(id);
+         } else {
+            await establishmentService.reactivate(id);
+         }
+         setEstablishments(prev =>
+            prev.map(est => est._id === id ? { ...est, active: !currentActive } : est)
+         );
+      } catch (err) {
+         setError('Error updating establishment status');
       }
    };
 
@@ -73,7 +88,12 @@ export const AdminEstablishments = () => {
                         <td>{est.address?.city}</td>
                         <td>{est.address?.province}</td>
                         <td>
-                           <span className={`admin-badge ${est.active ? 'admin-badge-success' : 'admin-badge-danger'}`}>
+                           <span
+                              className={`admin-badge ${est.active ? 'admin-badge-success' : 'admin-badge-danger'}`}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleToggleActive(est._id, est.active)}
+                              title={est.active ? 'Click to deactivate' : 'Click to activate'}
+                           >
                               {est.active ? 'Yes' : 'No'}
                            </span>
                         </td>
@@ -85,13 +105,13 @@ export const AdminEstablishments = () => {
                         <td>
                            <div className="admin-actions">
                               <button
-                                 className="admin-btn admin-btn-warning"
+                                 className="admin-btn admin-btn-warning admin-btn-sm"
                                  onClick={() => navigate(`/admin/establishments/${est._id}`)}
                               >
                                  Edit
                               </button>
                               <button
-                                 className="admin-btn admin-btn-danger"
+                                 className="admin-btn admin-btn-danger admin-btn-sm"
                                  onClick={() => handleDelete(est._id)}
                               >
                                  Delete

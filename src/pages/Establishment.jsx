@@ -232,7 +232,7 @@ export const Establishment = () => {
                      <div key={day} className="flex justify-between text-sm mb-1">
                         <span className="capitalize font-medium">{day}:</span>
                         <span className="text-neutral-600">
-                           {hours.open} - {hours.close}
+                           {hours.closed ? 'Cerrado' : `${hours.open} - ${hours.close}`}
                         </span>
                      </div>
                   ))}

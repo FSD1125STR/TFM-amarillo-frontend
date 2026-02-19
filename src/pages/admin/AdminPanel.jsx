@@ -1,7 +1,7 @@
 // AdminPanel.jsx
 
 import { NavLink, Outlet } from 'react-router-dom';
-import './admin.css';
+import './styles/admin.css';
 
 export const AdminPanel = () => {
    return (

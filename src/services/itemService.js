@@ -43,5 +43,26 @@ export const itemService = {
          console.error('Error al crear item:', error);
          throw error;
       }
-   }
+   },
+   update: async (itemId, itemData) => {
+      try {
+         const response = await api.put(`/items/${itemId}`, itemData);
+         return response.data;
+      } catch (error) {
+         console.error('Error al actualizar item:', error);
+         throw error;
+      }
+   },
+
+   delete: async (itemId) => {
+      try {
+         const response = await api.delete(`/items/${itemId}`);
+         return response.data;
+      } catch (error) {
+         console.error('Error al eliminar item:', error);
+         throw error;
+      }
+   },
 }; 
+
+

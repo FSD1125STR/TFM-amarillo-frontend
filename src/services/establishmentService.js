@@ -71,5 +71,14 @@ export const establishmentService = {
          console.error('Error al eliminar establecimiento:', error);
          throw error;
       }
-   }
+   },
+   reactivate: async (id) => {
+      try {
+         const response = await api.patch(`/establishment/${id}`);
+         return response.data;
+      } catch (error) {
+         console.error('Error al reactivar establecimiento:', error);
+         throw error;
+      }
+   },
 };
