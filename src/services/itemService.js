@@ -43,5 +43,15 @@ export const itemService = {
          console.error('Error al crear item:', error);
          throw error;
       }
+   },
+
+   getAll: async () => {
+   try {
+      const response = await api.get('/items');
+      return response.data;
+   } catch (error) {
+      console.error('Error al obtener todos los items:', error);
+      throw error;
    }
+},
 }; 
