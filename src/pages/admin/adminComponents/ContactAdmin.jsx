@@ -8,10 +8,10 @@ import { SaveButton } from './SaveButton';
 export const ContactAdmin = memo(({ contact, onChange, saving }) => {   
    return (
       <section className="admin-section">
-         <h2 className="admin-section-title">Contact</h2>
+         <h2 className="admin-section-title">Datos de Contacto</h2>
          <div className="admin-grid-2">
             <div className="admin-field">
-               <label>Phone *</label>
+               <label>Telefono *</label>
                <input className="admin-input" name="phone" value={contact.phone} onChange={onChange} required />
             </div>
             <div className="admin-field">

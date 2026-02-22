@@ -1,5 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 import Container from "../components/layout/Container";
 import Section from "../components/layout/Section";
@@ -11,43 +13,70 @@ import RatingBar from "../components/common/RatingBar";
 
 import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
+import { photoService } from "../services/photoService.js";
+
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 
 export const Establishment = () => {
    const navigate = useNavigate();
-   const { id } = useParams(); //para obtener el id de los parametros de la bbdd
+   const { id } = useParams();
 
-   const [establishment, setEstablishment] = useState(null); //variable para guardar los datos que vienen de la bbdd
+   const [establishment, setEstablishment] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
+   const [photos, setPhotos] = useState([]);
 
-   //  CARGAR DATOS CUANDO EL COMPONENTE SE MONTA
+   const mapInstance = useRef(null);
+
    useEffect(() => {
       loadEstablishmentData();
-   }, [id]); // Se ejecuta cuando cambia el ID
+   }, [id]);
 
-
-   // FUNCIÓN PARA CARGAR DATOS
    const loadEstablishmentData = async () => {
       try {
          setLoading(true);
          setError(null);
-
-         // Llamar a la API
          const response = await establishmentService.getById(id);
-         
-         // Guardar los datos en el estado
-         setEstablishment(response.data);         
-         console.log(' Datos cargados:', response.data);
-
+         setEstablishment(response.data);
+         const photosResponse = await photoService.getByEstablishment(id);
+         setPhotos(photosResponse || []);
       } catch (err) {
-         console.error(' Error cargando establecimiento:', err);
+         console.error('Error cargando establecimiento:', err);
          setError('No se pudo cargar el establecimiento');
       } finally {
          setLoading(false);
       }
    };
-   //  MIENTRAS CARGA, MOSTRAR UN LOADING
+
+   // ── useCallback ref: se ejecuta exactamente cuando el nodo aparece en el DOM ──
+   const mapContainer = useCallback((node) => {
+      if (!node || mapInstance.current) {return;}
+      if (!establishment?.location?.coordinates) {return;}
+
+      const [lng, lat] = establishment.location.coordinates;
+
+      const map = new mapboxgl.Map({
+         container: node,
+         style: 'mapbox://styles/mapbox/streets-v12',
+         center: [lng, lat],
+         zoom: 15,
+      });
+
+      new mapboxgl.Marker({ color: "#f97316" })
+         .setLngLat([lng, lat])
+         .addTo(map);
+
+      mapInstance.current = map;
+
+      return () => {
+         if (mapInstance.current) {
+            mapInstance.current.remove();
+            mapInstance.current = null;
+         }
+      };
+   }, [establishment]);
+
    if (loading) {
       return (
          <Container>
@@ -58,9 +87,6 @@ export const Establishment = () => {
       );
    }
 
-   
-   
-   // SI HAY ERROR O NO HAY DATOS
    if (error || !establishment) {
       return (
          <Container>
@@ -74,11 +100,6 @@ export const Establishment = () => {
       );
    }
 
-
-
-
-
-   // PINTAR LOS DATOS REALES
    return (
       <div>
          <div className="relative h-72 max-w-3xl mx-auto">
@@ -115,28 +136,34 @@ export const Establishment = () => {
                   {establishment.name}
                </h1>
                <p className="text-sm text-neutral-300">
-                  ⭐ {establishment.averageRating?.toFixed(1) || '0.0'} - {establishment.totalReviews || 0} reviews
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                     <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                  </svg>{establishment.averageRating?.toFixed(1) || '0.0'} - {establishment.totalReviews || 0} reviews
                </p>
             </div>
          </div>
 
          <Container>
-            {/* GALERIA DE IMAGENES  */}
+            {/* GALERIA DE IMAGENES */}
             <div className="flex gap-3 mt-4 overflow-x-auto">
-               {[
-                  establishment.mainImage || "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe",
-                  "https://images.unsplash.com/photo-1604908177522-429a7c04b6a4",
-                  "https://images.unsplash.com/photo-1551024709-8f23befc6f87",
-               ].map((img, i) => (
+               {photos.length > 0 ? (
+                  photos.map((photo) => (
+                     <img
+                        key={photo._id}
+                        src={photo.url}
+                        alt={photo.alt || photo.caption || establishment.name}
+                        className="h-20 w-32 object-cover rounded-lg shrink-0"
+                     />
+                  ))
+               ) : (
                   <img
-                     key={i}
-                     src={img}
-                     alt={`Gallery ${i + 1}`}
+                     src={establishment.mainImage}
+                     alt={establishment.name}
                      className="h-20 w-32 object-cover rounded-lg shrink-0"
                   />
-               ))}
-               
+               )}
             </div>
+
             {/* GALERÍA DE TAPAS */}
             <Section title="Nuestras Tapas">
                <ItemGallery establishmentId={establishment._id} />
@@ -144,8 +171,8 @@ export const Establishment = () => {
 
             <div className="grid grid-cols-3 gap-3 mt-6">
                <ActionButton label="Menu" />
-               <ActionButton 
-                  label="Telefono" 
+               <ActionButton
+                  label="Telefono"
                   onClick={() => window.location.href = `tel:${establishment.phone}`}
                />
                <ActionButton label="Compartir" />
@@ -188,41 +215,50 @@ export const Establishment = () => {
             {establishment.priceRange && (
                <Section title="Rango de precios">
                   <p className="text-sm text-neutral-50">
-                     {establishment.priceRange.toString().includes(' €') 
-                        ? establishment.priceRange 
-                        : `${establishment.priceRange}€`}
+                     {establishment.priceRange}
                   </p>
                </Section>
             )}
 
-            {/* RANGO DE PRECIOS */}
+            {/* EMAIL */}
             {establishment.email && (
-               <Section title="Rango de precios">
+               <Section title="Contacto">
                   <p className="text-sm text-neutral-50">
                      {establishment.email}
                   </p>
                </Section>
             )}
 
-            {/* UBICACION */}
+            {/* UBICACIÓN */}
             <Section title="Ubicación">
-               <p className="text-sm text-neutral-400">
-                  {establishment.address?.street}<br />
-                  {establishment.address?.postalCode} {establishment.address?.city}, {establishment.address?.province}
-               </p>
-               
-               {/* MAPA CON COORDENADAS REALES */}
-               {establishment.location?.coordinates && (
-                  <div className="mt-3 rounded-xl overflow-hidden">
-                     <iframe
-                        width="100%"
-                        height="300"
-                        frameBorder="0"
-                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${establishment.location.coordinates[0]-0.01},${establishment.location.coordinates[1]-0.01},${establishment.location.coordinates[0]+0.01},${establishment.location.coordinates[1]+0.01}&layer=mapnik&marker=${establishment.location.coordinates[1]},${establishment.location.coordinates[0]}`}
-                        style={{ border: 0 }}
-                     />
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-4">
+                  <div className="rounded-xl shadow-md">
+                     <div ref={mapContainer} style={{ width: '100%', height: '320px' }} />
                   </div>
-               )}
+
+                  <div className="flex flex-col justify-center">
+                     <div className="bg-neutral-900/40 backdrop-blur-sm rounded-xl p-5 border border-neutral-800">
+                        <h3 className="text-lg font-semibold mb-3 text-white">Dirección</h3>
+                        <p className="text-sm text-neutral-300 leading-relaxed">
+                           {establishment.address?.street}<br />
+                           {establishment.address?.postalCode}{" "}
+                           {establishment.address?.city},{" "}
+                           {establishment.address?.province}
+                        </p>
+                        <div className="mt-4">
+                           <button
+                              onClick={() => {
+                                 const [lng, lat] = establishment.location.coordinates;
+                                 window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
+                              }}
+                              className="mt-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium"
+                           >
+                              Cómo llegar
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </Section>
 
             {/* HORARIOS */}
@@ -258,7 +294,7 @@ export const Establishment = () => {
                   </div>
                </div>
             </Section>
-             
+
             <div className="mt-8 mb-6">
                <Button className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600 transition-colors">
                   Registrate Aqui

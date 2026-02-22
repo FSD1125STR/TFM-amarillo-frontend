@@ -30,9 +30,7 @@ export const ItemGallery = ({ establishmentId }) => {
    if (items.length === 0) {return null;}
 
    return (
-      <div className="
-   
-    flex gap-3 mt-3 
+      <div className="flex gap-3 mt-3  
     overflow-x-auto pb-4
     snap-x snap-mandatory
 

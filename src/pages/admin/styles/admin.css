@@ -153,6 +153,7 @@
   gap: 16px;
 }
 
+/* ── Filas de 2 columnas ── */
 .admin-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -160,10 +161,16 @@
   align-items: start;
 }
 
+/* ── Columna apilada (varios bloques en vertical dentro de un admin-row) ── */
 .admin-col {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* ── Ancho completo (BasicInfo, Schedule, etc. fuera de admin-row) ── */
+.admin-full {
+  width: 100%;
 }
 
 /* ── Section ── */
@@ -190,7 +197,7 @@
   margin-bottom: 14px;
 }
 
-/* ── Form footer — botón alineado a la derecha, tamaño natural ── */
+/* ── Form footer ── */
 .admin-form-footer {
   display: flex;
   justify-content: flex-end;
@@ -461,11 +468,15 @@ textarea.admin-input {
   text-align: center;
   padding: 28px;
 }
+
+/* ── Schedule estado cerrado ── */
 .admin-schedule-closed {
   font-size: 0.8rem;
   color: #ef4444;
   font-weight: 500;
 }
+
+/* ── Toggle abierto/cerrado en schedule ── */
 .admin-toggle-btn {
   padding: 3px 10px;
   border-radius: 20px;
@@ -483,4 +494,40 @@ textarea.admin-input {
 .admin-toggle-btn.is-closed {
   background: #fee2e2;
   color: #dc2626;
+}
+
+/* ── MapboxPicker: el mapa ocupa todo el ancho de su contenedor ── */
+.admin-map-container {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-map-container .mapboxgl-map {
+  width: 100% !important;
+  height: 350px !important;
+}
+
+/* ── Coordenadas bajo el mapa ── */
+.admin-coords-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (max-width: 968px) {
+  .admin-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-main {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  .admin-sidebar {
+    display: none;
+  }
 }

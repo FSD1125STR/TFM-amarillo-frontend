@@ -16,7 +16,7 @@ export const ViewInAppButton = memo(({ id }) => {
          rel="noopener noreferrer"
          className="admin-btn admin-btn-secondary admin-btn-sm"
       >  
-      View in app ↗
+      Ver en la app ↗
       </a>
      
       

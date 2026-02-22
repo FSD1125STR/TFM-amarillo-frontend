@@ -1,4 +1,5 @@
 // src/pages/admin/AdminEstablishmentDetail.jsx
+// Página de detalle/edición de un establecimiento en el panel de administración
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -10,48 +11,54 @@ import { EstablishmentStatus } from './adminComponents/StatusAdmin';
 import { BasicInformationAdmin } from './adminComponents/BasicInformationAdmin';
 import { CuisineTypeAdmin } from './adminComponents/CuisineTypeAdmin';
 import { AdressAdmin } from './adminComponents/AdressAdmin';
-import { CoordinatesAdmin } from './adminComponents/CoordinatesAdmin';
+import { MapboxPicker } from './adminComponents/MapboxPicker';
 import { ContactAdmin } from './adminComponents/ContactAdmin';
 import { ScheduleAdmin } from './adminComponents/ScheduleAdmin';
 import { FeaturesAdmin } from './adminComponents/FeaturesAdmin';
 import { ViewInAppButton } from './adminComponents/ViewInAppButton';
+import { EstablishmentPhotosAdmin } from './adminComponents/EstablishmentPhotosAdmin';
 
-export const AdminEstablishmentDetail = () => {
+const EMPTY_FORM = { // Estructura inicial vacía para un nuevo establecimiento
+   name: '',
+   slug: '',
+   description: '',
+   mainImage: '',
+   type: 'bar',
+   cuisineType: [],
+   address: { street: '', number: '', city: '', province: '', postalCode: '', country: 'España' },
+   location: { type: 'Point', coordinates: [-3.7038, 40.4168] },
+   phone: '',
+   email: '',
+   website: '',
+   schedule: {
+      lunes:     { open: '', close: '', closed: true },
+      martes:    { open: '', close: '', closed: true },
+      miercoles: { open: '', close: '', closed: true },
+      jueves:    { open: '', close: '', closed: true },
+      viernes:   { open: '', close: '', closed: true },
+      sabado:    { open: '', close: '', closed: true },
+      domingo:   { open: '', close: '', closed: true },
+   },
+   features: [],
+   priceRange: '€€',
+   owner: '',
+   verified: false,
+   active: true,
+};
+
+export const AdminEstablishmentDetail = () => { // Componente principal para crear/editar un establecimiento en el panel admin
    const { id } = useParams();
    const navigate = useNavigate();
-
-   const [loading, setLoading] = useState(true);
+   const isNew = id === 'new';
+   const [loading, setLoading] = useState(!isNew);
    const [saving, setSaving] = useState(false);
    const [error, setError] = useState(null);
    const [successMsg, setSuccessMsg] = useState(null);
-
-   const [form, setForm] = useState({//estructura del establecimiento, con valores por defecto para evitar errores de undefined
-      name: '',
-      slug: '',
-      description: '',
-      type: 'bar',
-      cuisineType: [],
-      address: { street: '', number: '', city: '', province: '', postalCode: '', country: 'España' },
-      location: { type: 'Point', coordinates: [0, 0] },
-      phone: '',
-      email: '',
-      website: '',
-      schedule: {
-         lunes:     { open: '', close: '', closed: true },
-         martes:    { open: '', close: '', closed: true },
-         miercoles: { open: '', close: '', closed: true },
-         jueves:    { open: '', close: '', closed: true },
-         viernes:   { open: '', close: '', closed: true },
-         sabado:    { open: '', close: '', closed: true },
-         domingo:   { open: '', close: '', closed: true },
-      },
-      features: [],
-      priceRange: '',
-      verified: false,
-      active: true,
-   });
+   const [form, setForm] = useState(EMPTY_FORM);
 
    useEffect(() => {
+      if (isNew) {return;}
+
       const load = async () => {
          try {
             setLoading(true);
@@ -61,6 +68,7 @@ export const AdminEstablishmentDetail = () => {
                name: est.name || '',
                slug: est.slug || '',
                description: est.description || '',
+               mainImage: est.mainImage || est.image || '',
                type: est.type || 'bar',
                cuisineType: est.cuisineType || [],
                address: {
@@ -84,10 +92,11 @@ export const AdminEstablishmentDetail = () => {
                   sabado:    { open: est.schedule?.sabado?.open || '',    close: est.schedule?.sabado?.close || '',    closed: est.schedule?.sabado?.closed ?? true },
                   domingo:   { open: est.schedule?.domingo?.open || '',   close: est.schedule?.domingo?.close || '',   closed: est.schedule?.domingo?.closed ?? true },
                },
-               features: est.features || [],
+               features: est.features || [], 
                priceRange: est.priceRange || '',
                verified: est.verified || false,
                active: est.active !== undefined ? est.active : true,
+               owner: est.owner?._id || est.owner || '',
             });
          } catch (err) {
             setError('Error loading establishment');
@@ -98,45 +107,54 @@ export const AdminEstablishmentDetail = () => {
       load();
    }, [id]);
 
-   // ── Handlers ───────────────────────────────────────────
-   const handleChange = (e) => { //maneja cambios en campos simples y checkbox
+   // ── Handlers ───────────────────────────────────────────────────────
+
+   const handleChange = (e) => {
       const { name, value, type, checked } = e.target;
       setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
    };
 
-   const handleAddress = (e) => { //maneja cambios en campos de dirección
+   const handleAddress = (e) => {
       const { name, value } = e.target;
       setForm(prev => ({ ...prev, address: { ...prev.address, [name]: value } }));
    };
 
-   const handleCoordinates = (e) => { //maneja cambios en campos de coordenadas
-      const { name, value } = e.target;
-      const coords = [...form.location.coordinates];
-      if (name === 'lng') {coords[0] = parseFloat(value) || 0;}
-      if (name === 'lat') {coords[1] = parseFloat(value) || 0;}
-      setForm(prev => ({ ...prev, location: { ...prev.location, coordinates: coords } }));
-   };
-
-   const handleScheduleChange = (day, field, value) => { //maneja cambios en campos de horario
-      console.log('Schedule change:', day, field, value);
+   const handleScheduleChange = (day, field, value) => {
       setForm(prev => ({
          ...prev,
-         schedule: { ...prev.schedule, [day]: { ...prev.schedule[day], [field]: value } }
+         schedule: { ...prev.schedule, [day]: { ...prev.schedule[day], [field]: value } }// 
       }));
    };
 
-   const handleSubmit = async (e) => { //maneja el envío del formulario
+   const handleMapCoordinates = (newCoords) => {
+      setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: newCoords } }));
+   };
+
+   const handleAddressFromMap = (newAddress) => {
+      setForm(prev => ({ ...prev, address: { ...prev.address, ...newAddress } }));
+   };
+
+   const handleCoordinatesFromAddress = (newCoords) => {
+      setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: newCoords } }));
+   };
+
+   const handleSubmit = async (e) => { 
       e.preventDefault();
-      console.log('SUBMIT FIRED');
       setError(null);
       setSuccessMsg(null);
       setSaving(true);
       try {
-         await establishmentService.update(id, form);
-         setSuccessMsg('Establishment updated successfully!');
-         setTimeout(() => setSuccessMsg(null), 3000);
+         if (isNew) {
+            const res = await establishmentService.create(form);
+            const newId = res.data._id;
+            navigate(`/admin/establishments/${newId}`);
+         } else {
+            await establishmentService.update(id, form);
+            setSuccessMsg('Establecimiento actualizado correctamente');
+            setTimeout(() => setSuccessMsg(null), 3000);
+         }
       } catch (err) {
-         setError(err.response?.data?.message || 'Error updating establishment');
+         setError(err.response?.data?.message || `Error al ${isNew ? 'crear' : 'actualizar'} el establecimiento`);
       } finally {
          setSaving(false);
       }
@@ -146,13 +164,14 @@ export const AdminEstablishmentDetail = () => {
 
    return (
       <div className="admin-page">
-
          <div className="admin-page-header">
             <button className="admin-btn admin-btn-secondary" onClick={() => navigate('/admin/establishments')}>
-        ← Back
+               ← Back
             </button>
-            <h1 className="admin-title">Editar: {form.name}</h1>
-            <ViewInAppButton id={id} />
+            <h1 className="admin-title">
+               {isNew ? 'Nuevo Establecimiento' : `Editar: ${form.name}`}
+            </h1>
+            {!isNew && <ViewInAppButton id={id} />}
          </div>
 
          {error && <div className="admin-alert admin-alert-error">{error}</div>}
@@ -160,14 +179,36 @@ export const AdminEstablishmentDetail = () => {
 
          <form onSubmit={handleSubmit} className="admin-form">
 
+            {/* Owner: solo visible al crear */}
+            {isNew && (
+               <div className="admin-section">
+                  <h2 className="admin-section-title">Propietario</h2>
+                  <div className="admin-field">
+                     <label className="admin-label">Owner ID </label>
+                     <input
+                        className="admin-input"
+                        name="owner"
+                        value={form.owner}
+                        onChange={handleChange}
+                        placeholder="Dejar vacío o ingresar ID de usuario propietario"
+                        //required
+                     />
+                     <span className="admin-hint">Puedes obtenerlo desde la sección Usuarios</span>
+                  </div>
+               </div>
+            )}
+
             {/* Fila 1: Status + Contact */}
             <div className="admin-row">
-               <EstablishmentStatus active={form.active} verified={form.verified} onChange={handleChange} name={form.name} saving={saving} />
+               {!isNew && <EstablishmentStatus active={form.active} verified={form.verified} onChange={handleChange} name={form.name} saving={saving} />}
                <ContactAdmin contact={{ phone: form.phone, email: form.email, website: form.website }} onChange={handleChange} saving={saving} />
             </div>
 
-            {/* Fila 2: Basic Info - ancho completo */}
-            <BasicInformationAdmin form={form} onChange={handleChange} saving={saving} />
+            {/* Fila 2: Basic Info + Schedule */}
+            <div className="admin-row">
+               <BasicInformationAdmin form={form} onChange={handleChange} saving={saving} />
+               <ScheduleAdmin schedule={form.schedule} onChange={handleScheduleChange} saving={saving} />
+            </div>
 
             {/* Fila 3: Features + Cuisine Type */}
             <div className="admin-row">
@@ -185,18 +226,46 @@ export const AdminEstablishmentDetail = () => {
                />
             </div>
 
-            {/* Fila 4: Address + columna con Coordinates y Schedule */}
+            {/* Fila 4: Dirección + Mapa */}
             <div className="admin-row">
-               <AdressAdmin address={form.address} onChange={handleAddress} saving={saving} />
-               <div className="admin-col">
-                  <CoordinatesAdmin coordinates={form.location.coordinates} onChange={handleCoordinates} saving={saving} />
-                  <ScheduleAdmin schedule={form.schedule} onChange={handleScheduleChange} saving={saving} />
-               </div>
+               <AdressAdmin
+                  address={form.address}
+                  onChange={handleAddress}
+                  onCoordinatesChange={handleCoordinatesFromAddress}
+                  saving={saving}
+               />
+               <MapboxPicker
+                  coordinates={form.location.coordinates}
+                  onChange={handleMapCoordinates}
+                  onAddressChange={handleAddressFromMap}
+                  saving={saving}
+               />
+            </div>
+
+            <div className="admin-form-footer">
+               <button type="submit" disabled={saving} className="admin-btn admin-btn-primary">
+                  {saving
+                     ? (isNew ? 'Creando...' : 'Guardando...')
+                     : (isNew ? 'Crear Establecimiento' : 'Guardar Cambios')
+                  }
+               </button>
             </div>
 
          </form>
 
-         <EstablishmentItems establishmentId={id} />
+         {/* Sección de medios e items: solo en modo edición */}
+         {!isNew && (
+            <div className="admin-row">
+               <EstablishmentPhotosAdmin 
+                  establishmentId={id}
+                  mainImage={form.mainImage}
+                  onMainImageChange={(url) => setForm(prev => ({ ...prev, mainImage: url }))}
+               />
+               <EstablishmentItems establishmentId={id} />
+            </div>
+         )}
+
+         {!isNew && <ViewInAppButton id={id} />}
 
       </div>
    );

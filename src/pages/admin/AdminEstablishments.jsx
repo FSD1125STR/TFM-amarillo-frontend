@@ -1,5 +1,4 @@
-// This file contains the admin page for establishments, where you can list, create, edit and delete establishments.
-
+// AdminEstablishments.jsx - Página de administración para listar y gestionar establecimientos
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { establishmentService } from '../../services/establishmentService';
@@ -42,28 +41,18 @@ export const AdminEstablishments = () => {
       }
    };
 
-   const handleDelete = async (id) => {
-      if (!confirm('Seguro que quieres eliminar este establecimiento?')) {return;}
-      try {
-         await establishmentService.delete(id);
-         fetchEstablishments();
-      } catch (err) {
-         setError('Error deleting establishment');
-      }
-   };
-
    if (loading) {return <p className="admin-loading">Loading...</p>;}
    if (error) {return <p className="admin-error">{error}</p>;}
 
    return (
       <div>
          <div className="admin-page-header">
-            <h2>Establishments</h2>
+            <h2>Establecimientos de la App</h2>
             <button
                className="admin-btn admin-btn-primary"
                onClick={() => navigate('/admin/establishments/new')}
             >
-               + New establishment
+               + Nuevo establecimiento
             </button>
          </div>
 
@@ -92,14 +81,14 @@ export const AdminEstablishments = () => {
                               className={`admin-badge ${est.active ? 'admin-badge-success' : 'admin-badge-danger'}`}
                               style={{ cursor: 'pointer' }}
                               onClick={() => handleToggleActive(est._id, est.active)}
-                              title={est.active ? 'Click to deactivate' : 'Click to activate'}
+                              title={est.active ? 'Click para desactivar' : 'Click para activar'}
                            >
                               {est.active ? 'Yes' : 'No'}
                            </span>
                         </td>
                         <td>
                            <span className={`admin-badge ${est.verified ? 'admin-badge-success' : 'admin-badge-warning'}`}>
-                              {est.verified ? 'Yes' : 'Pending'}
+                              {est.verified ? 'Verificado' : 'Pendiente'}
                            </span>
                         </td>
                         <td>
@@ -108,13 +97,7 @@ export const AdminEstablishments = () => {
                                  className="admin-btn admin-btn-warning admin-btn-sm"
                                  onClick={() => navigate(`/admin/establishments/${est._id}`)}
                               >
-                                 Edit
-                              </button>
-                              <button
-                                 className="admin-btn admin-btn-danger admin-btn-sm"
-                                 onClick={() => handleDelete(est._id)}
-                              >
-                                 Delete
+                                 Editar
                               </button>
                            </div>
                         </td>

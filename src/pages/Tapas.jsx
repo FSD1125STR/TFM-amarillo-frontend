@@ -32,7 +32,6 @@ export const Tapas = () => {
             return;
          }
          setTapa(response.data);
-         console.log("Tapa cargada:", response.data);
       } catch (err) {
          console.error("Error al cargar la tapa:", err);
          setError("No se pudo cargar la tapa.");

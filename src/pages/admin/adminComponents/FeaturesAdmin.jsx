@@ -19,7 +19,7 @@ export const FeaturesAdmin = memo(({ features, onAdd, onRemove, saving }) => {
 
    return (
       <section className="admin-section">
-         <h2 className="admin-section-title">Features</h2>
+         <h2 className="admin-section-title">Servicios Extra</h2>
          <div className="admin-tags-input">
             <div className="admin-tags">
                {features.map(f => (

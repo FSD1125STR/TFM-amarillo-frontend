@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@mapbox/mapbox-gl-geocoder": "^5.1.2",
     "axios": "^1.13.5",
     "cors": "^2.8.6",
     "mapbox-gl": "^3.18.1",

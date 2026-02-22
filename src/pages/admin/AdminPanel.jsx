@@ -9,7 +9,7 @@ export const AdminPanel = () => {
       
          {/* Sidebar */}
          <aside className="admin-sidebar">
-            <h1>⚙️ Admin Panel</h1>
+            <h1>⚙️ Panel de Administración</h1>
             <nav>
                <NavLink
                   to="/admin"

@@ -1,12 +1,12 @@
 
 //establishmentService.js - Servicio para manejar operaciones relacionadas con establecimientos en el frontend
-
+// Este servicio se encarga de realizar las llamadas a la API para obtener, crear, actualizar, eliminar y reactivar establecimientos.
 import { api } from './api';
 
-export const establishmentService = {
-   getAll: async (filters = {}) => {
+export const establishmentService = { 
+   getAll: async (filters = {}) => {// Permite obtener una lista de establecimientos con filtros opcionales (provincia y ciudad)
       try {
-         const params = new URLSearchParams();
+         const params = new URLSearchParams();// Utilizamos URLSearchParams para construir la cadena de consulta de manera segura
          if (filters.province) {params.append('province', filters.province);}
          if (filters.city) {params.append('city', filters.city);}
       
@@ -14,7 +14,7 @@ export const establishmentService = {
        
          const url = `/establishment${queryString ? `?${queryString}` : ''}`;
       
-         const response = await api.get(url);
+         const response = await api.get(url);// Realizamos la llamada a la API con la URL construida
          return response.data;
       } catch (error) {
          console.error('Error al obtener establecimientos:', error);
@@ -23,8 +23,7 @@ export const establishmentService = {
    },
 
    getById: async (id) => {
-      try {
-       
+      try {       
          const response = await api.get(`/establishment/${id}`);
          return response.data;
       } catch (error) {
@@ -55,7 +54,7 @@ export const establishmentService = {
 
    update: async (id, establishmentData) => {
       try {
-         const response = await api.put(`/establishment/${id}`, establishmentData);
+         const response = await api.patch(`/establishment/${id}`, establishmentData);
          return response.data;
       } catch (error) {
          console.error('Error al actualizar establecimiento:', error);
@@ -74,7 +73,7 @@ export const establishmentService = {
    },
    reactivate: async (id) => {
       try {
-         const response = await api.patch(`/establishment/${id}`);
+         const response = await api.patch(`/establishment/${id}/reactivate`);
          return response.data;
       } catch (error) {
          console.error('Error al reactivar establecimiento:', error);

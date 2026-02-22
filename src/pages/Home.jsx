@@ -6,7 +6,7 @@ import Container from "../components/layout/Container";
 import Footer from "../components/layout/Footer";
 
 import NearbySection from "../components/home/NearbySection";
-import FeaturedSection from "../components/home/FeaturedSection";
+import { FeaturedSection } from "../components/home/FeaturedSection";
 import TopCities from "../components/home/TopCities";
 
 export default function Home() {

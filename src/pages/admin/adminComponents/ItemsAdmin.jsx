@@ -30,7 +30,6 @@ export const EstablishmentItems = ({ establishmentId }) => {
       }
    };
 
-   // ── Toggle available ───────────────────────────────────
    const handleToggleAvailable = async (itemId, currentAvailable) => {
       try {
          await itemService.update(itemId, { available: !currentAvailable });
@@ -40,18 +39,18 @@ export const EstablishmentItems = ({ establishmentId }) => {
             )
          );
       } catch (err) {
-         setError('Error updating item availability');
+         setError('Error subiendo cambios');
       }
    };
 
    // ── Delete ─────────────────────────────────────────────
    const handleDelete = async (itemId) => {
-      if (!confirm('Are you sure you want to delete this tapa? This action cannot be undone.')) {return;}
+      if (!confirm('Estas seguro que quieres eliminar esta tapa? Esta acción no se puede deshacer.')) {return;}
       try {
          await itemService.delete(itemId);
          setItems(prev => prev.filter(item => item._id !== itemId));
       } catch (err) {
-         setError('Error deleting item');
+         setError('Error al eliminar la tapa');
       }
    };
 
@@ -68,20 +67,20 @@ export const EstablishmentItems = ({ establishmentId }) => {
          {error && <div className="admin-alert admin-alert-error">{error}</div>}
 
          {loading ? (
-            <p className="admin-loading">Loading tapas...</p>
+            <p className="admin-loading">Cargando tapas...</p>
          ) : items.length === 0 ? (
-            <p className="admin-empty">No tapas found for this establishment.</p>
+            <p className="admin-empty">No hay tapas para este establecimiento.</p>
          ) : (
             <div className="admin-table-wrapper">
                <table className="admin-table">
                   <thead>
                      <tr>
-                        <th>Name</th>
-                        <th>Type</th>
-                        <th>Price</th>
-                        <th>Available</th>
-                        <th>Featured</th>
-                        <th>Actions</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Precio</th>
+                        <th>Disponible</th>
+                        <th>Destacado</th>
+                        <th>Acciones</th>
                      </tr>
                   </thead>
                   <tbody>
@@ -89,15 +88,15 @@ export const EstablishmentItems = ({ establishmentId }) => {
                         <tr key={item._id}>
                            <td>{item.name}</td>
                            <td>{item.type}</td>
-                           <td>{item.isFree ? 'Free' : `${item.price}€`}</td>
+                           <td>{item.isFree ? 'Gratis' : `${item.price}€`}</td>
                            <td>
                               <span className={`admin-badge ${item.available ? 'admin-badge-success' : 'admin-badge-danger'}`}>
-                                 {item.available ? 'Yes' : 'No'}
+                                 {item.available ? 'Sí' : 'No'}
                               </span>
                            </td>
                            <td>
                               <span className={`admin-badge ${item.featured ? 'admin-badge-success' : 'admin-badge-warning'}`}>
-                                 {item.featured ? 'Yes' : 'No'}
+                                 {item.featured ? 'Sí' : 'No'}
                               </span>
                            </td>
                            <td>
@@ -106,19 +105,19 @@ export const EstablishmentItems = ({ establishmentId }) => {
                                     className="admin-btn admin-btn-warning admin-btn-sm"
                                     onClick={() => navigate(`/admin/items/${item._id}`)}
                                  >
-                        Edit
+                        Editar
                                  </button>
                                  <button
                                     className="admin-btn admin-btn-secondary admin-btn-sm"
                                     onClick={() => handleToggleAvailable(item._id, item.available)}
                                  >
-                                    {item.available ? 'Deactivate' : 'Activate'}
+                                    {item.available ? 'Desactivar' : 'Activar'}
                                  </button>
                                  <button
                                     className="admin-btn admin-btn-danger admin-btn-sm"
                                     onClick={() => handleDelete(item._id)}
                                  >
-                        Delete
+                        Borrar
                                  </button>
                               </div>
                            </td>
