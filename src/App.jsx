@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from "./pages/Home";
+import { AllEstablishment } from "./pages/AllEstablishment";
 import { Establishment } from "./pages/Establishment";
+import { AllTapas } from "./pages/AllTapas";
 import { Tapas } from "./pages/Tapas";
 import { AdminPanel } from "./pages/admin/AdminPanel";
 import { Dashboard } from "./pages/admin/Dashboard";
@@ -14,7 +16,9 @@ export default function App() {
             <Routes>
                {/* Public routes */}
                <Route path="/" element={<Home />} />
-               <Route path="/establishment/:id" element={<Establishment />} />   
+               <Route path="/establishments" element={<AllEstablishment />} />
+               <Route path="/establishment/:id" element={<Establishment />} /> 
+               <Route path="/items" element={<AllTapas />} />
                <Route path="/items/:id" element={<Tapas />} />
 
                {/* Admin routes */}
