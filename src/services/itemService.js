@@ -70,7 +70,6 @@ export const itemService = {
          throw error;
       }
    },
-<<<<<<< HEAD
    update: async (itemId, itemData) => {
       try {
          const response = await api.put(`/items/${itemId}`, itemData);
@@ -90,18 +89,6 @@ export const itemService = {
          throw error;
       }
    },
-=======
-
-   getAll: async () => {
-   try {
-      const response = await api.get('/items');
-      return response.data;
-   } catch (error) {
-      console.error('Error al obtener todos los items:', error);
-      throw error;
-   }
-},
->>>>>>> main
 }; 
 
 

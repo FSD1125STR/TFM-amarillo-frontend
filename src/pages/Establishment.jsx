@@ -15,17 +15,6 @@ import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { photoService } from "../services/photoService.js";
 
-<<<<<<< HEAD
-=======
-
-//mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
-//mapStyle="mapbox://styles/mapbox/dark-v11"
-//mapStyle="mapbox://styles/mapbox/light-v112"
-//mapStyle="mapbox://styles/mapbox/outdoors-v12"
-//mapStyle="mapbox://styles/mapbox/navigation-day-v1"
-//mapStyle="mapbox://styles/mapbox/streets-v12";
-// TOKEN MAPBOX
->>>>>>> main
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 
@@ -242,7 +231,7 @@ export const Establishment = () => {
 
             {/* UBICACIÓN */}
             <Section title="Ubicación">
-<<<<<<< HEAD
+
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-4">
                   <div className="rounded-xl shadow-md">
                      <div ref={mapContainer} style={{ width: '100%', height: '320px' }} />
@@ -272,50 +261,6 @@ export const Establishment = () => {
                   </div>
                </div>
             </Section>
-=======
-               {establishment.location?.coordinates && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-4">
-
-                     <div className="rounded-xl overflow-hidden shadow-md">
-                        <div
-                           ref={mapContainer}
-                           className="w-full h-75 md:h-full min-h-75"
-                        />
-                     </div>
-
-                     <div className="flex flex-col justify-center">
-                        <div className="bg-neutral-900/40 backdrop-blur-sm rounded-xl p-5 border border-neutral-800">
-                           <h3 className="text-lg font-semibold mb-3 text-white">
-                        Dirección
-                           </h3>
-                           <p className="text-sm text-neutral-300 leading-relaxed">
-                              {establishment.address?.street}<br />
-                              {establishment.address?.postalCode}{" "}
-                              {establishment.address?.city},{" "}
-                              {establishment.address?.province}
-                           </p>
-
-                           <div className="mt-4">
-                              <button
-                                 onClick={() => {
-                                    const [lng, lat] = establishment.location.coordinates;
-                                    window.open(
-                                       `https://www.google.com/maps?q=${lat},${lng}`, "_blank"
-                                    );
-                                 }}
-                                 className="mt-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium"
-                              >
-                     Cómo llegar
-                              </button>
-                           </div>
-                        </div>
-                     </div>
-
-                  </div>
-               )}
-            </Section>
-
->>>>>>> main
 
             {/* HORARIOS */}
             {establishment.schedule && Object.keys(establishment.schedule).length > 0 && (
@@ -324,11 +269,9 @@ export const Establishment = () => {
                      <div key={day} className="flex justify-between text-sm mb-1">
                         <span className="capitalize font-medium">{day}:</span>
                         <span className="text-neutral-600">
-<<<<<<< HEAD
+
                            {hours.closed ? 'Cerrado' : `${hours.open} - ${hours.close}`}
-=======
-                           {hours.open} - {hours.close}
->>>>>>> main
+
                         </span>
                      </div>
                   ))}

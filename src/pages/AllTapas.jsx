@@ -15,7 +15,7 @@ export const AllTapas = () => {
    const loadItems = async () => {
       try {
          setLoading(true);
-         const response = await itemService.getAll();
+         const response = await itemService.getAllItemns();
          setItems(response.data || []);
       } catch (error) {
          console.error("Error cargando items:", error);

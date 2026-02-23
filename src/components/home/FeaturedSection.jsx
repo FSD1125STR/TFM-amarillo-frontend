@@ -1,5 +1,10 @@
+
+//src/components/home/FeaturedSection.jsx
+// Este componente muestra las tapas destacadas en la página de inicio. Se encarga de cargar los datos desde el backend y manejar los estados de carga y error.
+
 import Card from "../common/Card";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { itemService } from "../../services/itemService";
 import Container from "../layout/Container";
 
@@ -7,6 +12,8 @@ export const FeaturedSection = () => {
    const [featuredItems, setFeaturedItems] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
+
+   const navigate = useNavigate();
 
    useEffect(() => {
       loadAllItems();
@@ -26,8 +33,7 @@ export const FeaturedSection = () => {
       }
    };
 
-   // --- Lógica de renderizado (FUERA de loadAllItems) ---
-
+   
    if (loading) {
       return (
          <Container>
@@ -55,9 +61,13 @@ export const FeaturedSection = () => {
          ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                {featuredItems.map((item, index) => (
-                  // Uso index si item.name se repite, pero lo ideal es item.id
-                  <Card key={item.id || index}>
+                  
+                  <Card key={item.id || index}
+                     onClick={() => navigate(`/items/${item._id || item.id}`)}
+                     className="cursor-pointer hover:shadow-lg transition-shadow"
+                  >
                      <img src={item.mainImage} alt={item.name} className="h-32 w-full object-cover" />
+                     
                      <div className="p-2">
                         <p className="font-semibold">{item.name}</p>
                         <p className="text-orange-400">{item.price > 0 ? `${item.price}€` : "Gratis"}</p>
