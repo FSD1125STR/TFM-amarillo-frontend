@@ -5,20 +5,20 @@ import { memo } from 'react';
 import { TagSelector } from './TagSelector';
 
 const ALLERGENS = [
-   { value: 'gluten', label: '🌾 Gluten' },
-   { value: 'lactosa', label: '🥛 Lácteos' },
-   { value: 'huevo', label: '🥚 Huevo' },
-   { value: 'pescado', label: '🐟 Pescado' },
-   { value: 'marisco', label: '🦐 Marisco' },
-   { value: 'frutos_secos', label: '🥜 Frutos Secos' },
-   { value: 'cacahuetes', label: '🥜 Cacahuetes' },
-   { value: 'soja', label: '🫘 Soja' },
-   { value: 'apio', label: '🥬 Apio' },
-   { value: 'mostaza', label: '🌿 Mostaza' },
-   { value: 'sesamo', label: '🌰 Sésamo' },
-   { value: 'sulfitos', label: '🍷 Sulfitos' },
-   { value: 'altramuz', label: '🌼 Altramuz' },
-   { value: 'moluscos', label: '🐚 Moluscos' },
+   { value: 'Gluten', label: '🌾 Gluten' },
+   { value: 'Lactosa', label: '🥛 Lácteos' },
+   { value: 'Huevo', label: '🥚 Huevo' },
+   { value: 'Pescado', label: '🐟 Pescado' },
+   { value: 'Marisco', label: '🦐 Marisco' },
+   { value: 'Frutos secos', label: '🥜 Frutos Secos' },
+   { value: 'Cacahuetes', label: '🥜 Cacahuetes' },
+   { value: 'Soja', label: '🫘 Soja' },
+   { value: 'Apio', label: '🥬 Apio' },
+   { value: 'Mostaza', label: '🌿 Mostaza' },
+   { value: 'Sésamo', label: '🌰 Sésamo' },
+   { value: 'Sulfitos', label: '🍷 Sulfitos' },
+   { value: 'Altramuz', label: '🌼 Altramuz' },
+   { value: 'Moluscos', label: '🐚 Moluscos' },
 ];
 
 export const Allergens = memo(({ form, handleChange }) => {

@@ -4,22 +4,22 @@ import { memo } from 'react';
 import { TagSelector } from './TagSelector';
 
 const CATEGORIES = [
-   { value: 'carne', label: '🥩 Carne' },
-   { value: 'pescado', label: '🐟 Pescado' },
-   { value: 'marisco', label: '🦐 Marisco' },
-   { value: 'verduras', label: '🥦 Verduras' },
-   { value: 'queso', label: '🧀 Queso' },
-   { value: 'embutido', label: '🥓 Embutido' },
-   { value: 'jamon', label: '🍖 Jamón' },
-   { value: 'huevo', label: '🍳 Huevo' },
-   { value: 'frito', label: '🍟 Frito' },
-   { value: 'plancha', label: '🔥 A la Plancha' },
-   { value: 'horno', label: '♨️ Al Horno' },
-   { value: 'guiso', label: '🍲 Guiso' },
-   { value: 'ensalada', label: '🥗 Ensalada' },
-   { value: 'croqueta', label: '🟤 Croqueta' },
-   { value: 'patatas', label: '🥔 Patatas' },
-   { value: 'pan', label: '🍞 Pan/Tostada' },
+   { value: 'Carne', label: '🥩 Carne' },
+   { value: 'Pescado', label: '🐟 Pescado' },
+   { value: 'Marisco', label: '🦐 Marisco' },
+   { value: 'Verduras', label: '🥦 Verduras' },
+   { value: 'Queso', label: '🧀 Queso' },
+   { value: 'Embutido', label: '🥓 Embutido' },
+   { value: 'Jamon', label: '🍖 Jamón' },
+   { value: 'Huevo', label: '🍳 Huevo' },
+   { value: 'Frito', label: '🍟 Frito' },
+   { value: 'Plancha', label: '🔥 A la Plancha' },
+   { value: 'Horno', label: '♨️ Al Horno' },
+   { value: 'Guiso', label: '🍲 Guiso' },
+   { value: 'Ensalada', label: '🥗 Ensalada' },
+   { value: 'Croqueta', label: '🟤 Croqueta' },
+   { value: 'Patatas', label: '🥔 Patatas' },
+   { value: 'Pan', label: '🍞 Pan/Tostada' },
 ];
 
 

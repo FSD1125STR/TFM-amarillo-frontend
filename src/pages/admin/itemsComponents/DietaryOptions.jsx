@@ -4,13 +4,13 @@ import { memo } from 'react';
 import { TagSelector } from './TagSelector';
 
 const DIETARY_OPTIONS = [
-   { value: 'vegetariano', label: '🥕 Vegetariano' },
-   { value: 'vegano', label: '🌱 Vegano' },
-   { value: 'sin_gluten', label: '🚫🌾 Sin Gluten' },
-   { value: 'sin_lactosa', label: '🚫🥛 Sin Lactosa' },
-   { value: 'sin_azucar', label: '🚫🍬 Sin Azúcar' },
-   { value: 'halal', label: '☪️ Halal' },
-   { value: 'kosher', label: '✡️ Kosher' },
+   { value: 'Vegetariano', label: '🥕 Vegetariano' },
+   { value: 'Vegano', label: '🌱 Vegano' },
+   { value: 'Sin Gluten', label: '🚫🌾 Sin Gluten' },
+   { value: 'Sin Lactosa', label: '🚫🥛 Sin Lactosa' },
+   { value: 'Sin Azúcar', label: '🚫🍬 Sin Azúcar' },
+   { value: 'Halal', label: '☪️ Halal' },
+   { value: 'Kosher', label: '✡️ Kosher' },
 ];
 
 export const DietaryOptions = memo(({ form, handleChange }) => {

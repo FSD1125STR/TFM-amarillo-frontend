@@ -90,7 +90,10 @@ export const ItemAdmin = () => {
          setError(null);
          const payload = {
             ...form,
-            modalities: form.modalities, 
+            modalities: form.modalities.map(m => ({
+               ...m,
+               isFree: m.price === 0,
+            })), 
             ...(isNew && establishmentIdFromState ? { establishment: establishmentIdFromState } : {}),
          };
          if (isNew) {

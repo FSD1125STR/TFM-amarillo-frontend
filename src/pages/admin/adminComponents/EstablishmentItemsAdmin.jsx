@@ -56,8 +56,42 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
             </span>
          </td>
          <td>{item.name}</td>
-         <td>{item.type}</td>
-         <td>{item.isFree ? 'Gratis' : `${item.price}€`}</td>
+         <td>
+            {item.modalities?.length === 1 ? (
+            // Una sola modalidad: mostrar inline
+               <span>
+                  {item.modalities[0].label} · {' '}
+                  {item.modalities[0].isFree || item.modalities[0].price === 0
+                     ? <span style={{ color: '#16a34a', fontWeight: 600 }}>Gratis</span>
+                     : `${item.modalities[0].price}€`
+                  }
+               </span>
+            ) : (
+            // Varias modalidades: select
+               <select
+                  style={{
+                     border: '1px solid var(--admin-border)',
+                     borderRadius: '6px',
+                     padding: '0.2rem 0.4rem',
+                     fontSize: '0.85rem',
+                     background: 'var(--admin-bg)',
+                     color: 'var(--admin-text)',
+                     cursor: 'default',
+                  }}
+                  defaultValue=""
+                  onChange={e => e.target.value = ""} // solo lectura
+               >
+                  <option value="" disabled>
+                     {item.modalities.length} presentaciones
+                  </option>
+                  {item.modalities.map((m, i) => (
+                     <option key={i} disabled>
+                        {m.label} · {m.isFree || m.price === 0 ? 'Gratis' : `${m.price}€`}
+                     </option>
+                  ))}
+               </select>
+            )}
+         </td>
          <td>
             <button
                type="button"
@@ -131,7 +165,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
          setItems(sorted);
          setOrderChanged(false);
       } catch (err) {
-         setError('Error loading tapas');
+         setError('Error loading tapas', err);
       } finally {
          setLoading(false);
       }
@@ -166,7 +200,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
          setOrderChanged(false);
          showSuccess('Orden guardado correctamente');
       } catch (err) {
-         setError('Error al guardar el orden');
+         setError('Error al guardar el orden', err);
       } finally {
          setSaving(false);
       }
@@ -180,7 +214,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
             prev.map(item => item._id === itemId ? { ...item, available: !currentAvailable } : item)
          );
       } catch (err) {
-         setError('Error al cambiar disponibilidad');
+         setError('Error al cambiar disponibilidad', err);
       }
    };
 
@@ -191,7 +225,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
             prev.map(item => item._id === itemId ? { ...item, featured: !currentFeatured } : item)
          );
       } catch (err) {
-         setError('Error al cambiar destacado');
+         setError('Error al cambiar destacado', err);
       }
    };
 
@@ -203,7 +237,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
          setItems(prev => prev.filter(item => item._id !== itemId));
          showSuccess('Tapa eliminada');
       } catch (err) {
-         setError('Error al eliminar la tapa');
+         setError('Error al eliminar la tapa', err);
       }
    };
 
@@ -248,8 +282,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
                      <tr>
                         <th style={{ width: '32px' }}></th>
                         <th>Nombre</th>
-                        <th>Tipo</th>
-                        <th>Precio</th>
+                        <th>Opciones</th>
                         <th>Disponible</th>
                         <th>Destacado</th>
                         <th>Acciones</th>
