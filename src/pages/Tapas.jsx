@@ -15,6 +15,7 @@ import RatingBar from "../components/common/RatingBar";
 import { itemService } from "../services/itemService";
 import { photoService } from "../services/photoService";
 import { ItemGallery } from "../components/common/ItemGallery";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
 
 export const Tapas = () => {
    const navigate = useNavigate();
@@ -81,15 +82,13 @@ export const Tapas = () => {
       );
    }
 
-   // Fotos secundarias (todas menos la que está en el hero)
-   const secondaryPhotos = photos.filter(p => p.url !== heroImage);
-
    return (
       <div>
          {/* HERO IMAGE */}
          <div className="relative max-w-3xl mx-auto mt-4 h-96">
             <img
-               src={heroImage || primaryImage}
+               // tapaDetail: 800x600 limit — suficiente para h-96, mucho menos peso que el original
+               src={cloudinaryPresets.tapaDetail(heroImage || primaryImage)}
                alt={tapa.name}
                className="w-full h-full object-cover rounded-xl shadow-md transition-all duration-300"
             />
@@ -126,6 +125,7 @@ export const Tapas = () => {
                   {photos.map(photo => (
                      <button
                         key={photo._id}
+                        // Al clicar guardamos la URL original, el hero la optimiza con el preset
                         onClick={() => setHeroImage(photo.url)}
                         className={`flex-none w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200
                            ${heroImage === photo.url
@@ -134,7 +134,8 @@ export const Tapas = () => {
                      }`}
                      >
                         <img
-                           src={photo.thumbnailUrl || photo.url}
+                           // thumbnail: 200x150 fill — más que suficiente para w-16 h-16
+                           src={cloudinaryPresets.thumbnail(photo.url)}
                            alt=""
                            className="w-full h-full object-cover"
                         />
@@ -156,7 +157,7 @@ export const Tapas = () => {
                         <div key={i} style={{ marginBottom: '0.25rem' }}>
                            {mod.isFree ? (
                               <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse">
-              Tapa Gratis
+                                 Tapa Gratis
                               </span>
                            ) : (
                               <span className="text-base font-semibold text-orange-500">
@@ -167,6 +168,7 @@ export const Tapas = () => {
                      ))}
                </div>
             </div>
+
             {/* DESCRIPTION */}
             <p className="text-sm text-neutral-500 mt-2">{tapa.description}</p>
 

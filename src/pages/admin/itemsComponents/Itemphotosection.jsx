@@ -1,5 +1,7 @@
-// src/pages/admin/itemsComponents/ItemPhotoSection.jsx
 
+
+// src/pages/admin/itemsComponents/ItemPhotoSection.jsx
+// Componente para gestionar las fotos de un establecimiento: subir, eliminar, ordenar y marcar principal
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
    DndContext,
@@ -16,6 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { photoService } from '../../../services/photoService';
+import { cloudinaryPresets } from '../../../utils/cloudinaryHelpers';
 import '../styles/itemPhotoSection.css';
 
 // ── Miniatura sortable ─────────────────────────────────────────────────────
@@ -43,7 +46,8 @@ const SortableThumb = ({ photo, onDelete, onSetPrimary, deletingId }) => {
          {...listeners}
       >
          <img
-            src={photo.thumbnailUrl || photo.url}
+            // preset thumbnail: 200x150 crop fill, WebP automático
+            src={cloudinaryPresets.thumbnail(photo.url)}
             alt={photo.alt || ''}
             className="iph-thumb-img"
             loading="lazy"
@@ -91,7 +95,7 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
    );
 
    useEffect(() => {
-      if (itemId) {fetchPhotos();}
+      if (itemId) { fetchPhotos(); }
    }, [itemId]);
 
    const fetchPhotos = async () => {
@@ -116,7 +120,7 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
 
    const handleDragEnd = useCallback((event) => {
       const { active, over } = event;
-      if (!over || active.id === over.id) {return;}
+      if (!over || active.id === over.id) { return; }
       setPhotos(prev => {
          const oldIndex = prev.findIndex(p => p._id === active.id);
          const newIndex = prev.findIndex(p => p._id === over.id);
@@ -142,7 +146,7 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
 
    const handleFileChange = async (e) => {
       const file = e.target.files[0];
-      if (!file) {return;}
+      if (!file) { return; }
       if (!file.type.startsWith('image/')) { setError('Solo JPG, PNG o WEBP'); return; }
       if (file.size > 5 * 1024 * 1024) { setError('Máximo 5MB'); return; }
       try {
@@ -155,18 +159,18 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
          if (isPrimary && onMainImageChange) {
             const updated = await photoService.getByItem(itemId);
             const primary = updated?.find(p => p.isPrimary);
-            if (primary) {onMainImageChange(primary.url);}
+            if (primary) { onMainImageChange(primary.url); }
          }
       } catch {
          setError('Error al subir la foto');
       } finally {
          setUploading(false);
-         if (fileInputRef.current) {fileInputRef.current.value = '';}
+         if (fileInputRef.current) { fileInputRef.current.value = ''; }
       }
    };
 
    const handleDelete = async (photoId) => {
-      if (!window.confirm('¿Eliminar esta foto?')) {return;}
+      if (!window.confirm('¿Eliminar esta foto?')) { return; }
       try {
          setDeletingId(photoId);
          await photoService.delete(photoId);
@@ -183,7 +187,7 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
       try {
          await photoService.setPrimary(photo._id);
          await fetchPhotos();
-         if (onMainImageChange) {onMainImageChange(photo.url);}
+         if (onMainImageChange) { onMainImageChange(photo.url); }
          showSuccess('Foto marcada como principal');
       } catch {
          setError('Error al marcar como principal');
@@ -215,7 +219,12 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
                <div className="iph-col-main">
                   <div className="iph-main-img-wrapper">
                      {displayImage ? (
-                        <img src={displayImage} alt="Imagen principal" className="iph-main-img" />
+                        <img
+                           // preset tapaDetail: 800x600 limit, WebP automático
+                           src={cloudinaryPresets.tapaDetail(displayImage)}
+                           alt="Imagen principal"
+                           className="iph-main-img"
+                        />
                      ) : (
                         <div className="iph-main-empty">
                            <span>📷</span>

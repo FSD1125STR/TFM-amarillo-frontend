@@ -1,3 +1,7 @@
+
+
+//src/pages/Establishment.jsx
+// Página de detalle de establecimiento
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
@@ -14,6 +18,7 @@ import RatingBar from "../components/common/RatingBar";
 import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { photoService } from "../services/photoService.js";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -49,10 +54,9 @@ export const Establishment = () => {
       }
    };
 
-   // ── useCallback ref: se ejecuta exactamente cuando el nodo aparece en el DOM ──
    const mapContainer = useCallback((node) => {
-      if (!node || mapInstance.current) {return;}
-      if (!establishment?.location?.coordinates) {return;}
+      if (!node || mapInstance.current) { return; }
+      if (!establishment?.location?.coordinates) { return; }
 
       const [lng, lat] = establishment.location.coordinates;
 
@@ -100,11 +104,17 @@ export const Establishment = () => {
       );
    }
 
+   const heroSrc = establishment.mainImage
+      ? cloudinaryPresets.detail(establishment.mainImage)
+      : "https://images.unsplash.com/photo-1559339352-11d035aa65de";
+
    return (
       <div>
+         {/* HERO IMAGE */}
          <div className="relative h-72 max-w-3xl mx-auto">
             <img
-               src={establishment.mainImage || "https://images.unsplash.com/photo-1559339352-11d035aa65de"}
+               // detail: 1200x900 limit — suficiente para h-72, mucho menos que el original
+               src={heroSrc}
                className="w-full h-full object-cover rounded-xl"
                alt={establishment.name}
             />
@@ -144,20 +154,21 @@ export const Establishment = () => {
          </div>
 
          <Container>
-            {/* GALERIA DE IMAGENES */}
+            {/* GALERÍA DE IMÁGENES */}
             <div className="flex gap-3 mt-4 overflow-x-auto">
                {photos.length > 0 ? (
                   photos.map((photo) => (
                      <img
                         key={photo._id}
-                        src={photo.url}
+                        // thumbnail: 200x150 fill — más que suficiente para h-20 w-32
+                        src={cloudinaryPresets.thumbnail(photo.url)}
                         alt={photo.alt || photo.caption || establishment.name}
                         className="h-20 w-32 object-cover rounded-lg shrink-0"
                      />
                   ))
                ) : (
                   <img
-                     src={establishment.mainImage}
+                     src={cloudinaryPresets.thumbnail(establishment.mainImage)}
                      alt={establishment.name}
                      className="h-20 w-32 object-cover rounded-lg shrink-0"
                   />
@@ -231,7 +242,6 @@ export const Establishment = () => {
 
             {/* UBICACIÓN */}
             <Section title="Ubicación">
-
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start mt-4">
                   <div className="rounded-xl shadow-md">
                      <div ref={mapContainer} style={{ width: '100%', height: '320px' }} />
@@ -269,9 +279,7 @@ export const Establishment = () => {
                      <div key={day} className="flex justify-between text-sm mb-1">
                         <span className="capitalize font-medium">{day}:</span>
                         <span className="text-neutral-600">
-
                            {hours.closed ? 'Cerrado' : `${hours.open} - ${hours.close}`}
-
                         </span>
                      </div>
                   ))}

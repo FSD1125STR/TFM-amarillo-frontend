@@ -1,5 +1,7 @@
-// src/pages/admin/adminComponents/EstablishmentPhotosAdmin.jsx
 
+
+// src/pages/admin/adminComponents/EstablishmentPhotosAdmin.jsx
+// Componente para gestionar las fotos de un establecimiento en el panel admin
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
    DndContext,
@@ -16,6 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { photoService } from '../../../services/photoService';
+import { cloudinaryPresets } from '../../../utils/cloudinaryHelpers';
 import '../styles/itemPhotoSection.css';
 
 // ── Miniatura sortable ─────────────────────────────────────────────────────
@@ -43,7 +46,8 @@ const SortableThumb = ({ photo, onDelete, onSetPrimary, deletingId }) => {
          {...listeners}
       >
          <img
-            src={photo.thumbnailUrl || photo.url}
+            // preset thumbnail: 200x150 crop fill, WebP automático
+            src={cloudinaryPresets.thumbnail(photo.url)}
             alt={photo.alt || ''}
             className="iph-thumb-img"
             loading="lazy"
@@ -91,7 +95,7 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
    );
 
    useEffect(() => {
-      if (establishmentId) {fetchPhotos();}
+      if (establishmentId) { fetchPhotos(); }
    }, [establishmentId]);
 
    const fetchPhotos = async () => {
@@ -116,7 +120,7 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
 
    const handleDragEnd = useCallback((event) => {
       const { active, over } = event;
-      if (!over || active.id === over.id) {return;}
+      if (!over || active.id === over.id) { return; }
       setPhotos(prev => {
          const oldIndex = prev.findIndex(p => p._id === active.id);
          const newIndex = prev.findIndex(p => p._id === over.id);
@@ -142,7 +146,7 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
 
    const handleFileChange = async (e) => {
       const file = e.target.files[0];
-      if (!file) {return;}
+      if (!file) { return; }
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) { setError('Formato no válido. Usa JPG, PNG o WEBP.'); return; }
       if (file.size > 5 * 1024 * 1024) { setError('La imagen no puede superar los 5MB.'); return; }
@@ -156,12 +160,12 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
          setError(err.response?.data?.message || 'Error al subir la foto');
       } finally {
          setUploading(false);
-         if (fileInputRef.current) {fileInputRef.current.value = '';}
+         if (fileInputRef.current) { fileInputRef.current.value = ''; }
       }
    };
 
    const handleDelete = async (photoId) => {
-      if (!window.confirm('¿Eliminar esta foto?')) {return;}
+      if (!window.confirm('¿Eliminar esta foto?')) { return; }
       try {
          setDeletingId(photoId);
          await photoService.delete(photoId);
@@ -178,7 +182,7 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
       try {
          await photoService.setPrimary(photo._id);
          await fetchPhotos();
-         if (onMainImageChange) {onMainImageChange(photo.url);}
+         if (onMainImageChange) { onMainImageChange(photo.url); }
          showSuccess('Foto marcada como principal');
       } catch {
          setError('Error al marcar como principal');
@@ -235,7 +239,12 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
                {/* Imagen principal — ancho completo */}
                <div className="iph-estab-main-wrapper">
                   {displayImage ? (
-                     <img src={displayImage} alt="Imagen principal" className="iph-estab-main-img" />
+                     <img
+                        // preset gallery: 800x600 limit, WebP automático
+                        src={cloudinaryPresets.gallery(displayImage)}
+                        alt="Imagen principal"
+                        className="iph-estab-main-img"
+                     />
                   ) : (
                      <div className="iph-main-empty">
                         <span>📷</span>
