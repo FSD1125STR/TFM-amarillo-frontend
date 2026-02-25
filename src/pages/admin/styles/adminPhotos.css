@@ -182,3 +182,48 @@
    padding: 4px;
   
 }
+
+/* Drag & drop */
+.photo-card--dragging {
+   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+   z-index: 10;
+}
+
+.photo-card-drag-handle {
+   text-align: center;
+   font-size: 1.2rem;
+   color: #999;
+   padding: 4px 0;
+   cursor: grab;
+   user-select: none;
+   letter-spacing: 2px;
+}
+
+.photo-card-drag-handle:active {
+   cursor: grabbing;
+}
+
+.photo-badge-order {
+   position: absolute;
+   top: 6px;
+   left: 6px;
+   background: rgba(0, 0, 0, 0.6);
+   color: #fff;
+   font-size: 0.7rem;
+   font-weight: 700;
+   padding: 2px 6px;
+   border-radius: 4px;
+}
+
+.photos-drag-hint {
+   font-size: 0.8rem;
+   color: #888;
+   margin-bottom: 12px;
+   text-align: center;
+}
+
+.photos-panel-actions {
+   display: flex;
+   gap: 8px;
+   align-items: center;
+}

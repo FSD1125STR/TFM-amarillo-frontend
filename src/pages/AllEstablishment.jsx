@@ -15,7 +15,7 @@ const MapPreview = ({ coordinates }) => {
    const mapContainer = useRef(null);
 
    useEffect(() => {
-      if (!coordinates) return;
+      if (!coordinates) {return;}
 
       const [lng, lat] = coordinates;
 

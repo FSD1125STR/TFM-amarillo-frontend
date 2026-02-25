@@ -38,5 +38,30 @@ export const photoService = {
    setPrimary: async (photoId) => {
       const res = await api.patch(`/photos/${photoId}/set-primary`);
       return res.data;
-   }
+   },
+
+   reorder: async (photos) => {
+      const res = await api.patch('/photos/reorder', { photos });
+      return res.data;
+   },
+   uploadToItem: async (file, itemId, options = {}) => {
+      const { caption = '', alt = '', isPrimary = false } = options;
+
+      const formData = new FormData();
+      formData.append('photo', file);
+      formData.append('item', itemId);
+      formData.append('caption', caption);
+      formData.append('alt', alt);
+      formData.append('isPrimary', isPrimary.toString());
+
+      const res = await api.post('/photos', formData, {
+         headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      return res.data;
+   },
+
+   getByItem: async (itemId) => {
+      const res = await api.get(`/photos/item/${itemId}`);
+      return res.data.data;
+   },
 };

@@ -8,6 +8,7 @@ import { AdminPanel } from "./pages/admin/AdminPanel";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
+import { ItemAdmin } from './pages/admin/ItemAdmin';
 
 export default function App() {
    return (
@@ -26,6 +27,7 @@ export default function App() {
                   <Route index element={<Dashboard />} />
                   <Route path="establishments" element={<AdminEstablishments />} />
                   <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
+                  <Route path="/admin/items/:id" element={<ItemAdmin />} />
                </Route>
             </Routes>
          </BrowserRouter>

@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { establishmentService } from '../../services/establishmentService';
 import './styles/admin.css';
 
-import { EstablishmentItems } from './adminComponents/ItemsAdmin';
+import { EstablishmentItems } from './adminComponents/EstablishmentItemsAdmin';
 import { EstablishmentStatus } from './adminComponents/StatusAdmin';
 import { BasicInformationAdmin } from './adminComponents/BasicInformationAdmin';
 import { CuisineTypeAdmin } from './adminComponents/CuisineTypeAdmin';
@@ -99,7 +99,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
                owner: est.owner?._id || est.owner || '',
             });
          } catch (err) {
-            setError('Error loading establishment');
+            setError('Error loading establishment', err);
          } finally {
             setLoading(false);
          }

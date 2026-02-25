@@ -1,6 +1,11 @@
-/* ===== ADMIN PANEL - CORPORATE STYLE ===== */
+/* src/pages/admin/styles/admin.css */
 
 /* ── Layout ── */
+
+.admin-layout,
+.admin-page {
+  color: #1e2a3a;
+}
 .admin-layout {
   display: flex;
   min-height: 100vh;
@@ -161,14 +166,12 @@
   align-items: start;
 }
 
-/* ── Columna apilada (varios bloques en vertical dentro de un admin-row) ── */
 .admin-col {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* ── Ancho completo (BasicInfo, Schedule, etc. fuera de admin-row) ── */
 .admin-full {
   width: 100%;
 }
@@ -216,7 +219,8 @@
   margin-bottom: 0;
 }
 
-.admin-field label {
+.admin-field label,
+.admin-label {
   font-size: 0.8rem;
   font-weight: 500;
   color: #475569;
@@ -252,74 +256,24 @@ textarea.admin-input {
   resize: vertical;
 }
 
-/* ── Toggles ── */
-.admin-toggles {
-  display: flex;
-  gap: 20px;
-}
-
-.admin-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1e2a3a;
-}
-
-/* ── Tags ── */
-.admin-tags-input {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.admin-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  min-height: 28px;
-}
-
-.admin-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+/* ── Toggle abierto/cerrado ── */
+.admin-toggle-btn {
   padding: 3px 10px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
   border-radius: 20px;
-  font-size: 0.8rem;
-  color: #1d4ed8;
-}
-
-.admin-tag button {
-  background: none;
   border: none;
   cursor: pointer;
-  color: #93c5fd;
-  font-size: 0.95rem;
-  line-height: 1;
-  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
-.admin-tag button:hover {
-  color: #1d4ed8;
+.admin-toggle-btn.is-open {
+  background: #dcfce7;
+  color: #16a34a;
 }
 
-.admin-tag-add {
-  display: flex;
-  gap: 8px;
-}
-
-.admin-tag-add .admin-input {
-  flex: 1;
-}
-
-.admin-tags-empty {
-  font-size: 0.8rem;
-  color: #94a3b8;
+.admin-toggle-btn.is-closed {
+  background: #fee2e2;
+  color: #dc2626;
 }
 
 /* ── Schedule ── */
@@ -346,6 +300,12 @@ textarea.admin-input {
 .admin-schedule-separator {
   color: #94a3b8;
   font-size: 0.85rem;
+}
+
+.admin-schedule-closed {
+  font-size: 0.8rem;
+  color: #ef4444;
+  font-weight: 500;
 }
 
 .admin-input-time {
@@ -444,7 +404,7 @@ textarea.admin-input {
   border: 1px solid #bbf7d0;
 }
 
-/* ── Loading & Error ── */
+/* ── Loading & Empty ── */
 .admin-loading {
   color: #64748b;
   font-size: 0.9rem;
@@ -457,11 +417,6 @@ textarea.admin-input {
   padding: 16px;
 }
 
-/* ── Items section ── */
-.admin-items-section {
-  margin-top: 8px;
-}
-
 .admin-empty {
   color: #94a3b8;
   font-size: 0.875rem;
@@ -469,34 +424,12 @@ textarea.admin-input {
   padding: 28px;
 }
 
-/* ── Schedule estado cerrado ── */
-.admin-schedule-closed {
-  font-size: 0.8rem;
-  color: #ef4444;
-  font-weight: 500;
+/* ── Items section ── */
+.admin-items-section {
+  margin-top: 8px;
 }
 
-/* ── Toggle abierto/cerrado en schedule ── */
-.admin-toggle-btn {
-  padding: 3px 10px;
-  border-radius: 20px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.admin-toggle-btn.is-open {
-  background: #dcfce7;
-  color: #16a34a;
-}
-
-.admin-toggle-btn.is-closed {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-/* ── MapboxPicker: el mapa ocupa todo el ancho de su contenedor ── */
+/* ── Mapbox ── */
 .admin-map-container {
   width: 100%;
   border-radius: 8px;
@@ -509,7 +442,6 @@ textarea.admin-input {
   height: 350px !important;
 }
 
-/* ── Coordenadas bajo el mapa ── */
 .admin-coords-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -517,6 +449,7 @@ textarea.admin-input {
   margin-top: 10px;
 }
 
+/* ── Responsive ── */
 @media (max-width: 968px) {
   .admin-row {
     grid-template-columns: 1fr;
@@ -530,4 +463,80 @@ textarea.admin-input {
   .admin-sidebar {
     display: none;
   }
+}
+
+.drag-handle {
+   cursor: grab;
+   font-size: 1.1rem;
+   color: #bbb;
+   padding: 4px 6px;
+   display: inline-block;
+   user-select: none;
+   letter-spacing: 2px;
+}
+
+.drag-handle:active {
+   cursor: grabbing;
+   color: #888;
+}
+
+/* ── Tags ── */
+.admin-tags-input {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 32px;
+}
+
+.admin-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.admin-tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #93c5fd;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.admin-tag button:hover {
+  color: #2563eb;
+}
+
+.admin-tags-empty {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.admin-tag-add {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.admin-tag-add .admin-input {
+  flex: 1;
 }

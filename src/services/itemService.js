@@ -89,6 +89,16 @@ export const itemService = {
          throw error;
       }
    },
-}; 
+   reorder: async (items) => {
+      try {
+         const response = await api.patch('/items/reorder', { items });
+         return response.data;
+      } catch (error) {
+         console.error('Error al reordenar items:', error);
+         throw error;
+      }     
+   } 
+
+};
 
 
