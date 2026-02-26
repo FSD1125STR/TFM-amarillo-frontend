@@ -19,7 +19,7 @@ import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
 
 export const Tapas = () => {
    const navigate = useNavigate();
-   const { id } = useParams();
+   const { slug } = useParams();
    const [tapa, setTapa] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
@@ -28,13 +28,13 @@ export const Tapas = () => {
    const [heroImage, setHeroImage] = useState(null);
 
    useEffect(() => {
-      if (id) { loadTapa(); }
-   }, [id]);
+      if (slug) { loadTapa(); }
+   }, [slug]);
 
    const loadTapa = async () => {
       try {
          setLoading(true);
-         const response = await itemService.getById(id);
+         const response = await itemService.getBySlug(slug );
          if (!response || !response.data) {
             setError("Tapa no encontrada");
             return;
@@ -45,7 +45,7 @@ export const Tapas = () => {
          setHeroImage(data.mainImage || null);
 
          // Cargar fotos
-         const fotosData = await photoService.getByItem(id);
+         const fotosData = await photoService.getByItem(data._id);
          const sorted = [...(fotosData || [])].sort((a, b) => a.order - b.order);
          setPhotos(sorted);
       } catch (err) {
@@ -255,7 +255,7 @@ export const Tapas = () => {
             {/* CTA */}
             <div className="mt-8 mb-6">
                <Button
-                  onClick={() => navigate(`/establishment/${tapa.establishment._id}`)}
+                  onClick={() => navigate(`/establishment/${tapa.establishment.slug}`)}
                   className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600"
                >
                   Volver al establecimiento {tapa.establishment.name}

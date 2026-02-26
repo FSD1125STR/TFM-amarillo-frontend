@@ -18,9 +18,9 @@ export default function App() {
                {/* Public routes */}
                <Route path="/" element={<Home />} />
                <Route path="/establishments" element={<AllEstablishment />} />
-               <Route path="/establishment/:id" element={<Establishment />} /> 
+               <Route path="/establishment/:slug" element={<Establishment />} /> 
                <Route path="/items" element={<AllTapas />} />
-               <Route path="/items/:id" element={<Tapas />} />
+               <Route path="/items/:slug" element={<Tapas />} />
 
                {/* Admin routes */}
                <Route path="/admin" element={<AdminPanel />}>

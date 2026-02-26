@@ -76,7 +76,7 @@ export const AllEstablishment = () => {
                            {est.mainImage && (
                               <div
                                  className="md:w-56 h-52 md:h-auto shrink-0 cursor-pointer relative overflow-hidden"
-                                 onClick={() => navigate(`/establishment/${est._id}`)}
+                                 onClick={() => navigate(`/establishment/${est.slug}`)}
                               >
                                  <img
                                     src={est.mainImage}
@@ -91,7 +91,7 @@ export const AllEstablishment = () => {
                            {/* DATOS */}
                            <div
                               className="p-5 flex-1 cursor-pointer flex flex-col justify-between"
-                              onClick={() => navigate(`/establishment/${est._id}`)}
+                              onClick={() => navigate(`/establishment/${est.slug}`)}
                            >
                               <div>
                                  <h2 className="text-xl font-bold text-white hover:text-orange-400 transition-colors">

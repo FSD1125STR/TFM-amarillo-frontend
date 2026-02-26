@@ -15,7 +15,7 @@ export const AllTapas = () => {
    const loadItems = async () => {
       try {
          setLoading(true);
-         const response = await itemService.getAllItemns();
+         const response = await itemService.getAllItems();
          setItems(response.data || []);
       } catch (error) {
          console.error("Error cargando items:", error);
@@ -47,7 +47,7 @@ export const AllTapas = () => {
                      {/* IMAGEN */}
                      <div
                         className="relative cursor-pointer"
-                        onClick={() => navigate(`/items/${item._id}`)}
+                        onClick={() => navigate(`/items/${item.slug}`)}
                      >
                         <img
                            src={item.mainImage || "/fallback.png"}
@@ -56,13 +56,13 @@ export const AllTapas = () => {
                         />
 
                         <div className="absolute top-2 right-2">
-                           {item.isFree || !item.price ? (
+                           {item.modalities[0]?.price === 0 ? (
                               <span className="bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                  Gratis
                               </span>
                            ) : (
                               <span className="bg-neutral-900/90 text-orange-400 text-xs font-bold px-2 py-1 rounded-full border border-orange-500/40">
-                                 €{item.price}
+                                 €{item.modalities[0]?.price}
                               </span>
                            )}
                         </div>
@@ -106,7 +106,7 @@ export const AllTapas = () => {
                            <button
                               onClick={(e) => {
                                  e.stopPropagation();
-                                 navigate(`/establishment/${item.establishment?._id}`);
+                                 navigate(`/establishment/${item.establishment?.slug}`);
                               }}
                               className="mt-1.5 w-full text-xs py-1.5 rounded-lg bg-neutral-800 hover:bg-orange-500 text-neutral-400 hover:text-white transition-colors duration-200"
                            >

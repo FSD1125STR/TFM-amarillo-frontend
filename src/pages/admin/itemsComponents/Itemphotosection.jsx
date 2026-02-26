@@ -2,7 +2,7 @@
 
 // src/pages/admin/itemsComponents/ItemPhotoSection.jsx
 // Componente para gestionar las fotos de un establecimiento: subir, eliminar, ordenar y marcar principal
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';// React DnD Kit para drag & drop
 import {
    DndContext,
    closestCenter,

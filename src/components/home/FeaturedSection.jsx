@@ -23,11 +23,11 @@ export const FeaturedSection = () => {
       try {
          setLoading(true);
          setError(null);
-         // Ojo: Asegúrate de que en itemService se llame getAllItems (sin la 'n' extra)
          const response = await itemService.getTopRatedItems(); 
+         console.log("Respuesta de tapas destacadas:", response);
          setFeaturedItems(response.data || response);
       } catch (err) {
-         setError("Error al cargar las tapas destacadas.");
+         setError("Error al cargar las tapas destacadas.", err);
       } finally {
          setLoading(false);
       }
@@ -63,14 +63,14 @@ export const FeaturedSection = () => {
                {featuredItems.map((item, index) => (
                   
                   <Card key={item.id || index}
-                     onClick={() => navigate(`/items/${item._id || item.id}`)}
+                     onClick={() => navigate(`/items/${item.slug}`)}
                      className="cursor-pointer hover:shadow-lg transition-shadow"
                   >
                      <img src={item.mainImage} alt={item.name} className="h-32 w-full object-cover" />
                      
                      <div className="p-2">
                         <p className="font-semibold">{item.name}</p>
-                        <p className="text-orange-400">{item.price > 0 ? `${item.price}€` : "Gratis"}</p>
+                        <p className="text-orange-400">{item.modalities[0]?.price > 0 ? `${item.modalities[0].price}€` : "Gratis"}</p>
                      </div>
                   </Card>
                ))}

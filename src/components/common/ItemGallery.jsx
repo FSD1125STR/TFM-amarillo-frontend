@@ -48,7 +48,7 @@ export const ItemGallery = ({ establishmentId }) => {
          {items.map((item) => (
             <button
                key={item._id}
-               onClick={() => navigate(`/items/${item._id}`)}
+               onClick={() => navigate(`/items/${item.slug}`)}
                className="
           group relative 
           flex-none 

@@ -25,7 +25,7 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export const Establishment = () => {
    const navigate = useNavigate();
-   const { id } = useParams();
+   const { slug } = useParams();
 
    const [establishment, setEstablishment] = useState(null);
    const [loading, setLoading] = useState(true);
@@ -36,15 +36,15 @@ export const Establishment = () => {
 
    useEffect(() => {
       loadEstablishmentData();
-   }, [id]);
+   }, [slug]);
 
    const loadEstablishmentData = async () => {
       try {
          setLoading(true);
          setError(null);
-         const response = await establishmentService.getById(id);
+         const response = await establishmentService.getBySlug(slug);
          setEstablishment(response.data);
-         const photosResponse = await photoService.getByEstablishment(id);
+         const photosResponse = await photoService.getByEstablishment(response.data._id);
          setPhotos(photosResponse || []);
       } catch (err) {
          console.error('Error cargando establecimiento:', err);
@@ -166,6 +166,7 @@ export const Establishment = () => {
                         className="h-20 w-32 object-cover rounded-lg shrink-0"
                      />
                   ))
+
                ) : (
                   <img
                      src={cloudinaryPresets.thumbnail(establishment.mainImage)}

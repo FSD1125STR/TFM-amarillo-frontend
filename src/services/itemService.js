@@ -3,6 +3,7 @@
 //src/services/itemService.js
 //ItemService.js - Servicio para manejar operaciones relacionadas con items (tapas) en el frontend
 //import { getTopRatedItems } from '../../../TFM-amarillo-backend/src/controllers/itemController';
+
 import { api } from './api';// Importamos la instancia de axios configurada en api.js
 
 export const itemService = {
@@ -24,7 +25,7 @@ export const itemService = {
          throw error;
       }
    },
-   getAllItemns: async (filters = {}) => {
+   getAllItems: async (filters = {}) => {
       try {
          const params = new URLSearchParams();  
          if (filters.type) {params.append('type', filters.type);}
@@ -49,6 +50,32 @@ export const itemService = {
          throw error;
       }
    }, 
+
+   getBySlug: async (slug) => {
+      try {
+         const response = await api.get(`/items/slug/${slug}`); 
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener item por slug:', error);
+         throw error;
+      }
+   },
+
+   getByEstablishmentSlug: async (slug, filters = {}) => {
+      try {
+         const params = new URLSearchParams();  
+         if (filters.type) {params.append('type', filters.type);}
+         if (filters.available !== undefined) {params.append('available', filters.available);}  
+         if (filters.featured !== undefined) {params.append('featured', filters.featured);}
+         const queryString = params.toString();
+         const url = `/items/establishment/slug/${slug}${queryString ? `?${queryString}` : ''}`;
+         const response = await api.get(url);
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener items por slug de establecimiento:', error);
+         throw error;
+      }
+   },
 
    getById: async (itemId) => {
       try {

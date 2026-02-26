@@ -10,29 +10,28 @@
 }
 
 /* ── Layout dos columnas ── */
-/* Usamos flex en lugar de grid para evitar conflictos con admin-row */
 .iph-layout {
    display: flex;
    flex-direction: row;
-   gap: 16px;
+   gap: 20px; /* Un poco más de aire entre columnas */
    align-items: flex-start;
    width: 100%;
    box-sizing: border-box;
 }
 
-/* ── Columna izquierda: tamaño fijo ── */
+/* ── Columna izquierda: Aumentada al 40% para mayor jerarquía ── */
 .iph-col-main {
-   flex: 0 0 180px;
-   width: 180px;
-   min-width: 180px;
+   flex: 0 0 40%;
+   width: 40%;
+   min-width: 40%;
    display: flex;
    flex-direction: column;
-   gap: 8px;
+   gap: 12px;
 }
 
 .iph-main-img-wrapper {
-   width: 180px;
-   height: 150px;
+   width: 100%;
+   height: 250px; /* Aumentado de 150px a 250px */
    border-radius: 8px;
    overflow: hidden;
    background: #f3f4f6;
@@ -54,20 +53,21 @@
    flex-direction: column;
    align-items: center;
    justify-content: center;
-   gap: 6px;
+   gap: 8px;
    color: #9ca3af;
 }
 
-.iph-main-empty span { font-size: 1.8rem; opacity: 0.4; }
-.iph-main-empty p { font-size: 0.78rem; margin: 0; }
+.iph-main-empty span { font-size: 2rem; opacity: 0.4; }
+.iph-main-empty p { font-size: 0.85rem; margin: 0; }
 
 .iph-upload-btn {
-   width: 180px !important;
+   width: 100% !important;
+   max-width: 200px;
    box-sizing: border-box;
    justify-content: center;
 }
 
-/* ── Columna derecha: ocupa el resto ── */
+/* ── Columna derecha: Ocupa el 60% restante ── */
 .iph-col-thumbs {
    flex: 1 1 auto;
    min-width: 0;
@@ -80,7 +80,7 @@
    display: flex;
    align-items: center;
    justify-content: center;
-   height: 150px;
+   height: 250px; /* Sincronizado con la altura de la imagen principal */
    background: #f9fafb;
    border: 1px dashed #d1d5db;
    border-radius: 8px;
@@ -88,11 +88,11 @@
    font-size: 0.82rem;
 }
 
-/* ── Grid miniaturas: 3 columnas ── */
+/* ── Grid miniaturas: 4 columnas para que sean más pequeñas ── */
 .iph-thumbs-grid {
    display: grid;
-   grid-template-columns: repeat(3, 1fr);
-   gap: 6px;
+   grid-template-columns: repeat(4, 1fr); 
+   gap: 8px;
    width: 100%;
 }
 
@@ -100,7 +100,7 @@
 .iph-thumb {
    position: relative;
    width: 100%;
-   padding-bottom: 100%; /* truco para aspect-ratio 1:1 sin depender de aspect-ratio */
+   padding-bottom: 100%; /* Mantiene proporción 1:1 */
    height: 0;
    border-radius: 6px;
    overflow: hidden;
@@ -158,12 +158,12 @@
    background: rgba(255, 255, 255, 0.92);
    border: none;
    border-radius: 6px;
-   width: 28px;
-   height: 28px;
+   width: 26px; /* Ligeramente más pequeños para miniaturas más pequeñas */
+   height: 26px;
    display: flex;
    align-items: center;
    justify-content: center;
-   font-size: 0.8rem;
+   font-size: 0.75rem;
    cursor: pointer;
    transition: background 0.1s, transform 0.1s;
    line-height: 1;
@@ -183,7 +183,7 @@
 }
 
 .iph-drag-hint {
-   font-size: 0.75rem;
+   font-size: 0.72rem;
    color: #9ca3af;
    margin: 0;
    text-align: center;
@@ -211,7 +211,7 @@
 
 .iph-estab-main-wrapper {
    width: 100%;
-   height: 200px;
+   height: 250px; /* Aumentado también aquí para consistencia */
    border-radius: 8px;
    overflow: hidden;
    background: #f3f4f6;

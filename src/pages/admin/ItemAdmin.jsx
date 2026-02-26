@@ -172,7 +172,7 @@ export const ItemAdmin = () => {
 
             <div className="admin-form-footer">
                <SaveButton saving={saving} />
-               {!isNew && <ViewItemInAppButton id={id} />}
+               {!isNew && <ViewItemInAppButton slug={item?.slug} />}
             </div>
 
          </form>

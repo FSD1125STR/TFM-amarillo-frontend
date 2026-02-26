@@ -53,7 +53,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
    const [loading, setLoading] = useState(!isNew);
    const [saving, setSaving] = useState(false);
    const [error, setError] = useState(null);
-   const [successMsg, setSuccessMsg] = useState(null);
+   const [successMsg, setSuccessMsg] = useState(null);// Mensaje de éxito después de guardar
    const [form, setForm] = useState(EMPTY_FORM);
 
    useEffect(() => {
@@ -171,7 +171,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
             <h1 className="admin-title">
                {isNew ? 'Nuevo Establecimiento' : `Editar: ${form.name}`}
             </h1>
-            {!isNew && <ViewInAppButton id={id} />}
+            {!isNew && <ViewInAppButton slug={form.slug} />}
          </div>
 
          {error && <div className="admin-alert admin-alert-error">{error}</div>}
@@ -265,7 +265,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
             </div>
          )}
 
-         {!isNew && <ViewInAppButton id={id} />}
+         {!isNew && <ViewInAppButton slug={form.slug} />}
 
       </div>
    );

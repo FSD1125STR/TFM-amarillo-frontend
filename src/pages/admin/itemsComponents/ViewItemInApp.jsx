@@ -4,13 +4,13 @@
 // Botón para ver la tapa en la app
 import { memo } from 'react';
 
-export const ViewItemInAppButton = memo(({ id }) => {
-   if (!id) {return null;}
+export const ViewItemInAppButton = memo(({ slug }) => {
+   if (!slug) {return null;}
 
    return (
        
       <a
-         href={`/items/${id}`}
+         href={`/items/${slug}`}
          target="_blank"
          rel="noopener noreferrer"
          className="admin-btn admin-btn-secondary admin-btn-sm"
