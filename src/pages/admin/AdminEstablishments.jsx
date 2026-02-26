@@ -66,7 +66,7 @@ export const AdminEstablishments = () => {
                      <th>Provincia</th>
                      <th>Activo</th>
                      <th>Verificado</th>
-                     <th>Acciones</th>
+                     <th>Acción</th>
                   </tr>
                </thead>
                <tbody>

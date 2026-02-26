@@ -540,3 +540,53 @@ textarea.admin-input {
 .admin-tag-add .admin-input {
   flex: 1;
 }
+
+.admin-schedule-times {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   gap: 10px;
+   flex: 1;
+   flex-wrap: wrap;  
+}
+.admin-schedule-shift {
+   display: flex;
+   align-items: center;
+   gap: 8px;
+}
+
+.admin-schedule-shift-label {
+   font-size: 0.75rem;
+   color: var(--admin-text-muted);
+   width: 52px;
+   flex-shrink: 0;
+}
+
+.admin-schedule-closed-label {
+   font-size: 0.85rem;
+   color: var(--admin-text-muted);
+}
+.admin-toggle-split {
+   padding: 3px 10px;
+   border-radius: 20px;
+   border: 1px dashed #cbd5e1;
+   cursor: pointer;
+   font-size: 0.78rem;
+   font-weight: 600;
+   background: transparent;
+   color: #94a3b8;
+   transition: all 0.15s;
+   white-space: nowrap;
+}
+
+.admin-toggle-split:hover {
+   border-color: #2563eb;
+   color: #2563eb;
+}
+
+.admin-toggle-split.is-active {
+   background: #eff6ff;
+   border-color: #2563eb;
+   border-style: solid;
+   color: #2563eb;
+}

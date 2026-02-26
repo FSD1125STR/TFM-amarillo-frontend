@@ -82,7 +82,7 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
                   onChange={e => e.target.value = ""} // solo lectura
                >
                   <option value="" disabled>
-                     {item.modalities.length} presentaciones
+                     {item.modalities.length} Opciones
                   </option>
                   {item.modalities.map((m, i) => (
                      <option key={i} disabled>
@@ -118,12 +118,12 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
                >
                   Editar
                </button>
-               <button
+               {/* <button
                   className="admin-btn admin-btn-secondary admin-btn-sm"
                   onClick={() => onToggleAvailable(item._id, item.available)}
                >
                   {item.available ? 'Desactivar' : 'Activar'}
-               </button>
+               </button> */}
                <button
                   className="admin-btn admin-btn-danger admin-btn-sm"
                   onClick={() => onDelete(item._id)}

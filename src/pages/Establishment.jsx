@@ -19,6 +19,7 @@ import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { photoService } from "../services/photoService.js";
 import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
+import { ScheduleDisplay } from "../components/common/ScheduleDisplay";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -276,14 +277,7 @@ export const Establishment = () => {
             {/* HORARIOS */}
             {establishment.schedule && Object.keys(establishment.schedule).length > 0 && (
                <Section title="Horarios">
-                  {Object.entries(establishment.schedule).map(([day, hours]) => (
-                     <div key={day} className="flex justify-between text-sm mb-1">
-                        <span className="capitalize font-medium">{day}:</span>
-                        <span className="text-neutral-600">
-                           {hours.closed ? 'Cerrado' : `${hours.open} - ${hours.close}`}
-                        </span>
-                     </div>
-                  ))}
+                  <ScheduleDisplay schedule={establishment.schedule} />
                </Section>
             )}
 
