@@ -1,3 +1,7 @@
+
+
+// src/pages/Tapas.jsx
+// Página para mostrar los detalles de una tapa/item específico
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -7,28 +11,41 @@ import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
 
 import { itemService } from "../services/itemService";
+import { photoService } from "../services/photoService";
 import { ItemGallery } from "../components/common/ItemGallery";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
 
 export const Tapas = () => {
    const navigate = useNavigate();
-   const { id } = useParams();
+   const { slug } = useParams();
    const [tapa, setTapa] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
 
+   const [photos, setPhotos] = useState([]);
+   const [heroImage, setHeroImage] = useState(null);
+
    useEffect(() => {
-      if (id) loadTapa();
-   }, [id]);
+      if (slug) { loadTapa(); }
+   }, [slug]);
 
    const loadTapa = async () => {
       try {
          setLoading(true);
-         const response = await itemService.getById(id);
+         const response = await itemService.getBySlug(slug );
          if (!response || !response.data) {
             setError("Tapa no encontrada");
             return;
          }
-         setTapa(response.data);
+         const data = response.data;
+         setTapa(data);
+         console.log("Tapa cargada:", data);
+         setHeroImage(data.mainImage || null);
+
+         // Cargar fotos
+         const fotosData = await photoService.getByItem(data._id);
+         const sorted = [...(fotosData || [])].sort((a, b) => a.order - b.order);
+         setPhotos(sorted);
       } catch (err) {
          console.error("Error al cargar la tapa:", err);
          setError("No se pudo cargar la tapa.");
@@ -36,6 +53,9 @@ export const Tapas = () => {
          setLoading(false);
       }
    };
+
+   // Imagen del hero: la que el usuario ha clicado, o la principal al recargar
+   const primaryImage = photos.find(p => p.isPrimary)?.url || tapa?.mainImage || "/fallback.png";
 
    if (loading) {
       return (
@@ -102,15 +122,63 @@ export const Tapas = () => {
             </div>
          </div>
 
+         {/* MINIATURAS DE FOTOS DE CLIENTES */}
+         {photos.length > 1 && (
+            <div className="max-w-3xl mx-auto px-4 mt-3">
+               <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">
+                  Fotos de clientes
+               </p>
+               <div className="flex gap-2 overflow-x-auto pb-1
+                  [&::-webkit-scrollbar]:h-1.5
+                  [&::-webkit-scrollbar-track]:bg-neutral-100
+                  [&::-webkit-scrollbar-track]:rounded-full
+                  [&::-webkit-scrollbar-thumb]:bg-neutral-300
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  [scrollbar-width:thin]
+               ">
+                  {photos.map(photo => (
+                     <button
+                        key={photo._id}
+                        // Al clicar guardamos la URL original, el hero la optimiza con el preset
+                        onClick={() => setHeroImage(photo.url)}
+                        className={`flex-none w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200
+                           ${heroImage === photo.url
+                        ? 'border-orange-500 opacity-100 scale-105'
+                        : 'border-transparent opacity-60 hover:opacity-90'
+                     }`}
+                     >
+                        <img
+                           // thumbnail: 200x150 fill — más que suficiente para w-16 h-16
+                           src={cloudinaryPresets.thumbnail(photo.url)}
+                           alt=""
+                           className="w-full h-full object-cover"
+                        />
+                     </button>
+                  ))}
+               </div>
+            </div>
+         )}
+
          <Container>
             {/* TITLE */}
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-start mt-4">
                <h1 className="text-3xl font-bold">{tapa.name}</h1>
-               {tapa.isFree && (
-                  <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse">
-                     Tapa Gratis
-                  </span>
-               )}
+
+               <div style={{ textAlign: 'right' }}>
+                  {tapa.modalities
+                     ?.filter(m => m.available)
+                     .map((mod, i) => (
+                        <div key={i} style={{ marginBottom: '0.25rem' }}>
+                           {mod.isFree ? (
+                              <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse">
+                                 Tapa Gratis
+                              </span>
+                           ) : (
+                              ''
+                           )}
+                        </div>
+                     ))}
+               </div>
             </div>
 
             {/* DESCRIPTION */}
@@ -211,46 +279,33 @@ export const Tapas = () => {
 
 
             {/* DISPONIBILIDAD */}
-            {(() => {
-               const ALL_DAYS = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo"];
-               const LABELS = { lunes: "Lunes", martes: "Martes", miercoles: "Miérc.", jueves: "Jueves", viernes: "Viernes", sabado: "Sábado", domingo: "Domingo" };
-               const activeDays = tapa.specialDays || [];
-               return (
-                  <div className="mt-6 bg-neutral-900 rounded-xl p-3 border border-neutral-800">
-                     <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide">Disponibilidad</p>
-                        <span className={`text-xs font-bold px-2.5 py-0.5 rounded-full ${
-                           tapa.available
-                              ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                              : "bg-red-500/20 text-red-400 border border-red-500/30"
-                        }`}>
-                           {tapa.available ? "● Disponible" : "● No disponible"}
-                        </span>
-                     </div>
-                     <div className="flex justify-between gap-1">
-                        {ALL_DAYS.map((day) => {
-                           const active = activeDays.includes(day);
+            <Section title="Disponibilidad">
+               <p>
+                  {!tapa.available ? (
+                     "No disponible"
+                  ) : tapa.specialDays && tapa.specialDays.length > 0 ? (
+                     <>
+                        {(() => {
+                           const hoy = new Date().toLocaleDateString('es-ES', { weekday: 'long' }).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                           const disponibleHoy = tapa.specialDays.includes(hoy);
                            return (
-                              <div key={day} className={`flex-1 rounded-lg py-1.5 flex items-center justify-center ${
-                                 active
-                                    ? "bg-orange-500/15 border border-orange-500/40"
-                                    : "bg-neutral-800 border border-transparent"
-                              }`}>
-                                 <span className={`text-center leading-tight ${
-                                    active ? "text-orange-400 font-semibold" : "text-neutral-600"
-                                 }`} style={{ fontSize: "9px" }}>
-                                    {LABELS[day]}
+                              <>
+                                 <span style={{ color: disponibleHoy ? '#16a34a' : '#dc2626', fontWeight: 600 }}>
+                                    {disponibleHoy ? '✓ Disponible hoy' : '✗ No disponible hoy'}
                                  </span>
-                              </div>
+                                 {' — solo disponible los '}
+                                 {tapa.specialDays.join(', ')}
+                              </>
                            );
-                        })}
-                     </div>
-                     {tapa.seasonalItem && (
-                        <p className="text-xs text-orange-400 mt-2.5 text-center">🍂 Item de temporada</p>
-                     )}
-                  </div>
-               );
-            })()}
+                        })()}
+                     </>
+                  ) : (
+                     <span style={{ color: '#16a34a' }}>✓ Disponible todos los días</span>
+                  )}
+                  {' '}
+                  {tapa.seasonalItem && <em style={{ color: '#b45309' }}>(Producto de temporada)</em>}
+               </p>
+            </Section>
 
             {/* RATING */}
             <Section title="Valoración">
@@ -273,7 +328,7 @@ export const Tapas = () => {
             {/* BOTON BAR */}
             <div className="mt-8 mb-6">
                <Button
-                  onClick={() => navigate(`/establishment/${tapa.establishment._id}`)}
+                  onClick={() => navigate(`/establishment/${tapa.establishment.slug}`)}
                   className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600"
                >
                   Volver al establecimiento {tapa.establishment.name}

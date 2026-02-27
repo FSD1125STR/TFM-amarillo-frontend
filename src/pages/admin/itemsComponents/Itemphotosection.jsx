@@ -1,8 +1,8 @@
 
 
-// src/pages/admin/adminComponents/EstablishmentPhotosAdmin.jsx
-// Componente para gestionar las fotos de un establecimiento en el panel admin
-import { useState, useEffect, useRef, useCallback } from 'react';
+// src/pages/admin/itemsComponents/ItemPhotoSection.jsx
+// Componente para gestionar las fotos de un establecimiento: subir, eliminar, ordenar y marcar principal
+import { useState, useEffect, useRef, useCallback } from 'react';// React DnD Kit para drag & drop
 import {
    DndContext,
    closestCenter,
@@ -78,7 +78,7 @@ const SortableThumb = ({ photo, onDelete, onSetPrimary, deletingId }) => {
 };
 
 // ── Componente principal ───────────────────────────────────────────────────
-export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainImageChange }) => {
+export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
    const [photos, setPhotos] = useState([]);
    const [loading, setLoading] = useState(false);
    const [uploading, setUploading] = useState(false);
@@ -95,15 +95,15 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
    );
 
    useEffect(() => {
-      if (establishmentId) { fetchPhotos(); }
-   }, [establishmentId]);
+      if (itemId) { fetchPhotos(); }
+   }, [itemId]);
 
    const fetchPhotos = async () => {
       try {
          setLoading(true);
          setError(null);
-         const res = await photoService.getByEstablishment(establishmentId);
-         const sorted = [...(res || [])].sort((a, b) => a.order - b.order);
+         const data = await photoService.getByItem(itemId);
+         const sorted = [...(data || [])].sort((a, b) => a.order - b.order);
          setPhotos(sorted);
          setOrderChanged(false);
       } catch {
@@ -136,7 +136,7 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
          await photoService.reorder(payload);
          setPhotos(prev => prev.map((p, i) => ({ ...p, order: i })));
          setOrderChanged(false);
-         showSuccess('Orden guardado correctamente');
+         showSuccess('Orden guardado');
       } catch {
          setError('Error al guardar el orden');
       } finally {
@@ -147,17 +147,22 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
    const handleFileChange = async (e) => {
       const file = e.target.files[0];
       if (!file) { return; }
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) { setError('Formato no válido. Usa JPG, PNG o WEBP.'); return; }
-      if (file.size > 5 * 1024 * 1024) { setError('La imagen no puede superar los 5MB.'); return; }
+      if (!file.type.startsWith('image/')) { setError('Solo JPG, PNG o WEBP'); return; }
+      if (file.size > 5 * 1024 * 1024) { setError('Máximo 5MB'); return; }
       try {
          setUploading(true);
          setError(null);
-         await photoService.uploadToEstablishment(file, establishmentId);
+         const isPrimary = photos.length === 0;
+         await photoService.uploadToItem(file, itemId, { isPrimary });
          showSuccess('Foto subida correctamente');
          await fetchPhotos();
-      } catch (err) {
-         setError(err.response?.data?.message || 'Error al subir la foto');
+         if (isPrimary && onMainImageChange) {
+            const updated = await photoService.getByItem(itemId);
+            const primary = updated?.find(p => p.isPrimary);
+            if (primary) { onMainImageChange(primary.url); }
+         }
+      } catch {
+         setError('Error al subir la foto');
       } finally {
          setUploading(false);
          if (fileInputRef.current) { fileInputRef.current.value = ''; }
@@ -189,77 +194,68 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
       }
    };
 
+   if (!itemId) {
+      return (
+         <div className="iph-new-notice">
+            💡 Guarda la tapa primero para poder añadir fotos.
+         </div>
+      );
+   }
+
    const primaryPhoto = photos.find(p => p.isPrimary);
    const displayImage = primaryPhoto?.url || mainImage;
 
    return (
       <div className="iph-wrapper">
-
-         {/* Header con contador y botón */}
-         <div className="iph-estab-header">
-            <span className="iph-count">
-               {photos.length} foto{photos.length !== 1 ? 's' : ''}
-            </span>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-               {orderChanged && (
-                  <button
-                     type="button"
-                     className="admin-btn admin-btn-primary admin-btn-sm"
-                     onClick={handleSaveOrder}
-                     disabled={saving}
-                  >
-                     {saving ? 'Guardando...' : '💾 Guardar orden'}
-                  </button>
-               )}
-               <button
-                  type="button"
-                  className="admin-btn admin-btn-primary admin-btn-sm"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-               >
-                  {uploading ? '⏳ Subiendo...' : '+ Añadir foto'}
-               </button>
-            </div>
-            <input
-               ref={fileInputRef}
-               type="file"
-               accept="image/jpeg,image/jpg,image/png,image/webp"
-               onChange={handleFileChange}
-               style={{ display: 'none' }}
-            />
-         </div>
-
          {error && <div className="admin-alert admin-alert-error">{error}</div>}
          {successMsg && <div className="admin-alert admin-alert-success">{successMsg}</div>}
-         {loading && <p className="admin-loading">Cargando fotos...</p>}
 
-         {!loading && (
-            <div className="iph-estab-layout">
+         {loading ? (
+            <p className="admin-loading">Cargando fotos...</p>
+         ) : (
+            <div className="iph-layout">
 
-               {/* Imagen principal — ancho completo */}
-               <div className="iph-estab-main-wrapper">
-                  {displayImage ? (
-                     <img
-                        // preset gallery: 800x600 limit, WebP automático
-                        src={cloudinaryPresets.gallery(displayImage)}
-                        alt="Imagen principal"
-                        className="iph-estab-main-img"
-                     />
-                  ) : (
-                     <div className="iph-main-empty">
-                        <span>📷</span>
-                        <p>Sin imagen principal</p>
-                     </div>
-                  )}
+               {/* Columna izquierda: foto principal + botón */}
+               <div className="iph-col-main">
+                  <div className="iph-main-img-wrapper">
+                     {displayImage ? (
+                        <img
+                           // preset tapaDetail: 800x600 limit, WebP automático
+                           src={cloudinaryPresets.tapaDetail(displayImage)}
+                           alt="Imagen principal"
+                           className="iph-main-img"
+                        />
+                     ) : (
+                        <div className="iph-main-empty">
+                           <span>📷</span>
+                           <p>Sin imagen</p>
+                        </div>
+                     )}
+                  </div>
+                  <input
+                     ref={fileInputRef}
+                     type="file"
+                     accept="image/jpeg,image/jpg,image/png,image/webp"
+                     onChange={handleFileChange}
+                     style={{ display: 'none' }}
+                  />
+                  <button
+                     type="button"
+                     className="admin-btn admin-btn-primary iph-upload-btn"
+                     onClick={() => fileInputRef.current?.click()}
+                     disabled={uploading}
+                  >
+                     {uploading ? '⏳ Subiendo...' : '+ Añadir foto'}
+                  </button>
                </div>
 
-               {/* Miniaturas */}
-               {photos.length === 0 ? (
-                  <div className="iph-thumbs-empty">
-                     <p>No hay fotos todavía. Añade la primera usando el botón de arriba.</p>
-                  </div>
-               ) : (
-                  <>
+               {/* Columna derecha: miniaturas + drag footer */}
+               <div className="iph-col-thumbs">
+                  {photos.length === 0 ? (
+                     <div className="iph-thumbs-empty">
+                        <p>Las fotos aparecerán aquí</p>
+                     </div>
+                  ) : (
                      <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
@@ -282,18 +278,23 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
                            </div>
                         </SortableContext>
                      </DndContext>
+                  )}
 
-                     <div className="iph-drag-footer">
+                  <div className="iph-drag-footer">
+                     {orderChanged ? (
+                        <button
+                           type="button"
+                           className="admin-btn admin-btn-primary admin-btn-sm"
+                           onClick={handleSaveOrder}
+                           disabled={saving}
+                        >
+                           {saving ? 'Guardando...' : '💾 Guardar orden'}
+                        </button>
+                     ) : (
                         <p className="iph-drag-hint">⠿ Arrastra para cambiar el orden</p>
-                     </div>
-                  </>
-               )}
-
-               {uploading && (
-                  <div className="iph-uploading">
-                     ⏳ Subiendo imagen a Cloudinary...
+                     )}
                   </div>
-               )}
+               </div>
 
             </div>
          )}

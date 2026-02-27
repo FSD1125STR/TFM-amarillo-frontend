@@ -34,7 +34,7 @@ export default function NearbySection() {
       );
    };
 
-   if (!establishments.length) return null;
+   if (!establishments.length) {return null;}
 
    return (
       <section className="px-4 mt-8">
@@ -52,14 +52,14 @@ export default function NearbySection() {
 
          <div className="relative w-full max-w-md mx-auto overflow-hidden"/>
 
-            {/* SLIDES */}
-            <div className="relative w-full overflow-hidden">
-               <div
-                  className="flex transition-transform duration-500 ease-in-out"
-                  style={{
-                     transform: `translateX(-${currentIndex * 100}%)`,
-                  }}
-                  >  
+         {/* SLIDES */}
+         <div className="relative w-full overflow-hidden">
+            <div
+               className="flex transition-transform duration-500 ease-in-out"
+               style={{
+                  transform: `translateX(-${currentIndex * 100}%)`,
+               }}
+            >  
                {establishments.map((establishment) => (
                   <div
                      key={establishment._id}
@@ -67,7 +67,7 @@ export default function NearbySection() {
                   >
                      <div
                         onClick={() =>
-                           navigate(`/establishment/${establishment._id}`)
+                           navigate(`/establishment/${establishment.slug}`)
                         }
                         className="bg-neutral-900 rounded-2xl overflow-hidden cursor-pointer hover:scale-[1.02] transition-transform duration-300 shadow-lg"
                      >

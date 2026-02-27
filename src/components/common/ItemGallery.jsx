@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { itemService } from '../../services/itemService.js';
 
-const DEFAULT_IMAGE = 'https://placehold.co/400x400/f5f5f0/a3a3a3?text=🍽️';
+const DEFAULT_IMAGE = '/Logo.jpg';
 
 export const ItemGallery = ({ establishmentId }) => {
    const [items, setItems] = useState([]);
@@ -17,8 +17,8 @@ export const ItemGallery = ({ establishmentId }) => {
                available: true
             });
             setItems(response.data);
-         } catch (err) {
-            console.error('Error al cargar galería:', err);
+         } catch (error) {
+            console.error('Error fetching items:', error);
          } finally {
             setLoading(false);
          }
@@ -48,7 +48,7 @@ export const ItemGallery = ({ establishmentId }) => {
          {items.map((item) => (
             <button
                key={item._id}
-               onClick={() => navigate(`/items/${item._id}`)}
+               onClick={() => navigate(`/items/${item.slug}`)}
                className="
           group relative 
           flex-none 
@@ -64,7 +64,7 @@ export const ItemGallery = ({ establishmentId }) => {
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                   onError={(e) => { e.currentTarget.src = DEFAULT_IMAGE; }}
                />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+               <div className="absolute inset-0  from-black/60 to-transparent flex items-end">
                   <p className="text-white text-[10px] md:text-xs font-medium p-2 md:p-3 line-clamp-1 w-full text-left">
                      {item.name}
                   </p>

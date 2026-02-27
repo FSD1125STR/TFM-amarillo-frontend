@@ -1,3 +1,5 @@
+
+
 // src/pages/admin/AdminEstablishmentDetail.jsx
 // Página de detalle/edición de un establecimiento en el panel de administración
 
@@ -6,7 +8,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { establishmentService } from '../../services/establishmentService';
 import './styles/admin.css';
 
-import { EstablishmentItems } from './adminComponents/ItemsAdmin';
+import { EstablishmentItems } from './adminComponents/EstablishmentItemsAdmin';
 import { EstablishmentStatus } from './adminComponents/StatusAdmin';
 import { BasicInformationAdmin } from './adminComponents/BasicInformationAdmin';
 import { CuisineTypeAdmin } from './adminComponents/CuisineTypeAdmin';
@@ -18,7 +20,35 @@ import { FeaturesAdmin } from './adminComponents/FeaturesAdmin';
 import { ViewInAppButton } from './adminComponents/ViewInAppButton';
 import { EstablishmentPhotosAdmin } from './adminComponents/EstablishmentPhotosAdmin';
 
-const EMPTY_FORM = { // Estructura inicial vacía para un nuevo establecimiento
+// ── Helpers de horario ─────────────────────────────────────────────────────────
+
+/**
+ * Crea un objeto de día con el nuevo schema.
+ * Por defecto: abierto de 09:00 a 00:00, sin horario partido.
+ */
+const makeDay = (closed = false, open = '09:00', close = '00:00') => ({
+   open,
+   close,
+   split: false,
+   afternoon: { open: '', close: '' },
+   closed,
+});
+
+/**
+ * Mapea un día existente (puede venir sin split/afternoon) al nuevo schema.
+ * Garantiza compatibilidad con datos guardados antes del cambio.
+ */
+const mapDay = (d) => ({
+   open:      d?.open      || '',
+   close:     d?.close     || '',
+   split:     d?.split     ?? false,
+   afternoon: d?.afternoon ?? { open: '', close: '' },
+   closed:    d?.closed    ?? true,
+});
+
+// ── Formulario vacío (default para nuevo establecimiento) ──────────────────────
+
+const EMPTY_FORM = {
    name: '',
    slug: '',
    description: '',
@@ -31,13 +61,13 @@ const EMPTY_FORM = { // Estructura inicial vacía para un nuevo establecimiento
    email: '',
    website: '',
    schedule: {
-      lunes:     { open: '', close: '', closed: true },
-      martes:    { open: '', close: '', closed: true },
-      miercoles: { open: '', close: '', closed: true },
-      jueves:    { open: '', close: '', closed: true },
-      viernes:   { open: '', close: '', closed: true },
-      sabado:    { open: '', close: '', closed: true },
-      domingo:   { open: '', close: '', closed: true },
+      lunes:     makeDay(true),           // Lunes cerrado por defecto
+      martes:    makeDay(false),          // Mar–Dom: 09:00–00:00
+      miercoles: makeDay(false),
+      jueves:    makeDay(false),
+      viernes:   makeDay(false),
+      sabado:    makeDay(false),
+      domingo:   makeDay(false),
    },
    features: [],
    priceRange: '€€',
@@ -46,68 +76,76 @@ const EMPTY_FORM = { // Estructura inicial vacía para un nuevo establecimiento
    active: true,
 };
 
-export const AdminEstablishmentDetail = () => { // Componente principal para crear/editar un establecimiento en el panel admin
+// ── Componente principal ───────────────────────────────────────────────────────
+
+export const AdminEstablishmentDetail = () => {
    const { id } = useParams();
    const navigate = useNavigate();
    const isNew = id === 'new';
-   const [loading, setLoading] = useState(!isNew);
-   const [saving, setSaving] = useState(false);
-   const [error, setError] = useState(null);
+
+   const [loading, setLoading]     = useState(!isNew);
+   const [saving, setSaving]       = useState(false);
+   const [error, setError]         = useState(null);
    const [successMsg, setSuccessMsg] = useState(null);
-   const [form, setForm] = useState(EMPTY_FORM);
+   const [form, setForm]           = useState(EMPTY_FORM);
+
+   // ── Carga del establecimiento existente ──────────────────────────────────────
 
    useEffect(() => {
-      if (isNew) {return;}
+      if (isNew) { return; }
 
       const load = async () => {
          try {
             setLoading(true);
             const res = await establishmentService.getById(id);
             const est = res.data;
+
             setForm({
-               name: est.name || '',
-               slug: est.slug || '',
+               name:        est.name        || '',
+               slug:        est.slug        || '',
                description: est.description || '',
-               mainImage: est.mainImage || est.image || '',
-               type: est.type || 'bar',
+               mainImage:   est.mainImage   || est.image || '',
+               type:        est.type        || 'bar',
                cuisineType: est.cuisineType || [],
                address: {
-                  street: est.address?.street || '',
-                  number: est.address?.number || '',
-                  city: est.address?.city || '',
-                  province: est.address?.province || '',
+                  street:     est.address?.street     || '',
+                  number:     est.address?.number     || '',
+                  city:       est.address?.city       || '',
+                  province:   est.address?.province   || '',
                   postalCode: est.address?.postalCode || '',
-                  country: est.address?.country || 'España',
+                  country:    est.address?.country    || 'España',
                },
                location: { type: 'Point', coordinates: est.location?.coordinates || [0, 0] },
-               phone: est.phone || '',
-               email: est.email || '',
+               phone:   est.phone   || '',
+               email:   est.email   || '',
                website: est.website || '',
+               // mapDay garantiza compatibilidad con documentos sin split/afternoon
                schedule: {
-                  lunes:     { open: est.schedule?.lunes?.open || '',     close: est.schedule?.lunes?.close || '',     closed: est.schedule?.lunes?.closed ?? true },
-                  martes:    { open: est.schedule?.martes?.open || '',    close: est.schedule?.martes?.close || '',    closed: est.schedule?.martes?.closed ?? true },
-                  miercoles: { open: est.schedule?.miercoles?.open || '', close: est.schedule?.miercoles?.close || '', closed: est.schedule?.miercoles?.closed ?? true },
-                  jueves:    { open: est.schedule?.jueves?.open || '',    close: est.schedule?.jueves?.close || '',    closed: est.schedule?.jueves?.closed ?? true },
-                  viernes:   { open: est.schedule?.viernes?.open || '',   close: est.schedule?.viernes?.close || '',   closed: est.schedule?.viernes?.closed ?? true },
-                  sabado:    { open: est.schedule?.sabado?.open || '',    close: est.schedule?.sabado?.close || '',    closed: est.schedule?.sabado?.closed ?? true },
-                  domingo:   { open: est.schedule?.domingo?.open || '',   close: est.schedule?.domingo?.close || '',   closed: est.schedule?.domingo?.closed ?? true },
+                  lunes:     mapDay(est.schedule?.lunes),
+                  martes:    mapDay(est.schedule?.martes),
+                  miercoles: mapDay(est.schedule?.miercoles),
+                  jueves:    mapDay(est.schedule?.jueves),
+                  viernes:   mapDay(est.schedule?.viernes),
+                  sabado:    mapDay(est.schedule?.sabado),
+                  domingo:   mapDay(est.schedule?.domingo),
                },
-               features: est.features || [], 
+               features:   est.features   || [],
                priceRange: est.priceRange || '',
-               verified: est.verified || false,
-               active: est.active !== undefined ? est.active : true,
-               owner: est.owner?._id || est.owner || '',
+               verified:   est.verified   || false,
+               active:     est.active !== undefined ? est.active : true,
+               owner:      est.owner?._id || est.owner || '',
             });
          } catch (err) {
-            setError('Error loading establishment');
+            setError('Error al cargar el establecimiento', err);
          } finally {
             setLoading(false);
          }
       };
+
       load();
    }, [id]);
 
-   // ── Handlers ───────────────────────────────────────────────────────
+   // ── Handlers ─────────────────────────────────────────────────────────────────
 
    const handleChange = (e) => {
       const { name, value, type, checked } = e.target;
@@ -119,11 +157,35 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
       setForm(prev => ({ ...prev, address: { ...prev.address, [name]: value } }));
    };
 
+   /**
+    * Actualiza un campo de un día del horario.
+    * Soporta campos planos (open, close, closed, split) y el objeto anidado afternoon.
+    *
+    * Para afternoon se pasa un objeto parcial, p.ej: { open: '17:00' }
+    * y se hace merge con el estado anterior para no perder el otro campo.
+    */
    const handleScheduleChange = (day, field, value) => {
-      setForm(prev => ({
-         ...prev,
-         schedule: { ...prev.schedule, [day]: { ...prev.schedule[day], [field]: value } }// 
-      }));
+      setForm(prev => {
+         const prevDay = prev.schedule[day] || {};
+         const updatedDay = field === 'afternoon'
+            ? {
+               ...prevDay,
+               afternoon: {
+                  open:  prevDay.afternoon?.open  || '',
+                  close: prevDay.afternoon?.close || '',
+                  ...value, // merge parcial: { open: v } o { close: v }
+               },
+            }
+            : { ...prevDay, [field]: value };
+
+         return {
+            ...prev,
+            schedule: {
+               ...prev.schedule,
+               [day]: updatedDay, // nueva referencia → memo re-renderiza
+            },
+         };
+      });
    };
 
    const handleMapCoordinates = (newCoords) => {
@@ -138,7 +200,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
       setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: newCoords } }));
    };
 
-   const handleSubmit = async (e) => { 
+   const handleSubmit = async (e) => {
       e.preventDefault();
       setError(null);
       setSuccessMsg(null);
@@ -160,21 +222,23 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
       }
    };
 
-   if (loading) {return <p className="admin-loading">Loading...</p>;}
+   // ── Render ────────────────────────────────────────────────────────────────────
+
+   if (loading) { return <p className="admin-loading">Cargando...</p>; }
 
    return (
       <div className="admin-page">
          <div className="admin-page-header">
             <button className="admin-btn admin-btn-secondary" onClick={() => navigate('/admin/establishments')}>
-               ← Back
+               ← Volver
             </button>
             <h1 className="admin-title">
                {isNew ? 'Nuevo Establecimiento' : `Editar: ${form.name}`}
             </h1>
-            {!isNew && <ViewInAppButton id={id} />}
+            {!isNew && <ViewInAppButton slug={form.slug} />}
          </div>
 
-         {error && <div className="admin-alert admin-alert-error">{error}</div>}
+         {error      && <div className="admin-alert admin-alert-error">{error}</div>}
          {successMsg && <div className="admin-alert admin-alert-success">{successMsg}</div>}
 
          <form onSubmit={handleSubmit} className="admin-form">
@@ -184,14 +248,13 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
                <div className="admin-section">
                   <h2 className="admin-section-title">Propietario</h2>
                   <div className="admin-field">
-                     <label className="admin-label">Owner ID </label>
+                     <label className="admin-label">Owner ID</label>
                      <input
                         className="admin-input"
                         name="owner"
                         value={form.owner}
                         onChange={handleChange}
                         placeholder="Dejar vacío o ingresar ID de usuario propietario"
-                        //required
                      />
                      <span className="admin-hint">Puedes obtenerlo desde la sección Usuarios</span>
                   </div>
@@ -200,8 +263,20 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
 
             {/* Fila 1: Status + Contact */}
             <div className="admin-row">
-               {!isNew && <EstablishmentStatus active={form.active} verified={form.verified} onChange={handleChange} name={form.name} saving={saving} />}
-               <ContactAdmin contact={{ phone: form.phone, email: form.email, website: form.website }} onChange={handleChange} saving={saving} />
+               {!isNew && (
+                  <EstablishmentStatus
+                     active={form.active}
+                     verified={form.verified}
+                     onChange={handleChange}
+                     name={form.name}
+                     saving={saving}
+                  />
+               )}
+               <ContactAdmin
+                  contact={{ phone: form.phone, email: form.email, website: form.website }}
+                  onChange={handleChange}
+                  saving={saving}
+               />
             </div>
 
             {/* Fila 2: Basic Info + Schedule */}
@@ -214,13 +289,13 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
             <div className="admin-row">
                <FeaturesAdmin
                   features={form.features}
-                  onAdd={f => setForm(prev => ({ ...prev, features: [...prev.features, f] }))}
-                  onRemove={f => setForm(prev => ({ ...prev, features: prev.features.filter(ft => ft !== f) }))}
+                  onAdd={f  => setForm(prev => ({ ...prev, features:    [...prev.features,    f] }))}
+                  onRemove={f => setForm(prev => ({ ...prev, features:    prev.features.filter(ft  => ft  !== f) }))}
                   saving={saving}
                />
                <CuisineTypeAdmin
                   cuisineType={form.cuisineType}
-                  onAdd={c => setForm(prev => ({ ...prev, cuisineType: [...prev.cuisineType, c] }))}
+                  onAdd={c  => setForm(prev => ({ ...prev, cuisineType: [...prev.cuisineType, c] }))}
                   onRemove={c => setForm(prev => ({ ...prev, cuisineType: prev.cuisineType.filter(ct => ct !== c) }))}
                   saving={saving}
                />
@@ -245,7 +320,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
             <div className="admin-form-footer">
                <button type="submit" disabled={saving} className="admin-btn admin-btn-primary">
                   {saving
-                     ? (isNew ? 'Creando...' : 'Guardando...')
+                     ? (isNew ? 'Creando...'   : 'Guardando...')
                      : (isNew ? 'Crear Establecimiento' : 'Guardar Cambios')
                   }
                </button>
@@ -256,7 +331,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
          {/* Sección de medios e items: solo en modo edición */}
          {!isNew && (
             <div className="admin-row">
-               <EstablishmentPhotosAdmin 
+               <EstablishmentPhotosAdmin
                   establishmentId={id}
                   mainImage={form.mainImage}
                   onMainImageChange={(url) => setForm(prev => ({ ...prev, mainImage: url }))}
@@ -265,8 +340,7 @@ export const AdminEstablishmentDetail = () => { // Componente principal para cre
             </div>
          )}
 
-         {!isNew && <ViewInAppButton id={id} />}
-
+         {!isNew && <ViewInAppButton slug={form.slug} />}
       </div>
    );
 };

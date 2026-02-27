@@ -1,17 +1,16 @@
 
 
-// src/pages/admin/adminComponents/ViewInAppButton.jsx
-
-
+// src/pages/admin/itemsComponents/ViewItemInApp.jsx
+// Botón para ver la tapa en la app
 import { memo } from 'react';
 
-export const ViewInAppButton = memo(({ slug }) => {
+export const ViewItemInAppButton = memo(({ slug }) => {
    if (!slug) {return null;}
-   
+
    return (
        
       <a
-         href={`/establishment/${slug}`}
+         href={`/items/${slug}`}
          target="_blank"
          rel="noopener noreferrer"
          className="admin-btn admin-btn-secondary admin-btn-sm"

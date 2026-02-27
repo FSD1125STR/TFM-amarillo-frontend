@@ -1,3 +1,7 @@
+
+
+//src/pages/Establishment.jsx
+// Página de detalle de establecimiento
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
@@ -13,6 +17,8 @@ import RatingBar from "../components/common/RatingBar";
 import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { photoService } from "../services/photoService.js";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
+import { ScheduleDisplay } from "../components/common/ScheduleDisplay";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -24,9 +30,9 @@ function Lightbox({ images, startIndex, onClose }) {
 
    useEffect(() => {
       const onKey = (e) => {
-         if (e.key === "Escape") onClose();
-         if (e.key === "ArrowLeft") prev();
-         if (e.key === "ArrowRight") next();
+         if (e.key === "Escape") {onClose();}
+         if (e.key === "ArrowLeft") {prev();}
+         if (e.key === "ArrowRight") {next();}
       };
       window.addEventListener("keydown", onKey);
       return () => window.removeEventListener("keydown", onKey);
@@ -63,7 +69,7 @@ function Lightbox({ images, startIndex, onClose }) {
 
 export const Establishment = () => {
    const navigate = useNavigate();
-   const { id } = useParams();
+   const { slug } = useParams();
 
    const [establishment, setEstablishment] = useState(null);
    const [loading, setLoading] = useState(true);
@@ -73,15 +79,17 @@ export const Establishment = () => {
    const [lightboxIndex, setLightboxIndex] = useState(0);
    const mapInstance = useRef(null);
 
-   useEffect(() => { loadEstablishmentData(); }, [id]);
+   useEffect(() => {
+      loadEstablishmentData();
+   }, [slug]);
 
    const loadEstablishmentData = async () => {
       try {
          setLoading(true);
          setError(null);
-         const response = await establishmentService.getById(id);
+         const response = await establishmentService.getBySlug(slug);
          setEstablishment(response.data);
-         const photosResponse = await photoService.getByEstablishment(id);
+         const photosResponse = await photoService.getByEstablishment(response.data._id);
          setPhotos(photosResponse || []);
       } catch (err) {
          console.error('Error cargando establecimiento:', err);
@@ -107,9 +115,13 @@ export const Establishment = () => {
    ];
    const openLightbox = (index = 0) => { setLightboxIndex(index); setLightboxOpen(true); };
 
-   if (loading) return <Container><div className="flex items-center justify-center h-screen"><p className="text-lg">Cargando establecimiento...</p></div></Container>;
-   if (error || !establishment) return <Container><div className="flex flex-col items-center justify-center h-screen"><p className="text-lg text-red-500 mb-4">{error || 'Establecimiento no encontrado'}</p><Button onClick={() => navigate('/')}>Volver al inicio</Button></div></Container>;
+   if (loading) {return <Container><div className="flex items-center justify-center h-screen"><p className="text-lg">Cargando establecimiento...</p></div></Container>;}
+   if (error || !establishment) {return <Container><div className="flex flex-col items-center justify-center h-screen"><p className="text-lg text-red-500 mb-4">{error || 'Establecimiento no encontrado'}</p><Button onClick={() => navigate('/')}>Volver al inicio</Button></div></Container>;}
 
+
+   const heroSrc = establishment.mainImage
+      ? cloudinaryPresets.detail(establishment.mainImage)
+      : "https://images.unsplash.com/photo-1559339352-11d035aa65de";
 
    return (
       <div>
@@ -159,6 +171,7 @@ export const Establishment = () => {
                         className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => openLightbox(i + 1)} />
                   ))
+
                ) : (
                   <img src={establishment.mainImage} alt={establishment.name}
                      className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
@@ -254,25 +267,9 @@ export const Establishment = () => {
 
             {/* HORARIOS */}
             {establishment.schedule && Object.keys(establishment.schedule).length > 0 && (
-               <div className="mt-6">
-                  <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-3">Horarios</p>
-                  <div className="space-y-1">
-                     {Object.entries(establishment.schedule).map(([day, hours]) => (
-                        <div key={day} className="flex items-center gap-2 py-1">
-                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-md w-20 text-center ${
-                              hours.closed
-                                 ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                                 : "bg-green-500/20 text-green-400 border border-green-500/30"
-                           }`}>
-                              {day.charAt(0).toUpperCase() + day.slice(1, 3)}
-                           </span>
-                           <span className="text-xs text-neutral-400">
-                              {hours.closed ? "Cerrado" : `${hours.open} - ${hours.close}`}
-                           </span>
-                        </div>
-                     ))}
-                  </div>
-               </div>
+               <Section title="Horarios">
+                  <ScheduleDisplay schedule={establishment.schedule} />
+               </Section>
             )}
 
             {/* OPINIONES */}

@@ -20,7 +20,7 @@ export const AdminEstablishments = () => {
          const response = await establishmentService.getAll();
          setEstablishments(response.data);
       } catch (err) {
-         setError('Error loading establishments');
+         setError('Error loading establishments', err);
       } finally {
          setLoading(false);
       }
@@ -37,7 +37,7 @@ export const AdminEstablishments = () => {
             prev.map(est => est._id === id ? { ...est, active: !currentActive } : est)
          );
       } catch (err) {
-         setError('Error updating establishment status');
+         setError('Error updating establishment status', err);
       }
    };
 
@@ -66,7 +66,7 @@ export const AdminEstablishments = () => {
                      <th>Provincia</th>
                      <th>Activo</th>
                      <th>Verificado</th>
-                     <th>Acciones</th>
+                     <th>Acción</th>
                   </tr>
                </thead>
                <tbody>

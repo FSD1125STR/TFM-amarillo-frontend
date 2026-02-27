@@ -8,6 +8,7 @@ import { AdminPanel } from "./pages/admin/AdminPanel";
 import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
+import { ItemAdmin } from './pages/admin/ItemAdmin';
 
 export default function App() {
    return (
@@ -17,15 +18,16 @@ export default function App() {
                {/* Public routes */}
                <Route path="/" element={<Home />} />
                <Route path="/establishments" element={<AllEstablishment />} />
-               <Route path="/establishment/:id" element={<Establishment />} /> 
+               <Route path="/establishment/:slug" element={<Establishment />} /> 
                <Route path="/items" element={<AllTapas />} />
-               <Route path="/items/:id" element={<Tapas />} />
+               <Route path="/items/:slug" element={<Tapas />} />
 
                {/* Admin routes */}
                <Route path="/admin" element={<AdminPanel />}>
                   <Route index element={<Dashboard />} />
                   <Route path="establishments" element={<AdminEstablishments />} />
                   <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
+                  <Route path="/admin/items/:id" element={<ItemAdmin />} />
                </Route>
             </Routes>
          </BrowserRouter>
