@@ -50,9 +50,13 @@ export const AllTapas = () => {
                         onClick={() => navigate(`/items/${item.slug}`)}
                      >
                         <img
-                           src={item.mainImage || "/fallback.png"}
+                           src={item.mainImage || "/Logo.jpg"}
                            alt={item.name}
                            className="w-full h-40 object-cover"
+                           onError={(e) => {
+                              e.target.onerror = null; // evita bucle infinito
+                              e.target.src = "/Logo.jpg";
+                           }}
                         />
 
                         <div className="absolute top-2 right-2">

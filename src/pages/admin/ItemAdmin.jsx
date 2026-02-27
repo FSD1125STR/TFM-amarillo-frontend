@@ -97,12 +97,18 @@ export const ItemAdmin = () => {
             ...(isNew && establishmentIdFromState ? { establishment: establishmentIdFromState } : {}),
          };
          if (isNew) {
-            await itemService.create(payload);
+            const res = await itemService.create(payload);
+            const newId = res.data._id;
+            // Redirigir a edición con el ID real, manteniendo el establishmentId en state
+            navigate(`/admin/items/${newId}`, { 
+               replace: true,
+               state: { establishmentId: establishmentIdFromState }
+            });
          } else {
             await itemService.update(id, payload);
+            setSuccess(true);
+            setTimeout(() => setSuccess(false), 3000);
          }
-         setSuccess(true);
-         setTimeout(() => setSuccess(false), 3000);
       } catch (err) {
          setError('Error al guardar la tapa', err);
       } finally {
