@@ -12,6 +12,7 @@ const CATEGORIES = [
    { value: 'Embutido', label: '🥓 Embutido' },
    { value: 'Jamon', label: '🍖 Jamón' },
    { value: 'Huevo', label: '🍳 Huevo' },
+   { value: 'Tortilla', label: '🟡 Tortilla' },
    { value: 'Frito', label: '🍟 Frito' },
    { value: 'Plancha', label: '🔥 A la Plancha' },
    { value: 'Horno', label: '♨️ Al Horno' },
@@ -19,9 +20,18 @@ const CATEGORIES = [
    { value: 'Ensalada', label: '🥗 Ensalada' },
    { value: 'Croqueta', label: '🟤 Croqueta' },
    { value: 'Patatas', label: '🥔 Patatas' },
-   { value: 'Pan', label: '🍞 Pan/Tostada' },
+   { value: 'Pan/Tostada', label: '🍞 Pan/Tostada' },
+   { value: 'Montadito', label: '🥪 Montadito' },
+   { value: 'Hamburguesa', label: '🍔 Hamburguesa' },
+   { value: 'Arroz', label: '🥘 Arroz' },
+   { value: 'Caldos', label: '🥣 Caldos' },
+   { value: 'Gazpacho', label: '🍅 Gazpacho' },
+   { value: 'Migas', label: '🌾 Migas' },
+   { value: 'Encurtido', label: '🥒 Encurtidos' }, 
+   { value: 'Legumbres', label: '🌱 Legumbres' },  
+   { value: 'Postre', label: '🍰 Postre' },
+   { value: 'Bebida', label: '🍷 Bebida' },
 ];
-
 
 export const Categories = memo(({ form, handleChange }) => {
    return (

@@ -24,7 +24,6 @@ export const FeaturedSection = () => {
          setLoading(true);
          setError(null);
          const response = await itemService.getTopRatedItems(); 
-         console.log("Respuesta de tapas destacadas:", response);
          setFeaturedItems(response.data || response);
       } catch (err) {
          setError("Error al cargar las tapas destacadas.", err);
@@ -66,7 +65,7 @@ export const FeaturedSection = () => {
                      onClick={() => navigate(`/items/${item.slug}`)}
                      className="cursor-pointer hover:shadow-lg transition-shadow"
                   >
-                     <img src={item.mainImage} alt={item.name} className="h-32 w-full object-cover" />
+                     <img src={item.mainImage || '/Logo.jpg'} alt={item.name} className="h-32 w-full object-cover" />
                      
                      <div className="p-2">
                         <p className="font-semibold">{item.name}</p>
