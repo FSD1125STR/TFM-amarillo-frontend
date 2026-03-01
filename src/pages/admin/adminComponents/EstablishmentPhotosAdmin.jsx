@@ -266,11 +266,11 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
                         onDragEnd={handleDragEnd}
                      >
                         <SortableContext
-                           items={photos.map(p => p._id)}
+                           items={photos.filter(p => !p.isPrimary).map(p => p._id)}
                            strategy={rectSortingStrategy}
                         >
                            <div className="iph-thumbs-grid">
-                              {photos.map(photo => (
+                              {photos.filter(p => !p.isPrimary).map(photo => (
                                  <SortableThumb
                                     key={photo._id}
                                     photo={photo}

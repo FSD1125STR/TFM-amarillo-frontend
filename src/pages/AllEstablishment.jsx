@@ -6,6 +6,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Container from "../components/layout/Container";
 import Header from "../components/layout/Header";
 import Badge from "../components/common/Badge";
+import Footer from "../components/layout/Footer";
 
 import { establishmentService } from "../services/establishmentService";
 
@@ -160,6 +161,7 @@ export const AllEstablishment = () => {
                })}
 
             </div>
+            <Footer />
          </Container>
       </div>
    );

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import footer from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import { itemService } from "../services/itemService";
+import Footer from "../components/layout/Footer";
 
 export const AllTapas = () => {
    const navigate = useNavigate();
@@ -122,7 +124,7 @@ export const AllTapas = () => {
                ))}
             </div>
          </div>
-
+         <Footer />
       </div>
    );
 };

@@ -1,7 +1,3 @@
-
-//src/components/home/FeaturedSection.jsx
-// Este componente muestra las tapas destacadas en la página de inicio. Se encarga de cargar los datos desde el backend y manejar los estados de carga y error.
-
 import Card from "../common/Card";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +19,7 @@ export const FeaturedSection = () => {
       try {
          setLoading(true);
          setError(null);
-         const response = await itemService.getTopRatedItems(); 
+         const response = await itemService.getTopRatedItems();
          setFeaturedItems(response.data || response);
       } catch (err) {
          setError("Error al cargar las tapas destacadas.", err);
@@ -32,7 +28,6 @@ export const FeaturedSection = () => {
       }
    };
 
-   
    if (loading) {
       return (
          <Container>
@@ -51,25 +46,43 @@ export const FeaturedSection = () => {
       );
    }
 
+   const displayedItems = featuredItems.slice(0, 8);
+
    return (
       <section className="px-4 mt-6">
-         <h2 className="text-lg font-semibold mb-3">Las Mejores Tapas</h2>
-      
-         {featuredItems.length === 0 ? (
+         {/* Header */}
+         <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold">Las Mejores Tapas</h2>
+            <button
+               onClick={() => navigate("/items")}
+               className="text-orange-400 cursor-pointer hover:text-orange-500 transition-colors"
+            >
+               Ver todas
+            </button>
+         </div>
+
+         {displayedItems.length === 0 ? (
             <p>No hay tapas disponibles en este momento.</p>
          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-               {featuredItems.map((item, index) => (
-                  
-                  <Card key={item.id || index}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+               {displayedItems.map((item, index) => (
+                  <Card
+                     key={item.id || index}
                      onClick={() => navigate(`/items/${item.slug}`)}
                      className="cursor-pointer hover:shadow-lg transition-shadow"
                   >
-                     <img src={item.mainImage || '/Logo.jpg'} alt={item.name} className="h-32 w-full object-cover" />
-                     
+                     <img
+                        src={item.mainImage || "/Logo.jpg"}
+                        alt={item.name}
+                        className="h-32 w-full object-cover"
+                     />
                      <div className="p-2">
                         <p className="font-semibold">{item.name}</p>
-                        <p className="text-orange-400">{item.modalities[0]?.price > 0 ? `${item.modalities[0].price}€` : "Gratis"}</p>
+                        <p className="text-orange-400">
+                           {item.modalities[0]?.price > 0
+                              ? `${item.modalities[0].price}€`
+                              : "Gratis"}
+                        </p>
                      </div>
                   </Card>
                ))}

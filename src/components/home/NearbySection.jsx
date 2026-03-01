@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Badge from "../common/Badge";
 import { establishmentService } from "../../services/establishmentService";
-import { ArrowLeftFromLine, ArrowRightFromLine } from "lucide-react";
+import { CircleChevronLeft, CircleChevronRight } from "lucide-react";
 
 export default function NearbySection() {
    const navigate = useNavigate();
@@ -42,12 +42,12 @@ export default function NearbySection() {
             <h2 className="text-lg font-semibold">
                Establecimientos cercanos
             </h2>
-            <span
+            <button
                onClick={() => navigate("/establishments")}
                className="text-orange-400 cursor-pointer hover:text-orange-500 transition-colors"
             >
                Ver todos
-            </span>
+            </button>
          </div>
 
          <div className="relative w-full max-w-md mx-auto overflow-hidden"/>
@@ -105,7 +105,7 @@ export default function NearbySection() {
                onClick={prevSlide}
                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors"
             >
-               <ArrowLeftFromLine />
+               <CircleChevronLeft />
             </button>
 
             {/* BOTÓN DERECHA */}
@@ -113,7 +113,7 @@ export default function NearbySection() {
                onClick={nextSlide}
                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white w-10 h-10 rounded-full flex items-center justify-center transition-colors"
             >
-               <ArrowRightFromLine />
+               <CircleChevronRight />
             </button>
          </div>
 
