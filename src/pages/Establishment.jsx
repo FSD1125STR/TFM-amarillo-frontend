@@ -37,15 +37,9 @@ function Lightbox({ images, startIndex, onClose }) {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-      if (e.key === "ArrowLeft") {
-        prev();
-      }
-      if (e.key === "ArrowRight") {
-        next();
-      }
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -96,7 +90,9 @@ function Lightbox({ images, startIndex, onClose }) {
                 e.stopPropagation();
                 setCurrent(i);
               }}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`}
+              className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                i === current ? "bg-orange-400" : "bg-white/30"
+              }`}
             />
           ))}
         </div>
@@ -141,12 +137,9 @@ export const Establishment = () => {
 
   const mapContainer = useCallback(
     (node) => {
-      if (!node || mapInstance.current) {
-        return;
-      }
-      if (!establishment?.location?.coordinates) {
-        return;
-      }
+      if (!node || mapInstance.current) return;
+      if (!establishment?.location?.coordinates) return;
+
       const [lng, lat] = establishment.location.coordinates;
       const map = new mapboxgl.Map({
         container: node,
@@ -154,10 +147,9 @@ export const Establishment = () => {
         center: [lng, lat],
         zoom: 15,
       });
-      new mapboxgl.Marker({ color: "#f97316" })
-        .setLngLat([lng, lat])
-        .addTo(map);
+      new mapboxgl.Marker({ color: "#f97316" }).setLngLat([lng, lat]).addTo(map);
       mapInstance.current = map;
+
       return () => {
         if (mapInstance.current) {
           mapInstance.current.remove();
@@ -190,6 +182,7 @@ export const Establishment = () => {
       </Container>
     );
   }
+
   if (error || !establishment) {
     return (
       <Container>
@@ -203,10 +196,6 @@ export const Establishment = () => {
     );
   }
 
-  const heroSrc = establishment.mainImage
-    ? cloudinaryPresets.detail(establishment.mainImage)
-    : "https://images.unsplash.com/photo-1559339352-11d035aa65de";
-
   return (
     <div>
       {lightboxOpen && allImages.length > 0 && (
@@ -219,10 +208,7 @@ export const Establishment = () => {
 
       <div className="relative h-72 max-w-3xl mx-auto">
         <img
-          src={
-            primaryUrl ||
-            "https://images.unsplash.com/photo-1559339352-11d035aa65de"
-          }
+          src={primaryUrl || "https://images.unsplash.com/photo-1559339352-11d035aa65de"}
           className="w-full h-full object-cover rounded-xl cursor-pointer"
           alt={establishment.name}
           onClick={() => openLightbox(0)}
@@ -244,9 +230,7 @@ export const Establishment = () => {
           {establishment.verified && (
             <Badge className="mb-2 inline-block">VERIFICADO</Badge>
           )}
-          <h1 className="text-3xl font-bold text-white">
-            {establishment.name}
-          </h1>
+          <h1 className="text-3xl font-bold text-white">{establishment.name}</h1>
           <p className="text-sm text-neutral-300 flex items-center gap-1">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -303,7 +287,6 @@ export const Establishment = () => {
               <h2 className="text-xl font-bold text-white">Descripción</h2>
               <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
             </div>
-
             <p className="text-sm text-white leading-relaxed">
               {establishment.description}
             </p>
@@ -349,7 +332,6 @@ export const Establishment = () => {
                   {establishment.address?.city},{" "}
                   {establishment.address?.province}
                 </p>
-
                 <button
                   onClick={() => {
                     const [lng, lat] = establishment.location.coordinates;
@@ -375,6 +357,7 @@ export const Establishment = () => {
             </div>
           </div>
         </div>
+
         {/* RATING */}
         <Section title="Valoración">
           <RatingBar

@@ -1,20 +1,21 @@
 
+
 //establishmentService.js - Servicio para manejar operaciones relacionadas con establecimientos en el frontend
 // Este servicio se encarga de realizar las llamadas a la API para obtener, crear, actualizar, eliminar y reactivar establecimientos.
 import { api } from './api';
 
 export const establishmentService = { 
-   getAll: async (filters = {}) => {// Permite obtener una lista de establecimientos con filtros opcionales (provincia y ciudad)
+   getAll: async (filters = {}) => {
       try {
-         const params = new URLSearchParams();// Utilizamos URLSearchParams para construir la cadena de consulta de manera segura
+         const params = new URLSearchParams();
          if (filters.province) {params.append('province', filters.province);}
          if (filters.city) {params.append('city', filters.city);}
+         if (filters.includeInactive) {params.append('includeInactive', 'true');}
       
          const queryString = params.toString();
-       
          const url = `/establishment${queryString ? `?${queryString}` : ''}`;
       
-         const response = await api.get(url);// Realizamos la llamada a la API con la URL construida
+         const response = await api.get(url);
          return response.data;
       } catch (error) {
          console.error('Error al obtener establecimientos:', error);
@@ -71,6 +72,7 @@ export const establishmentService = {
          throw error;
       }
    },
+
    reactivate: async (id) => {
       try {
          const response = await api.patch(`/establishment/${id}/reactivate`);

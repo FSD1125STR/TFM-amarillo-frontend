@@ -15,10 +15,10 @@ export const MapboxPicker = ({ coordinates, onChange, onAddressChange, saving })
    const defaultCoords = coordinates?.length === 2 ? coordinates : [-3.7038, 40.4168];
    const [lng, setLng] = useState(defaultCoords[0]);
    const [lat, setLat] = useState(defaultCoords[1]);
-   const [geocoding, setGeocoding] = useState(false);
+   const [geocoding, setGeocoding] = useState(false);// Para mostrar un mensaje mientras se obtiene la dirección
 
    // ── Geocodificación inversa: [lng, lat] → dirección ──────────────
-   const reverseGeocode = useCallback(async (newLng, newLat) => {
+   const reverseGeocode = useCallback(async (newLng, newLat) => {// Si no hay callback para actualizar la dirección, no hacemos nada
       if (!onAddressChange) {return;}
       try {
          setGeocoding(true);
@@ -29,10 +29,10 @@ export const MapboxPicker = ({ coordinates, onChange, onAddressChange, saving })
          const feature = data.features?.[0];
          if (!feature) {return;}
 
-         const context = feature.context || [];
-         const get = (type) => context.find(c => c.id.startsWith(type))?.text || '';
+         const context = feature.context || [];// Para facilitar la extracción de componentes de la dirección
+         const get = (type) => context.find(c => c.id.startsWith(type))?.text || '';// Extraemos los componentes principales de la dirección y los pasamos al callback
 
-         onAddressChange({
+         onAddressChange({// La calle y número se extraen de forma un poco rudimentaria, ya que Mapbox no siempre los separa bien. Se podría mejorar con más lógica o usando otro tipo de consulta.
             street:     feature.text || '',
             number:     feature.address || '',
             city:       get('place') || get('locality') || '',
