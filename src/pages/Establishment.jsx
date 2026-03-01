@@ -275,11 +275,6 @@ export const Establishment = () => {
           )}
         </div>
 
-        {/* TAPAS */}
-        <Section title="Nuestras Tapas">
-          <ItemGallery establishmentId={establishment._id} />
-        </Section>
-
         {/* DESCRIPCIÓN */}
         {establishment.description && (
           <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -292,6 +287,11 @@ export const Establishment = () => {
             </p>
           </div>
         )}
+
+        {/* TAPAS */}
+        <Section title="Nuestras Tapas">
+          <ItemGallery establishmentId={establishment._id} />
+        </Section>
 
         {/* SERVICIOS + COCINA */}
         <ServiceKitchen
