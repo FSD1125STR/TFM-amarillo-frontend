@@ -17,7 +17,7 @@ export const AdminEstablishments = () => {
    const fetchEstablishments = async () => {
       try {
          setLoading(true);
-         const response = await establishmentService.getAll();
+         const response = await establishmentService.getAll({includeInactive: true});
          setEstablishments(response.data);
       } catch (err) {
          setError('Error loading establishments', err);

@@ -109,10 +109,8 @@ export const Establishment = () => {
       return () => { if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; } };
    }, [establishment]);
 
-   const allImages = [
-      ...(establishment?.mainImage ? [establishment.mainImage] : []),
-      ...photos.map((p) => p.url).filter(Boolean),
-   ];
+   const allImages = photos.map((p) => p.url).filter(Boolean);
+
    const openLightbox = (index = 0) => { setLightboxIndex(index); setLightboxOpen(true); };
 
    if (loading) {return <Container><div className="flex items-center justify-center h-screen"><p className="text-lg">Cargando establecimiento...</p></div></Container>;}
@@ -169,7 +167,7 @@ export const Establishment = () => {
                   photos.map((photo, i) => (
                      <img key={photo._id} src={photo.url} alt={photo.alt || establishment.name}
                         className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => openLightbox(i + 1)} />
+                        onClick={() => openLightbox(i )} />
                   ))
 
                ) : (
