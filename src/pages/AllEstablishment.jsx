@@ -7,7 +7,7 @@ import Container from "../components/layout/Container";
 import Header from "../components/layout/Header";
 import Badge from "../components/common/Badge";
 import Footer from "../components/layout/Footer";
-
+import { useGeolocation } from "../hooks/useGeolocation";
 import { establishmentService } from "../services/establishmentService";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
@@ -17,7 +17,6 @@ const MapPreview = ({ coordinates }) => {
 
    useEffect(() => {
       if (!coordinates) {return;}
-
       const [lng, lat] = coordinates;
 
       const map = new mapboxgl.Map({
@@ -35,26 +34,60 @@ const MapPreview = ({ coordinates }) => {
       return () => map.remove();
    }, [coordinates]);
 
-   return (
-      <div
-         ref={mapContainer}
-         className="w-full h-full min-h-45"
-      />
-   );
+   return <div ref={mapContainer} className="w-full h-full min-h-45" />;
 };
 
 export const AllEstablishment = () => {
    const navigate = useNavigate();
    const [establishments, setEstablishments] = useState([]);
+   const { coords, loading: geoLoading, error: geoError } = useGeolocation();
 
    useEffect(() => {
-      loadEstablishments();
-   }, []);
+      if (coords) {
+         loadEstablishments();
+      }
+   }, [coords]);
 
    const loadEstablishments = async () => {
-      const response = await establishmentService.getAll();
-      setEstablishments(response.data || []);
+      try {
+         const response = await establishmentService.getNearby({
+            lat: coords.lat,
+            lng: coords.lng,
+            limit: 50,
+         });
+         setEstablishments(response.data || []);
+      } catch (error) {
+         console.error("Error cargando establecimientos:", error);
+      }
    };
+
+   if (geoLoading) {
+      return (
+         <div className="bg-neutral-950 min-h-screen text-white">
+            <Header />
+            <Container>
+               <div className="space-y-6 py-8">
+                  {[...Array(3)].map((_, i) => (
+                     <div key={i} className="bg-neutral-900 rounded-2xl h-52 animate-pulse" />
+                  ))}
+               </div>
+            </Container>
+         </div>
+      );
+   }
+
+   if (geoError) {
+      return (
+         <div className="bg-neutral-950 min-h-screen text-white">
+            <Header />
+            <Container>
+               <p className="py-8 text-neutral-400">
+                  Activa la ubicación para ver establecimientos cercanos
+               </p>
+            </Container>
+         </div>
+      );
+   }
 
    return (
       <div className="bg-neutral-950 min-h-screen text-white">
@@ -62,9 +95,8 @@ export const AllEstablishment = () => {
 
          <Container>
             <div className="space-y-6 py-8">
-
                {establishments.map((est) => {
-                  const coords = est.location?.coordinates;
+                  const estCoords = est.location?.coordinates;
 
                   return (
                      <div
@@ -72,7 +104,6 @@ export const AllEstablishment = () => {
                         className="bg-neutral-900 rounded-2xl overflow-hidden shadow-xl border border-neutral-800 hover:border-orange-500/30 transition-colors duration-300"
                      >
                         <div className="flex flex-col md:flex-row">
-
                            {/* IMAGEN PRINCIPAL */}
                            {est.mainImage && (
                               <div
@@ -84,7 +115,6 @@ export const AllEstablishment = () => {
                                     alt={est.name}
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                                  />
-
                                  <div className="absolute inset-0 bg-linear-to-r from-transparent to-neutral-900/40 md:block hidden" />
                               </div>
                            )}
@@ -112,27 +142,36 @@ export const AllEstablishment = () => {
                                  </div>
                               </div>
 
-                              {/* BOTON MAPS */}
                               <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
-                                 <div className="flex items-center gap-1 text-sm">
-                                    <span className="text-yellow-400 text-base">⭐</span>
-                                    <span className="font-semibold text-white">
-                                       {est.averageRating ? est.averageRating.toFixed(1) : "0.0"}
-                                    </span>
-                                    <span className="text-neutral-500">/ 5</span>
+                                 <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-1 text-sm">
+                                       <span className="text-yellow-400 text-base">⭐</span>
+                                       <span className="font-semibold text-white">
+                                          {Number(est.averageRating || 0).toFixed(1)}
+                                       </span>
+                                       <span className="text-neutral-500">/ 5</span>
+                                    </div>
+
+                                    {est.distance && (
+                                       <span className="text-sm text-orange-400">
+                                          {est.distance < 1000
+                                             ? `${Math.round(est.distance)} m`
+                                             : `${(est.distance / 1000).toFixed(1)} km`}
+                                       </span>
+                                    )}
                                  </div>
 
-                                 {coords && (
+                                 {estCoords && (
                                     <button
                                        onClick={(e) => {
                                           e.stopPropagation();
-                                          const [lng, lat] = coords;
+                                          const [lng, lat] = estCoords;
                                           window.open(
-                                             `https://www.google.com/maps?q=${lat},${lng}`,
+                                             `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
                                              "_blank"
                                           );
                                        }}
-                                       className="flex items-center gap-1.5 text-xs px-3 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 rounded-lg transition font-medium"
+                                       className="flex items-center gap-1.5 text-xs px-3 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 rounded-lg transition font-medium text-white"
                                     >
                                        <svg
                                           xmlns="http://www.w3.org/2000/svg"
@@ -149,17 +188,15 @@ export const AllEstablishment = () => {
                            </div>
 
                            {/* MAPA */}
-                           {coords && (
+                           {estCoords && (
                               <div className="md:w-72 h-52 md:h-auto shrink-0 border-t border-neutral-800 md:border-t-0 md:border-l">
-                                 <MapPreview coordinates={coords} />
+                                 <MapPreview coordinates={estCoords} />
                               </div>
                            )}
-
                         </div>
                      </div>
                   );
                })}
-
             </div>
             <Footer />
          </Container>

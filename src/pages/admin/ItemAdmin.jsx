@@ -35,7 +35,7 @@ export const ItemAdmin = () => {
    const [form, setForm] = useState({
       name: '',
       description: '',
-      modalities: [{ label: 'Tapa', price: 0, isFree: false, available: true }], // ← nuevo
+      modalities: [{ label: 'Tapa', price: 0, isFree: false, available: true }], 
       categories: [],
       allergens: [],
       dietaryOptions: [],
@@ -59,7 +59,7 @@ export const ItemAdmin = () => {
          setForm({
             name: data.name || '',
             description: data.description || '',
-            modalities: data.modalities?.length  // ← nuevo
+            modalities: data.modalities?.length  
                ? data.modalities
                : [{ label: 'Tapa', price: 0, isFree: false, available: true }],
             categories: data.categories || [],
