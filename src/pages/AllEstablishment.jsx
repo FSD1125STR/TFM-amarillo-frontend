@@ -147,7 +147,7 @@ export const AllEstablishment = () => {
                                     <div className="flex items-center gap-1 text-sm">
                                        <span className="text-yellow-400 text-base">⭐</span>
                                        <span className="font-semibold text-white">
-                                          {Number(est.averageRating || 0).toFixed(1)}
+                                          {Number(est.averageRating || 0).toFixed(1) }
                                        </span>
                                        <span className="text-neutral-500">/ 5</span>
                                     </div>

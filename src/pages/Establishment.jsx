@@ -1,3 +1,8 @@
+
+
+// src/pages/Establishment.jsx
+// Página de detalle del establecimiento con integración de geolocalización y mapa interactivo
+// INTEGRACIÓN GEOLOCALIZACIÓN: Se envían las coordenadas del usuario al backend para calcular la distancia al establecimiento
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
