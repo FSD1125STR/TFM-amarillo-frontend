@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
@@ -6,7 +8,7 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Container from "../components/layout/Container";
 import Header from "../components/layout/Header";
 import Badge from "../components/common/Badge";
-import Footer from "../components/layout/Footer";
+import { Footer } from "../components/layout/Footer";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { establishmentService } from "../services/establishmentService";
 
@@ -16,7 +18,7 @@ const MapPreview = ({ coordinates }) => {
    const mapContainer = useRef(null);
 
    useEffect(() => {
-      if (!coordinates) {return;}
+      if (!coordinates) return;
       const [lng, lat] = coordinates;
 
       const map = new mapboxgl.Map({
@@ -27,9 +29,7 @@ const MapPreview = ({ coordinates }) => {
          interactive: false,
       });
 
-      new mapboxgl.Marker({ color: "#f97316" })
-         .setLngLat([lng, lat])
-         .addTo(map);
+      new mapboxgl.Marker({ color: "#f97316" }).setLngLat([lng, lat]).addTo(map);
 
       return () => map.remove();
    }, [coordinates]);
@@ -43,9 +43,7 @@ export const AllEstablishment = () => {
    const { coords, loading: geoLoading, error: geoError } = useGeolocation();
 
    useEffect(() => {
-      if (coords) {
-         loadEstablishments();
-      }
+      if (coords) loadEstablishments();
    }, [coords]);
 
    const loadEstablishments = async () => {
@@ -55,6 +53,7 @@ export const AllEstablishment = () => {
             lng: coords.lng,
             limit: 50,
          });
+         // El backend ya devuelve ordenado por distancia, no tocamos el orden
          setEstablishments(response.data || []);
       } catch (error) {
          console.error("Error cargando establecimientos:", error);
@@ -97,12 +96,24 @@ export const AllEstablishment = () => {
             <div className="space-y-6 py-8">
                {establishments.map((est) => {
                   const estCoords = est.location?.coordinates;
+                  const isOpen = est.isOpen === true;
 
                   return (
                      <div
                         key={est._id}
-                        className="bg-neutral-900 rounded-2xl overflow-hidden shadow-xl border border-neutral-800 hover:border-orange-500/30 transition-colors duration-300"
+                        className={`relative bg-neutral-900 rounded-2xl overflow-hidden shadow-xl border border-neutral-800 hover:border-orange-500/30 transition-colors duration-300 ${
+                           !isOpen ? "opacity-60" : ""
+                        }`}
                      >
+                        {/* Badge cerrado — esquina superior izquierda sobre la imagen */}
+                        {!isOpen && (
+                           <div className="absolute top-3 left-3 z-10">
+                              <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm">
+                                 Cerrado
+                              </span>
+                           </div>
+                        )}
+
                         <div className="flex flex-col md:flex-row">
                            {/* IMAGEN PRINCIPAL */}
                            {est.mainImage && (
@@ -125,9 +136,17 @@ export const AllEstablishment = () => {
                               onClick={() => navigate(`/establishment/${est.slug}`)}
                            >
                               <div>
-                                 <h2 className="text-xl font-bold text-white hover:text-orange-400 transition-colors">
-                                    {est.name}
-                                 </h2>
+                                 <div className="flex items-center gap-2 flex-wrap">
+                                    <h2 className="text-xl font-bold text-white hover:text-orange-400 transition-colors">
+                                       {est.name}
+                                    </h2>
+                                    {/* Badge inline en el nombre para pantallas sin imagen */}
+                                    {!isOpen && !est.mainImage && (
+                                       <span className="text-xs font-semibold text-red-400 border border-red-400/30 px-2 py-0.5 rounded-full">
+                                          Cerrado
+                                       </span>
+                                    )}
+                                 </div>
 
                                  <p className="text-sm text-neutral-400 mt-2 line-clamp-3">
                                     {est.description}
@@ -147,7 +166,7 @@ export const AllEstablishment = () => {
                                     <div className="flex items-center gap-1 text-sm">
                                        <span className="text-yellow-400 text-base">⭐</span>
                                        <span className="font-semibold text-white">
-                                          {Number(est.averageRating || 0).toFixed(1) }
+                                          {Number(est.averageRating || 0).toFixed(1)}
                                        </span>
                                        <span className="text-neutral-500">/ 5</span>
                                     </div>

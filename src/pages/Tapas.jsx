@@ -5,7 +5,7 @@ import Container from "../components/layout/Container";
 import Section from "../components/layout/Section";
 import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
-import Footer from "../components/layout/Footer";
+import { Footer } from "../components/layout/Footer";
 
 import { itemService } from "../services/itemService";
 import { photoService } from "../services/photoService";
@@ -185,22 +185,43 @@ export const Tapas = () => {
 
                {/* Disponibilidad */}
                <div className="mt-4 md:mt-0">
-                  <Section title="Disponibilidad">
-                     <div className="flex items-center gap-3">
-                        {tapa.available ? (
-                           <>
-                              <CheckCircle className="text-green-500 w-5 h-5" />
-                              <span className="text-green-400 font-semibold">
-                      Disponible
-                              </span>
-                           </>
-                        ) : (
-                           <>
-                              <XCircle className="text-red-500 w-5 h-5" />
-                              <span className="text-red-400 font-semibold">
-                      No disponible
-                              </span>
-                           </>
+                  <Section title="">
+                     <div className="flex flex-col gap-2">
+                        {/* Disponibilidad de la tapa */}
+                        <div className="flex items-center gap-3">
+                           {tapa.available ? (
+                              <>
+                                 <CheckCircle className="text-green-500 w-5 h-5" />
+                                 <span className="text-green-400 font-semibold">Tapa disponible</span>
+                              </>
+                           ) : (
+                              <>
+                                 <XCircle className="text-red-500 w-5 h-5" />
+                                 <span className="text-red-400 font-semibold">Tapa no disponible</span>
+                              </>
+                           )}
+                        </div>
+
+                        {/* Estado del establecimiento AHORA */}
+                        <div className="flex items-center gap-3">
+                           {tapa.establishment?.isOpen ? (
+                              <>
+                                 <CheckCircle className="text-green-500 w-5 h-5" />
+                                 <span className="text-green-400 font-semibold">Local abierto ahora</span>
+                              </>
+                           ) : (
+                              <>
+                                 <XCircle className="text-red-500 w-5 h-5" />
+                                 <span className="text-red-400 font-semibold">Local cerrado ahora</span>
+                              </>
+                           )}
+                        </div>
+
+                        {/* Aviso combinado */}
+                        {tapa.available && !tapa.establishment?.isOpen && (
+                           <p className="text-xs text-yellow-400 mt-1">
+          ⚠️ La tapa está disponible pero el local está cerrado ahora mismo
+                           </p>
                         )}
                      </div>
                   </Section>

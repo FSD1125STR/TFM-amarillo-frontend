@@ -22,7 +22,7 @@ import Section from "../components/layout/Section";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
-import Footer from "../components/layout/Footer.jsx";
+import { Footer } from "../components/layout/Footer.jsx";
 
 import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
@@ -250,7 +250,7 @@ export const Establishment = () => {
                      </div>
                      <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
                         <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3"><Clock className="text-orange-500" /> Horario</h3>
-                        <ScheduleDisplay schedule={establishment.schedule} />
+                        <ScheduleDisplay schedule={establishment.schedule} isOpen={establishment.isOpen} />
                      </div>
                   </div>
                </div>
