@@ -1,3 +1,7 @@
+
+
+// src/pages/Tapas.jsx
+// Página de detalle de una tapa individual, con toda su información, fotos, valoración y enlaces relacionados.
 import { useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -10,7 +14,6 @@ import { Footer } from "../components/layout/Footer";
 import { itemService } from "../services/itemService";
 import { photoService } from "../services/photoService";
 import { ItemGallery } from "../components/common/ItemGallery";
-import { cloudinaryPresets } from "../utils/cloudinaryHelpers";
 import {
    CheckCircle,
    XCircle,
@@ -27,9 +30,7 @@ export const Tapas = () => {
    const [tapa, setTapa] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
-
    const [photos, setPhotos] = useState([]);
-   const [heroImage, setHeroImage] = useState(null);
 
    useEffect(() => {
       if (slug) {
@@ -47,7 +48,6 @@ export const Tapas = () => {
          }
          const data = response.data;
          setTapa(data);
-         setHeroImage(data.mainImage || null);
 
          const fotosData = await photoService.getByItem(data._id);
          const sorted = [...(fotosData || [])].sort((a, b) => a.order - b.order);
@@ -61,7 +61,7 @@ export const Tapas = () => {
    };
 
    const primaryImage =
-    photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || "/fallback.png";
+      photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || "/fallback.png";
 
    if (loading) {
       return (
@@ -86,7 +86,7 @@ export const Tapas = () => {
       );
    }
 
-   const hasImage = !!tapa.mainImage;
+   const hasImage = !!primaryImage && primaryImage !== "/fallback.png";
 
    return (
       <div>
@@ -95,7 +95,7 @@ export const Tapas = () => {
             {hasImage ? (
                <>
                   <img
-                     src={tapa.mainImage}
+                     src={primaryImage}
                      alt={tapa.name}
                      className="w-full h-full object-cover rounded-xl shadow-md"
                      onError={(e) => {
@@ -132,6 +132,38 @@ export const Tapas = () => {
             </div>
          </div>
 
+         {/* CARRUSEL DE FOTOS DE LA TAPA */}
+         {photos.length > 1 && (
+            <div className="max-w-3xl mx-auto mt-3 px-2">
+               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  {photos.map((photo, i) => (
+                     <button
+                        key={photo._id || i}
+                        onClick={() => {
+                           // Swap hero image al hacer clic en miniatura
+                           setTapa((prev) => ({ ...prev, mainImage: photo.url }));
+                        }}
+                        className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                           primaryImage === photo.url
+                              ? "border-orange-500 opacity-100"
+                              : "border-transparent opacity-60 hover:opacity-90"
+                        }`}
+                     >
+                        <img
+                           src={photo.url}
+                           alt={`Foto ${i + 1}`}
+                           className="w-full h-full object-cover"
+                           onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = "/Logo.jpg";
+                           }}
+                        />
+                     </button>
+                  ))}
+               </div>
+            </div>
+         )}
+
          <Container>
             {/* DESCRIPCIÓN */}
             {tapa.description && (
@@ -165,7 +197,7 @@ export const Tapas = () => {
 
                            {mod.isFree ? (
                               <span className="text-xs font-bold text-green-400">
-                      Gratis
+                                 Gratis
                               </span>
                            ) : (
                               <span className="text-sm font-bold text-orange-400">
@@ -175,7 +207,7 @@ export const Tapas = () => {
 
                            {!mod.available && (
                               <span className="text-xs text-neutral-600">
-                      · No disponible
+                                 · No disponible
                               </span>
                            )}
                         </div>
@@ -220,7 +252,7 @@ export const Tapas = () => {
                         {/* Aviso combinado */}
                         {tapa.available && !tapa.establishment?.isOpen && (
                            <p className="text-xs text-yellow-400 mt-1">
-          ⚠️ La tapa está disponible pero el local está cerrado ahora mismo
+                              ⚠️ La tapa está disponible pero el local está cerrado ahora mismo
                            </p>
                         )}
                      </div>
@@ -236,7 +268,7 @@ export const Tapas = () => {
                      <div>
                         <Tags className="w-6 h-6 text-blue-400 mx-auto mb-2" />
                         <h3 className="text-white font-semibold text-lg mb-4">
-                  Categorías
+                           Categorías
                         </h3>
                      </div>
 
@@ -261,7 +293,7 @@ export const Tapas = () => {
                      <div>
                         <AlertTriangle className="w-6 h-6 text-red-400 mx-auto mb-2" />
                         <h3 className="text-white font-semibold text-lg mb-4">
-                  Alérgenos
+                           Alérgenos
                         </h3>
                      </div>
 
@@ -315,10 +347,14 @@ export const Tapas = () => {
                />
             </Section>
 
-            {/* GALERÍA */}
-            <Section title={`Todas las tapas de ${tapa.establishment.name}`}>
-               <ItemGallery establishmentId={tapa.establishment._id} />
-            </Section>
+            {/* GALERÍA DE TAPAS DEL ESTABLECIMIENTO SI HAY MAS DE 1 */}
+            
+            <ItemGallery 
+               establishmentId={tapa.establishment._id} 
+               currentItemId={tapa._id}
+               establishmentName={tapa.establishment.name}
+            />
+         
 
             {/* BOTÓN BAR */}
             <div className="mt-8 mb-6">
@@ -328,7 +364,7 @@ export const Tapas = () => {
                   }
                   className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600"
                >
-            Volver al establecimiento {tapa.establishment.name}
+                  Volver al establecimiento {tapa.establishment.name}
                </Button>
             </div>
 

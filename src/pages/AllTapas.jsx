@@ -1,3 +1,7 @@
+
+
+// src/pages/AllTapas.jsx
+// Página principal que muestra todas las tapas disponibles, ordenadas por proximidad y disponibilidad
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "../components/layout/Footer";
@@ -19,7 +23,6 @@ export const AllTapas = () => {
          const response = await itemService.getAllItems(params);
          const data = response.data || [];
          setItems(data);
-         console.log("items:", data); // ✅ log correcto, sin estado stale
       } catch (error) {
          console.error("Error cargando items:", error);
       } finally {
@@ -27,7 +30,7 @@ export const AllTapas = () => {
       }
    }, [coords]);
 
-   // ✅ Esperar a que la geolocalización termine antes de cargar
+   //  Esperar a que la geolocalización termine antes de cargar
    useEffect(() => {
       if (!geoLoading) {
          loadItems();
@@ -47,16 +50,6 @@ export const AllTapas = () => {
       );
    }
 
-   // const sortedItems = [...items].sort((a, b) => {
-   //    // ✅ Lógica de apertura más robusta
-   //    const aOpen = a.available === true && a.establishment?.isOpen === true;
-   //    const bOpen = b.available === true && b.establishment?.isOpen === true;
-   //    if (bOpen !== aOpen) return bOpen - aOpen;
-   //    // Secundario: más cercano primero
-   //    const aDist = a.distance ?? Infinity;
-   //    const bDist = b.distance ?? Infinity;
-   //    return aDist - bDist;
-   // });
    const sortedItems = items;
    return (
       <div className="min-h-screen bg-neutral-950 text-white">
@@ -70,12 +63,12 @@ export const AllTapas = () => {
 
             <div className="grid grid-cols-2 gap-3">
                {sortedItems.map((item) => {
-                  // ✅ Distinguir correctamente los dos casos de cierre
+                  //  Distinguir correctamente los dos casos de cierre
                   const establishmentClosed = item.establishment?.isOpen === false;
                   const tapaUnavailable = item.available === false;
                   const unavailable = establishmentClosed || tapaUnavailable;
 
-                  // ✅ Mensaje diferenciado según el motivo real
+                  //  Mensaje diferenciado según el motivo real
                   const closedLabel = tapaUnavailable
                      ? "Tapa no disponible"
                      : "Establecimiento cerrado";

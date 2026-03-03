@@ -206,10 +206,13 @@ export const Establishment = () => {
             <div className="absolute bottom-4 left-4 right-4">
                {establishment.verified && <Badge className="mb-2 inline-block">VERIFICADO</Badge>}
                <h1 className="text-3xl font-bold text-white">{establishment.name}</h1>
-               <p className="text-sm text-neutral-300 flex items-center gap-1">
+               <span className="text-l text-white font-bold">
+                  {displayDistance()}
+               </span>
+               <p className="text-sm text-white flex items-center gap-1 font-bold">
                   <span className="text-yellow-400">★</span>
                   {Number(establishment.averageRating || 0).toFixed(1)} · {establishment.totalReviews || 0} reviews
-               </p>
+               </p>              
             </div>
          </div>
 
@@ -235,9 +238,7 @@ export const Establishment = () => {
             <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm">
                <div className="mb-6">
                   <h2 className="text-xl font-bold text-white">Descripción</h2>
-                  <span className="text-sm text-orange-400 font-medium">
-                     {displayDistance()}
-                  </span>
+                  
                   <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
                </div>
                {establishment.description && (
@@ -246,7 +247,10 @@ export const Establishment = () => {
             </div>
 
             <Section title="Nuestras Tapas">
-               <ItemGallery establishmentId={establishment._id} />
+               <ItemGallery 
+                  establishmentId={establishment._id}
+                  currentItemId={establishment.tapas?.[0]?._id} // Si queremos destacar la primera tapa
+                  establishmentName={establishment.name} />
             </Section>
 
             <ServiceKitchen features={establishment.features || []} cuisineType={establishment.cuisineType || []} />
