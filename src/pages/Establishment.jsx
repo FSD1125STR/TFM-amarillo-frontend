@@ -271,7 +271,7 @@ export const Establishment = () => {
                            <MapPinHouse className="text-orange-500" /> Dirección
                         </h3>
                         <p className="text-sm text-neutral-200">
-                           {establishment.address?.street}<br />
+                           {establishment.address?.street}, {establishment.address?.number}<br />
                            {establishment.address?.postalCode} {establishment.address?.city}, {establishment.address?.province}
                         </p>
                         <button
