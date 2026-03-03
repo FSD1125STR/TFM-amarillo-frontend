@@ -1,9 +1,5 @@
-
-
 // src/pages/Establishment.jsx
-// Página de detalle del establecimiento con integración de geolocalización y mapa interactivo
-// INTEGRACIÓN GEOLOCALIZACIÓN: Se envían las coordenadas del usuario al backend para calcular la distancia al establecimiento
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -69,7 +65,9 @@ function Lightbox({ images, startIndex, onClose }) {
          <div className="flex justify-center pb-6 pt-3">
             <div className="flex gap-1.5">
                {images.map((_, i) => (
-                  <button key={i} onClick={(e) => { e.stopPropagation(); setCurrent(i); }} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`} />
+                  <button key={i} onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                     className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`}
+                  />
                ))}
             </div>
          </div>
@@ -80,6 +78,11 @@ function Lightbox({ images, startIndex, onClose }) {
 export const Establishment = () => {
    const navigate = useNavigate();
    const { slug } = useParams();
+   const location = useLocation();
+
+   // Distancia pre-calculada desde el listado — evita recalcular con $geoNear
+   const preloadedDistance = location.state?.distance ?? null;
+
    const [establishment, setEstablishment] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
@@ -87,22 +90,22 @@ export const Establishment = () => {
    const [lightboxOpen, setLightboxOpen] = useState(false);
    const [lightboxIndex, setLightboxIndex] = useState(0);
    const mapInstance = useRef(null);
-   
-   // INTEGRACIÓN GEOLOCALIZACIÓN
+
    const { coords, loading: geoLoading } = useGeolocation();
 
    const loadEstablishmentData = useCallback(async () => {
       try {
-         // Si ya tenemos datos, no mostramos el spinner de pantalla completa para evitar parpadeos
          if (!establishment) {setLoading(true);}
          setError(null);
 
-         const params = (coords && coords.lat) ? { lat: coords.lat, lng: coords.lng } : {};
+         // Si ya tenemos distancia del listado, no necesitamos coords → petición más ligera sin $geoNear
+         const params = (!preloadedDistance && coords?.lat)
+            ? { lat: coords.lat, lng: coords.lng }
+            : {};
+
          const response = await establishmentService.getBySlug(slug, params);
-         
          setEstablishment(response.data);
 
-         // Cargar fotos solo si no las tenemos o ha cambiado el establecimiento
          const photosResponse = await photoService.getByEstablishment(response.data._id);
          setPhotos(photosResponse || []);
       } catch (err) {
@@ -111,7 +114,7 @@ export const Establishment = () => {
       } finally {
          setLoading(false);
       }
-   }, [slug, coords]); // Dependencia de coords para re-ejecutar cuando el GPS esté listo
+   }, [slug, coords, preloadedDistance]);
 
    useEffect(() => {
       loadEstablishmentData();
@@ -128,7 +131,12 @@ export const Establishment = () => {
       });
       new mapboxgl.Marker({ color: "#f97316" }).setLngLat([lng, lat]).addTo(map);
       mapInstance.current = map;
-      return () => { if (mapInstance.current) { mapInstance.current.remove(); mapInstance.current = null; } };
+      return () => {
+         if (mapInstance.current) {
+            mapInstance.current.remove();
+            mapInstance.current = null;
+         }
+      };
    }, [establishment]);
 
    const primaryUrl = photos.find((p) => p.isPrimary)?.url || establishment?.mainImage;
@@ -138,6 +146,17 @@ export const Establishment = () => {
    const openLightbox = (index = 0) => {
       setLightboxIndex(index);
       setLightboxOpen(true);
+   };
+
+   // Distancia a mostrar: precargada del listado o calculada por el backend
+   const displayDistance = () => {
+      const dist = Number(preloadedDistance ?? establishment?.distance);
+      if (isNaN(dist) || dist <= 0) {
+         return geoLoading ? "Calculando distancia..." : "Distancia no disponible";
+      }
+      return dist < 1000
+         ? `${Math.round(dist)} m`
+         : `${(dist / 1000).toFixed(1)} km`;
    };
 
    if (loading && !establishment) {
@@ -168,23 +187,28 @@ export const Establishment = () => {
          )}
 
          <div className="relative h-72 max-w-3xl mx-auto">
-            <img 
-               src={primaryUrl || "/Logo.jpg"} 
-               className="w-full h-full object-cover rounded-xl cursor-pointer" 
-               alt={establishment.name} 
-               onClick={() => openLightbox(0)} 
+            <img
+               src={primaryUrl || "/Logo.jpg"}
+               className="w-full h-full object-cover rounded-xl cursor-pointer"
+               alt={establishment.name}
+               onClick={() => openLightbox(0)}
             />
             <div className="absolute inset-0 bg-black/40 rounded-xl pointer-events-none" />
             <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-               <button onClick={() => navigate(-1)} className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80"><SquareArrowLeft /></button>
+               <button onClick={() => navigate(-1)} className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80">
+                  <SquareArrowLeft />
+               </button>
                <span className="text-white font-semibold">nexTapa</span>
-               <button className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80"><HeartHandshake /></button>
+               <button className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80">
+                  <HeartHandshake />
+               </button>
             </div>
             <div className="absolute bottom-4 left-4 right-4">
                {establishment.verified && <Badge className="mb-2 inline-block">VERIFICADO</Badge>}
                <h1 className="text-3xl font-bold text-white">{establishment.name}</h1>
                <p className="text-sm text-neutral-300 flex items-center gap-1">
-                  <span className="text-yellow-400">★</span> {Number(establishment.averageRating || 0).toFixed(1)} · {establishment.totalReviews || 0} reviews
+                  <span className="text-yellow-400">★</span>
+                  {Number(establishment.averageRating || 0).toFixed(1)} · {establishment.totalReviews || 0} reviews
                </p>
             </div>
          </div>
@@ -193,10 +217,18 @@ export const Establishment = () => {
             <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
                {photos.length > 0 ? (
                   photos.map((photo, i) => (
-                     <img key={photo._id} src={photo.url} className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80" onClick={() => openLightbox(i)} alt="Tapa" />
+                     <img key={photo._id} src={photo.url}
+                        className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80"
+                        onClick={() => openLightbox(i)} alt="Tapa"
+                     />
                   ))
                ) : (
-                  primaryUrl && <img src={primaryUrl} className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer" onClick={() => openLightbox(0)} alt="Default" />
+                  primaryUrl && (
+                     <img src={primaryUrl}
+                        className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer"
+                        onClick={() => openLightbox(0)} alt="Default"
+                     />
+                  )
                )}
             </div>
 
@@ -204,17 +236,7 @@ export const Establishment = () => {
                <div className="mb-6">
                   <h2 className="text-xl font-bold text-white">Descripción</h2>
                   <span className="text-sm text-orange-400 font-medium">
-                    
-                     {(() => {
-                        const dist = Number(establishment.distance);
-                        console.log("Distancia recibida del backend:", establishment.distance); // Debug distancia   
-                        if (isNaN(dist) || dist <= 0) {
-                           return geoLoading ? "Calculando distancia..." : "Distancia no disponible";
-                        }
-                        return dist < 1000
-                           ? `${Math.round(dist)} m`
-                           : `${(dist / 1000).toFixed(1)} km`;
-                     })()}
+                     {displayDistance()}
                   </span>
                   <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
                </div>
@@ -241,15 +263,27 @@ export const Establishment = () => {
                   </div>
                   <div className="flex flex-col justify-between gap-6">
                      <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
-                        <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3"><MapPinHouse className="text-orange-500" /> Dirección</h3>
-                        <p className="text-sm text-neutral-200">{establishment.address?.street}<br />{establishment.address?.postalCode} {establishment.address?.city}, {establishment.address?.province}</p>
-                        <button onClick={() => {
-                           const [lng, lat] = establishment.location.coordinates;
-                           window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, "_blank");
-                        }} className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all text-sm font-medium">Cómo llegar</button>
+                        <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3">
+                           <MapPinHouse className="text-orange-500" /> Dirección
+                        </h3>
+                        <p className="text-sm text-neutral-200">
+                           {establishment.address?.street}<br />
+                           {establishment.address?.postalCode} {establishment.address?.city}, {establishment.address?.province}
+                        </p>
+                        <button
+                           onClick={() => {
+                              const [lng, lat] = establishment.location.coordinates;
+                              window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, "_blank");
+                           }}
+                           className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all text-sm font-medium"
+                        >
+                           Cómo llegar
+                        </button>
                      </div>
                      <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
-                        <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3"><Clock className="text-orange-500" /> Horario</h3>
+                        <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3">
+                           <Clock className="text-orange-500" /> Horario
+                        </h3>
                         <ScheduleDisplay schedule={establishment.schedule} isOpen={establishment.isOpen} />
                      </div>
                   </div>
@@ -261,7 +295,9 @@ export const Establishment = () => {
             </Section>
 
             <div className="mt-8 mb-6">
-               <Button className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600">Regístrate Aquí</Button>
+               <Button className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600">
+                  Regístrate Aquí
+               </Button>
             </div>
             <Footer />
          </Container>

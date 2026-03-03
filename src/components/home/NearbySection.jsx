@@ -124,7 +124,9 @@ export default function NearbySection() {
                   return (
                      <div key={establishment._id} className="w-full shrink-0">
                         <div
-                           onClick={() => navigate(`/establishment/${establishment.slug}`)}
+                           onClick={() => navigate(`/establishment/${establishment.slug}`, {
+                              state: { distance: establishment.distance }
+                           })}
                            className={`bg-neutral-900 rounded-2xl overflow-hidden cursor-pointer hover:ring-1 ring-orange-500/50 transition-all duration-300 shadow-xl relative ${
                               !isOpen ? "opacity-60" : ""
                            }`}

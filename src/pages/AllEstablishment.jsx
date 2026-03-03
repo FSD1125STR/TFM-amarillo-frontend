@@ -147,7 +147,7 @@ export const AllEstablishment = () => {
                            {est.mainImage && (
                               <div
                                  className="md:w-56 h-52 md:h-auto shrink-0 cursor-pointer relative overflow-hidden"
-                                 onClick={() => navigate(`/establishment/${est.slug}`)}
+                                 onClick={() => navigate(`/establishment/${est.slug}`,{ state: { distance: est.distance }  })}
                               >
                                  <img
                                     src={est.mainImage}
@@ -176,7 +176,15 @@ export const AllEstablishment = () => {
                                  </div>
 
                                  <p className="text-sm text-neutral-400 mt-2 line-clamp-3">
-                                    {est.description}
+                                    {/* {est.description} */}
+                                    {/* Distancia en mtrs o km */}
+                                    {typeof est.distance === "number" && (
+                                       <span className="text-sm text-orange-400">
+                                          {est.distance < 1000
+                                             ? `${Math.round(est.distance)} m`
+                                             : `${(est.distance / 1000).toFixed(1)} km`}
+                                       </span>
+                                    )}
                                  </p>
 
                                  <div className="flex gap-2 flex-wrap mt-3">
@@ -195,42 +203,35 @@ export const AllEstablishment = () => {
                                        <span className="font-semibold text-white">
                                           {Number(est.averageRating || 0).toFixed(1)}
                                        </span>
-                                       <span className="text-neutral-500">/ 5</span>
+                                       <span className="text-neutral-500"></span>
+                                       
                                     </div>
 
-                                    {/* Distancia solo si viene del endpoint de proximidad */}
-                                    {typeof est.distance === "number" && (
-                                       <span className="text-sm text-orange-400">
-                                          {est.distance < 1000
-                                             ? `${Math.round(est.distance)} m`
-                                             : `${(est.distance / 1000).toFixed(1)} km`}
-                                       </span>
-                                    )}
-                                 </div>
-
-                                 {estCoords && (
-                                    <button
-                                       onClick={(e) => {
-                                          e.stopPropagation();
-                                          const [lng, lat] = estCoords;
-                                          window.open(
-                                             `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
-                                             "_blank"
-                                          );
-                                       }}
-                                       className="flex items-center gap-1.5 text-xs px-3 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 rounded-lg transition font-medium text-white"
+                                    
+                                 </div> 
+ 
+                                 <button
+                                    onClick={(e) => {
+                                       e.stopPropagation();
+                                       const [lng, lat] = estCoords;
+                                       window.open(
+                                          `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
+                                          "_blank"
+                                       );
+                                    }}
+                                    className="flex items-center gap-1.5 text-xs px-3 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 rounded-lg transition font-medium text-white"
+                                 >
+                                    <svg
+                                       xmlns="http://www.w3.org/2000/svg"
+                                       className="w-3.5 h-3.5"
+                                       viewBox="0 0 24 24"
+                                       fill="currentColor"
                                     >
-                                       <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          className="w-3.5 h-3.5"
-                                          viewBox="0 0 24 24"
-                                          fill="currentColor"
-                                       >
-                                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
-                                       </svg>
+                                       <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
+                                    </svg>
                                        Abrir en Maps
-                                    </button>
-                                 )}
+                                 </button>
+                                 
                               </div>
                            </div>
 

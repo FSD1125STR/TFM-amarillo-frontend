@@ -163,7 +163,9 @@ export const AllTapas = () => {
                               <button
                                  onClick={(e) => {
                                     e.stopPropagation();
-                                    navigate(`/establishment/${item.establishment?.slug}`);
+                                    navigate(`/establishment/${item.establishment?.slug}`, {
+                                       state: { distance: item.distance }  // ← la distancia ya la tiene el item
+                                    });
                                  }}
                                  className="w-full text-[11px] py-2 rounded-xl bg-neutral-800 hover:bg-orange-500 text-neutral-300 hover:text-white transition-all duration-200 font-medium"
                               >
