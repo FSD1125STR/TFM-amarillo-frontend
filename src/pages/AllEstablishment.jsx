@@ -1,6 +1,4 @@
-
-
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -11,6 +9,7 @@ import Badge from "../components/common/Badge";
 import { Footer } from "../components/layout/Footer";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { establishmentService } from "../services/establishmentService";
+import { MapPinOff } from "lucide-react";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -18,7 +17,7 @@ const MapPreview = ({ coordinates }) => {
    const mapContainer = useRef(null);
 
    useEffect(() => {
-      if (!coordinates) return;
+      if (!coordinates) {return;}
       const [lng, lat] = coordinates;
 
       const map = new mapboxgl.Map({
@@ -40,27 +39,51 @@ const MapPreview = ({ coordinates }) => {
 export const AllEstablishment = () => {
    const navigate = useNavigate();
    const [establishments, setEstablishments] = useState([]);
-   const { coords, loading: geoLoading, error: geoError } = useGeolocation();
+   const [loading, setLoading] = useState(true);
+   const [usingFallback, setUsingFallback] = useState(false);
+   const { coords, loading: geoLoading, error: geoError, clearCache } = useGeolocation();
 
-   useEffect(() => {
-      if (coords) loadEstablishments();
-   }, [coords]);
-
-   const loadEstablishments = async () => {
+   const loadNearby = useCallback(async () => {
       try {
+         setLoading(true);
          const response = await establishmentService.getNearby({
             lat: coords.lat,
             lng: coords.lng,
             limit: 50,
          });
-         // El backend ya devuelve ordenado por distancia, no tocamos el orden
          setEstablishments(response.data || []);
+         setUsingFallback(false);
+      } catch (error) {
+         console.error("Error cargando establecimientos cercanos:", error);
+      } finally {
+         setLoading(false);
+      }
+   }, [coords]);
+
+   const loadFallback = useCallback(async () => {
+      try {
+         setLoading(true);
+         const response = await establishmentService.getAll();
+         setEstablishments((response.data || []).slice(0, 50));
+         setUsingFallback(true);
       } catch (error) {
          console.error("Error cargando establecimientos:", error);
+      } finally {
+         setLoading(false);
       }
-   };
+   }, []);
 
-   if (geoLoading) {
+   useEffect(() => {
+      if (geoLoading) {return;}
+      if (coords) {
+         loadNearby();
+      } else {
+         loadFallback();
+      }
+   }, [coords, geoLoading, loadNearby, loadFallback]);
+
+   // ESTADO: Cargando
+   if (geoLoading || loading) {
       return (
          <div className="bg-neutral-950 min-h-screen text-white">
             <Header />
@@ -75,25 +98,30 @@ export const AllEstablishment = () => {
       );
    }
 
-   if (geoError) {
-      return (
-         <div className="bg-neutral-950 min-h-screen text-white">
-            <Header />
-            <Container>
-               <p className="py-8 text-neutral-400">
-                  Activa la ubicación para ver establecimientos cercanos
-               </p>
-            </Container>
-         </div>
-      );
-   }
-
    return (
       <div className="bg-neutral-950 min-h-screen text-white">
          <Header />
 
          <Container>
-            <div className="space-y-6 py-8">
+            {/* Aviso si no hay ubicación */}
+            {usingFallback && (
+               <div className="flex items-center gap-2 py-4 mt-2">
+                  <MapPinOff size={14} className="text-neutral-500 shrink-0" />
+                  <p className="text-xs text-neutral-500">
+                     Ubicación no disponible — mostrando todos los establecimientos.
+                  </p>
+                  {geoError && (
+                     <button
+                        onClick={() => { clearCache(); window.location.reload(); }}
+                        className="text-xs text-orange-500 hover:text-orange-400 underline transition-colors shrink-0"
+                     >
+                        Activar ubicación
+                     </button>
+                  )}
+               </div>
+            )}
+
+            <div className="space-y-6 py-4">
                {establishments.map((est) => {
                   const estCoords = est.location?.coordinates;
                   const isOpen = est.isOpen === true;
@@ -105,7 +133,7 @@ export const AllEstablishment = () => {
                            !isOpen ? "opacity-60" : ""
                         }`}
                      >
-                        {/* Badge cerrado — esquina superior izquierda sobre la imagen */}
+                        {/* Badge cerrado */}
                         {!isOpen && (
                            <div className="absolute top-3 left-3 z-10">
                               <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm">
@@ -140,7 +168,6 @@ export const AllEstablishment = () => {
                                     <h2 className="text-xl font-bold text-white hover:text-orange-400 transition-colors">
                                        {est.name}
                                     </h2>
-                                    {/* Badge inline en el nombre para pantallas sin imagen */}
                                     {!isOpen && !est.mainImage && (
                                        <span className="text-xs font-semibold text-red-400 border border-red-400/30 px-2 py-0.5 rounded-full">
                                           Cerrado
@@ -171,7 +198,8 @@ export const AllEstablishment = () => {
                                        <span className="text-neutral-500">/ 5</span>
                                     </div>
 
-                                    {est.distance && (
+                                    {/* Distancia solo si viene del endpoint de proximidad */}
+                                    {typeof est.distance === "number" && (
                                        <span className="text-sm text-orange-400">
                                           {est.distance < 1000
                                              ? `${Math.round(est.distance)} m`
