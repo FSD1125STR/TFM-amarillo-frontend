@@ -1,3 +1,5 @@
+
+
 // AdminEstablishments.jsx - Página de administración para listar y gestionar establecimientos
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +49,7 @@ export const AdminEstablishments = () => {
    return (
       <div>
          <div className="admin-page-header">
-            <h2>Establecimientos de la App</h2>
+            <h2>Establecimientos de la App ({establishments.length})</h2>
             <button
                className="admin-btn admin-btn-primary"
                onClick={() => navigate('/admin/establishments/new')}

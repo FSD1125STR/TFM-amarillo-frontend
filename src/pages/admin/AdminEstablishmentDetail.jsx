@@ -20,12 +20,7 @@ import { FeaturesAdmin } from './adminComponents/FeaturesAdmin';
 import { ViewInAppButton } from './adminComponents/ViewInAppButton';
 import { EstablishmentPhotosAdmin } from './adminComponents/EstablishmentPhotosAdmin';
 
-// ── Helpers de horario ─────────────────────────────────────────────────────────
 
-/**
- * Crea un objeto de día con el nuevo schema.
- * Por defecto: abierto de 09:00 a 00:00, sin horario partido.
- */
 const makeDay = (closed = false, open = '09:00', close = '00:00') => ({
    open,
    close,
@@ -34,10 +29,7 @@ const makeDay = (closed = false, open = '09:00', close = '00:00') => ({
    closed,
 });
 
-/**
- * Mapea un día existente (puede venir sin split/afternoon) al nuevo schema.
- * Garantiza compatibilidad con datos guardados antes del cambio.
- */
+
 const mapDay = (d) => ({
    open:      d?.open      || '',
    close:     d?.close     || '',
@@ -157,13 +149,6 @@ export const AdminEstablishmentDetail = () => {
       setForm(prev => ({ ...prev, address: { ...prev.address, [name]: value } }));
    };
 
-   /**
-    * Actualiza un campo de un día del horario.
-    * Soporta campos planos (open, close, closed, split) y el objeto anidado afternoon.
-    *
-    * Para afternoon se pasa un objeto parcial, p.ej: { open: '17:00' }
-    * y se hace merge con el estado anterior para no perder el otro campo.
-    */
    const handleScheduleChange = (day, field, value) => {
       setForm(prev => {
          const prevDay = prev.schedule[day] || {};
@@ -173,8 +158,8 @@ export const AdminEstablishmentDetail = () => {
                afternoon: {
                   open:  prevDay.afternoon?.open  || '',
                   close: prevDay.afternoon?.close || '',
-                  ...value, // merge parcial: { open: v } o { close: v }
-               },
+                  ...value, 
+               }
             }
             : { ...prevDay, [field]: value };
 
@@ -182,7 +167,7 @@ export const AdminEstablishmentDetail = () => {
             ...prev,
             schedule: {
                ...prev.schedule,
-               [day]: updatedDay, // nueva referencia → memo re-renderiza
+               [day]: updatedDay, 
             },
          };
       });

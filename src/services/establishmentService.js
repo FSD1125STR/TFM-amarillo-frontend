@@ -23,6 +23,18 @@ export const establishmentService = {
       }
    },
 
+   getNearby: async ({ lat, lng, maxDistance, limit = 10 }) => {
+      try {
+         const response = await api.get('/establishment/nearby', {
+            params: { lat, lng, maxDistance, limit }
+         });
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener establecimientos cercanos:', error);
+         throw error;
+      }
+   },
+
    getById: async (id) => {
       try {       
          const response = await api.get(`/establishment/${id}`);
@@ -33,16 +45,15 @@ export const establishmentService = {
       }
    },
 
-   getBySlug: async (slug) => {
+   getBySlug: async (slug, params) => { 
       try {
-         const response = await api.get(`/establishment/slug/${slug}`);
+         const response = await api.get(`/establishment/slug/${slug}`, { params });
          return response.data;
       } catch (error) {
          console.error('Error al obtener establecimiento por slug:', error);
          throw error;
       }
    },
-
    create: async (establishmentData) => {
       try {
          const response = await api.post('/establishment', establishmentData);
