@@ -1,5 +1,6 @@
 
 
+
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Compass, Heart, User } from "lucide-react";
@@ -28,8 +29,8 @@ export const Footer = () => {
    };
 
    return (
-      <footer className="p-4 max-w-3xl mx-auto">
-         <div className="flex justify-around items-center px-4 py-2">
+      <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50">
+         <div className="flex justify-around items-center px-4 py-2 max-w-3xl mx-auto">
             {items.map(({ id, label, Icon, path }) => {
                const isActive = active === id;
 
@@ -60,7 +61,6 @@ export const Footer = () => {
                );
             })}
          </div>
-
       </footer>
    );
 };

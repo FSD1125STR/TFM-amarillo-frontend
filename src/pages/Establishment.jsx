@@ -235,7 +235,7 @@ export const Establishment = () => {
                )}
             </div>
 
-            <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm">
+            <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm   hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
                <div className="mb-6">
                   <h2 className="text-xl font-bold text-white">Descripción</h2>
                   
@@ -250,7 +250,9 @@ export const Establishment = () => {
                <ItemGallery 
                   establishmentId={establishment._id}
                   currentItemId={establishment.tapas?.[0]?._id} // Si queremos destacar la primera tapa
-                  establishmentName={establishment.name} />
+                  establishmentName={establishment.name} 
+                  distance={preloadedDistance ?? establishment.distance} // Pasamos la distancia pre-calculada o la calculada por el backend
+               />
             </Section>
 
             <ServiceKitchen features={establishment.features || []} cuisineType={establishment.cuisineType || []} />

@@ -6,7 +6,7 @@ import  Section  from '../layout/Section.jsx';
 
 const DEFAULT_IMAGE = '/Logo.jpg';
 
-export const ItemGallery = ({ establishmentId, currentItemId, establishmentName }) => {
+export const ItemGallery = ({ establishmentId, currentItemId, establishmentName, distance }) => {
    const [items, setItems] = useState([]);
    const [loading, setLoading] = useState(true);
    const navigate = useNavigate();
@@ -48,7 +48,7 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName 
          ">    {filtered.map((item) => (
                <button
                   key={item._id}
-                  onClick={() => navigate(`/items/${item.slug}`)}
+                  onClick={() => navigate(`/items/${item.slug}`, { state: { distance } })}
                   className="
           group relative 
           flex-none 

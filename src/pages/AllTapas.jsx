@@ -1,7 +1,5 @@
-
-
 // src/pages/AllTapas.jsx
-// Página principal que muestra todas las tapas disponibles, ordenadas por proximidad y disponibilidad
+// Página principal que muestra todas las tapas disponibles, ordenadas por proximidad
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "../components/layout/Footer";
@@ -30,7 +28,6 @@ export const AllTapas = () => {
       }
    }, [coords]);
 
-   //  Esperar a que la geolocalización termine antes de cargar
    useEffect(() => {
       if (!geoLoading) {
          loadItems();
@@ -50,7 +47,6 @@ export const AllTapas = () => {
       );
    }
 
-   const sortedItems = items;
    return (
       <div className="min-h-screen bg-neutral-950 text-white">
          <Header />
@@ -62,16 +58,22 @@ export const AllTapas = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-               {sortedItems.map((item) => {
-                  //  Distinguir correctamente los dos casos de cierre
-                  const establishmentClosed = item.establishment?.isOpen === false;
+               {items.map((item) => {
+                  // Tapa desactivada por el hostelero
                   const tapaUnavailable = item.available === false;
-                  const unavailable = establishmentClosed || tapaUnavailable;
+                  // Tapa activa pero no se sirve hoy (specialDays)
+                  const notServedToday = item.servedToday === false;
+                  // Local cerrado
+                  const establishmentClosed = item.establishment?.isOpen === false;
 
-                  //  Mensaje diferenciado según el motivo real
+                  const unavailable = tapaUnavailable || notServedToday || establishmentClosed;
+
+                  // Mensaje diferenciado según el motivo
                   const closedLabel = tapaUnavailable
                      ? "Tapa no disponible"
-                     : "Establecimiento cerrado";
+                     : notServedToday
+                        ? `Solo: ${item.availableOnlyOn?.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')}`
+                        : "Local cerrado";
 
                   return (
                      <div
@@ -83,7 +85,7 @@ export const AllTapas = () => {
                         {/* IMAGEN */}
                         <div
                            className="relative cursor-pointer group"
-                           onClick={() => navigate(`/items/${item.slug}`)}
+                           onClick={() => navigate(`/items/${item.slug}`, { state: { distance: item.distance } })}
                         >
                            <img
                               src={item.mainImage || "/Logo.jpg"}
@@ -104,10 +106,10 @@ export const AllTapas = () => {
                               </span>
                            </div>
 
-                           {/* Badge cerrado — encima de la imagen */}
+                           {/* Badge estado — encima de la imagen */}
                            {unavailable && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                 <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm">
+                                 <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm text-center">
                                     {closedLabel}
                                  </span>
                               </div>
@@ -119,7 +121,7 @@ export const AllTapas = () => {
                            <div>
                               <h3
                                  className="font-bold text-sm text-white leading-tight cursor-pointer hover:text-orange-400 transition-colors line-clamp-2"
-                                 onClick={() => navigate(`/items/${item.slug}`)}
+                                 onClick={() => navigate(`/items/${item.slug}`, { state: { distance: item.distance } })}
                               >
                                  {item.name}
                               </h3>
@@ -136,7 +138,6 @@ export const AllTapas = () => {
                                     <span />
                                  )}
 
-                                 {/* ✅ Renderiza si distance es número válido (incluso 0) */}
                                  {typeof item.distance === "number" && (
                                     <span className="text-[10px] text-orange-500/80 font-medium">
                                        {item.distance < 1000
@@ -157,7 +158,7 @@ export const AllTapas = () => {
                                  onClick={(e) => {
                                     e.stopPropagation();
                                     navigate(`/establishment/${item.establishment?.slug}`, {
-                                       state: { distance: item.distance }  // ← la distancia ya la tiene el item
+                                       state: { distance: item.distance }
                                     });
                                  }}
                                  className="w-full text-[11px] py-2 rounded-xl bg-neutral-800 hover:bg-orange-500 text-neutral-300 hover:text-white transition-all duration-200 font-medium"

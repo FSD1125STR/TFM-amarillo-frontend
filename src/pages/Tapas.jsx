@@ -2,7 +2,7 @@
 
 // src/pages/Tapas.jsx
 // Página de detalle de una tapa individual, con toda su información, fotos, valoración y enlaces relacionados.
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import Container from "../components/layout/Container";
@@ -10,10 +10,12 @@ import Section from "../components/layout/Section";
 import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
 import { Footer } from "../components/layout/Footer";
+import { LittleEstablishCard } from "../components/common/LittleEstablishCard";
 
 import { itemService } from "../services/itemService";
 import { photoService } from "../services/photoService";
 import { ItemGallery } from "../components/common/ItemGallery";
+import { useGeolocation } from "../hooks/useGeolocation.js";
 import {
    CheckCircle,
    XCircle,
@@ -27,21 +29,30 @@ import {
 export const Tapas = () => {
    const navigate = useNavigate();
    const { slug } = useParams();
+   const location = useLocation();
+
+   // Distancia pre-calculada desde el listado o desde el establecimiento
+   const distanceFromState = location.state?.distance ?? null;
+
    const [tapa, setTapa] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [photos, setPhotos] = useState([]);
+   const { coords, loading: geoLoading } = useGeolocation();
 
    useEffect(() => {
-      if (slug) {
+      if (slug && !geoLoading) {
          loadTapa();
       }
-   }, [slug]);
+   }, [slug, geoLoading]);
 
    const loadTapa = async () => {
       try {
          setLoading(true);
-         const response = await itemService.getBySlug(slug);
+         const params = (!distanceFromState && coords)
+            ? { lat: coords.lat, lng: coords.lng }
+            : {};
+         const response = await itemService.getBySlug(slug, params);
          if (!response || !response.data) {
             setError("Tapa no encontrada");
             return;
@@ -62,6 +73,12 @@ export const Tapas = () => {
 
    const primaryImage =
       photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || "/fallback.png";
+
+   // Prioriza distancia del state (ya calculada), si no la del backend
+   const distance = distanceFromState ?? tapa?.establishment?.distance ?? null;
+
+   // Disponibilidad real: activa por el hostelero Y se sirve hoy
+   const isAvailableToday = tapa?.available && (tapa?.servedToday ?? true);
 
    if (loading) {
       return (
@@ -123,9 +140,7 @@ export const Tapas = () => {
                >
                   <SquareArrowLeft />
                </button>
-
                <span className="text-white font-semibold">nexTapa</span>
-
                <button className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
                   <HeartHandshake />
                </button>
@@ -140,7 +155,6 @@ export const Tapas = () => {
                      <button
                         key={photo._id || i}
                         onClick={() => {
-                           // Swap hero image al hacer clic en miniatura
                            setTapa((prev) => ({ ...prev, mainImage: photo.url }));
                         }}
                         className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
@@ -164,101 +178,108 @@ export const Tapas = () => {
             </div>
          )}
 
+         {/* MODALIDADES + DISPONIBILIDAD */}
+         <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row gap-3 p-4 items-center bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
+
+            {/* Modalidades */}
+            {tapa.modalities?.length > 0 && (
+               <div className="flex flex-wrap gap-2 flex-1">
+                  {tapa.modalities.map((mod, i) => (
+                     <div
+                        key={i}
+                        className={`flex items-center gap-2 rounded-xl px-4 py-2.5 border ${
+                           !mod.available
+                              ? "bg-neutral-900 border-neutral-700 opacity-50"
+                              : mod.isFree
+                                 ? "bg-green-500/10 border-green-500/30"
+                                 : "bg-neutral-900 border-neutral-700"
+                        }`}
+                     >
+                        <span className="text-sm text-neutral-200 font-medium">{mod.label}</span>
+                        <span className="w-px h-3 bg-neutral-600" />
+                        {mod.isFree ? (
+                           <span className="text-xs font-bold text-green-400 uppercase tracking-wide">Gratis</span>
+                        ) : (
+                           <span className="text-sm font-bold text-orange-400">{mod.price}€</span>
+                        )}
+                        {!mod.available && (
+                           <span className="text-[10px] text-neutral-500 italic">no disponible</span>
+                        )}
+                     </div>
+                  ))}
+               </div>
+            )}
+
+            {/* Disponibilidad */}
+            <div className="flex flex-col gap-2 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-3 self-start">
+
+               {/* Estado de la tapa */}
+               <div className="flex items-center gap-2.5">
+                  {isAvailableToday ? (
+                     <>
+                        <CheckCircle className="text-green-500 w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm text-green-400 font-medium">Tapa disponible</span>
+                     </>
+                  ) : tapa.availableOnlyOn?.length > 0 ? (
+                     <>
+                        <XCircle className="text-red-400 w-4 h-4 " />
+                        <span className="text-sm text-red-400 font-medium">
+                           Disponible los: {tapa.availableOnlyOn.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')}
+                        </span>
+                     </>
+                  ) : (
+                     <>
+                        <XCircle className="text-red-500 w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm text-red-400 font-medium">Tapa no disponible</span>
+                     </>
+                  )}
+               </div>
+
+               {/* Estado del local */}
+               <div className="flex items-center gap-2.5">
+                  {tapa.establishment?.isOpen ? (
+                     <>
+                        <CheckCircle className="text-green-500 w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm text-green-400 font-medium">Local abierto ahora</span>
+                     </>
+                  ) : (
+                     <>
+                        <XCircle className="text-red-500 w-4 h-4 flex-shrink-0" />
+                        <span className="text-sm text-red-400 font-medium">Local cerrado ahora</span>
+                     </>
+                  )}
+               </div>
+
+               {/* Aviso combinado */}
+               {isAvailableToday && !tapa.establishment?.isOpen && (
+                  <p className="text-[11px] text-yellow-400/80 border-t border-neutral-800 pt-2 mt-1">
+                     ⚠️ Disponible pero el local está cerrado
+                  </p>
+               )}
+            </div>
+         </div>
+
          <Container>
             {/* DESCRIPCIÓN */}
             {tapa.description && (
-               <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-sm hover:shadow-md transition-shadow duration-200">
+               <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border   border-neutral-800  hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
                   <div className="mb-6 text-center">
                      <h2 className="text-3xl font-bold text-white">{tapa.name}</h2>
                      <div className="w-16 h-1 bg-orange-500 rounded-full mt-3 mx-auto" />
                   </div>
-
                   <p className="text-sm text-white leading-relaxed text-center">
                      {tapa.description}
                   </p>
                </div>
             )}
 
-            {/* MODALIDADES + DISPONIBILIDAD */}
-            <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mt-4">
-               {/* Modalidades */}
-               {tapa.modalities?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 md:max-w-[60%]">
-                     {tapa.modalities.map((mod, i) => (
-                        <div
-                           key={i}
-                           className={`flex items-center gap-2 rounded-xl px-3 py-2 border ${
-                              mod.isFree
-                                 ? "bg-green-500/10 border-green-500/30"
-                                 : "bg-neutral-800 border-neutral-700"
-                           }`}
-                        >
-                           <span className="text-sm text-neutral-300">{mod.label}</span>
-
-                           {mod.isFree ? (
-                              <span className="text-xs font-bold text-green-400">
-                                 Gratis
-                              </span>
-                           ) : (
-                              <span className="text-sm font-bold text-orange-400">
-                                 {mod.price}€
-                              </span>
-                           )}
-
-                           {!mod.available && (
-                              <span className="text-xs text-neutral-600">
-                                 · No disponible
-                              </span>
-                           )}
-                        </div>
-                     ))}
-                  </div>
-               )}
-
-               {/* Disponibilidad */}
-               <div className="mt-4 md:mt-0">
-                  <Section title="">
-                     <div className="flex flex-col gap-2">
-                        {/* Disponibilidad de la tapa */}
-                        <div className="flex items-center gap-3">
-                           {tapa.available ? (
-                              <>
-                                 <CheckCircle className="text-green-500 w-5 h-5" />
-                                 <span className="text-green-400 font-semibold">Tapa disponible</span>
-                              </>
-                           ) : (
-                              <>
-                                 <XCircle className="text-red-500 w-5 h-5" />
-                                 <span className="text-red-400 font-semibold">Tapa no disponible</span>
-                              </>
-                           )}
-                        </div>
-
-                        {/* Estado del establecimiento AHORA */}
-                        <div className="flex items-center gap-3">
-                           {tapa.establishment?.isOpen ? (
-                              <>
-                                 <CheckCircle className="text-green-500 w-5 h-5" />
-                                 <span className="text-green-400 font-semibold">Local abierto ahora</span>
-                              </>
-                           ) : (
-                              <>
-                                 <XCircle className="text-red-500 w-5 h-5" />
-                                 <span className="text-red-400 font-semibold">Local cerrado ahora</span>
-                              </>
-                           )}
-                        </div>
-
-                        {/* Aviso combinado */}
-                        {tapa.available && !tapa.establishment?.isOpen && (
-                           <p className="text-xs text-yellow-400 mt-1">
-                              ⚠️ La tapa está disponible pero el local está cerrado ahora mismo
-                           </p>
-                        )}
-                     </div>
-                  </Section>
-               </div>
-            </div>
+            {/* INFORMACIÓN DEL ESTABLECIMIENTO */}
+            <LittleEstablishCard
+               name={tapa.establishment.name}
+               address={`${tapa.establishment.address.street}, ${tapa.establishment.address.number} - ${tapa.establishment.address.city}`}
+               distance={distance}
+               slug={tapa.establishment.slug}
+            />
 
             {/* INFORMACIÓN ADICIONAL */}
             <Section title="Información adicional">
@@ -267,18 +288,12 @@ export const Tapas = () => {
                   <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-blue-500 text-center min-h-55 flex flex-col">
                      <div>
                         <Tags className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                        <h3 className="text-white font-semibold text-lg mb-4">
-                           Categorías
-                        </h3>
+                        <h3 className="text-white font-semibold text-lg mb-4">Categorías</h3>
                      </div>
-
                      <div className="flex flex-wrap justify-center gap-2 grow items-center">
                         {tapa.categories?.length > 0 ? (
                            tapa.categories.map((cat, i) => (
-                              <span
-                                 key={i}
-                                 className="text-xs bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1 rounded-full"
-                              >
+                              <span key={i} className="text-xs bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1 rounded-full">
                                  {cat}
                               </span>
                            ))
@@ -292,18 +307,12 @@ export const Tapas = () => {
                   <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-red-500 text-center min-h-55 flex flex-col">
                      <div>
                         <AlertTriangle className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                        <h3 className="text-white font-semibold text-lg mb-4">
-                           Alérgenos
-                        </h3>
+                        <h3 className="text-white font-semibold text-lg mb-4">Alérgenos</h3>
                      </div>
-
                      <div className="flex flex-wrap justify-center gap-2 grow items-center">
                         {tapa.allergens?.length > 0 ? (
                            tapa.allergens.map((allergen, i) => (
-                              <span
-                                 key={i}
-                                 className="text-xs bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1 rounded-full"
-                              >
+                              <span key={i} className="text-xs bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1 rounded-full">
                                  {allergen}
                               </span>
                            ))
@@ -319,14 +328,10 @@ export const Tapas = () => {
                         <Leaf className="w-6 h-6 text-green-400 mx-auto mb-2" />
                         <h3 className="text-white font-semibold text-lg mb-4">Dieta</h3>
                      </div>
-
                      <div className="flex flex-wrap justify-center gap-2 grow items-center">
                         {tapa.dietaryOptions?.length > 0 ? (
                            tapa.dietaryOptions.map((diet, i) => (
-                              <span
-                                 key={i}
-                                 className="text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1 rounded-full"
-                              >
+                              <span key={i} className="text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1 rounded-full">
                                  {diet}
                               </span>
                            ))
@@ -347,21 +352,18 @@ export const Tapas = () => {
                />
             </Section>
 
-            {/* GALERÍA DE TAPAS DEL ESTABLECIMIENTO SI HAY MAS DE 1 */}
-            
-            <ItemGallery 
-               establishmentId={tapa.establishment._id} 
+            {/* GALERÍA DE TAPAS DEL ESTABLECIMIENTO */}
+            <ItemGallery
+               establishmentId={tapa.establishment._id}
                currentItemId={tapa._id}
                establishmentName={tapa.establishment.name}
+               distance={distance}
             />
-         
 
             {/* BOTÓN BAR */}
             <div className="mt-8 mb-6">
                <Button
-                  onClick={() =>
-                     navigate(`/establishment/${tapa.establishment.slug}`)
-                  }
+                  onClick={() => navigate(`/establishment/${tapa.establishment.slug}`)}
                   className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600"
                >
                   Volver al establecimiento {tapa.establishment.name}

@@ -1,5 +1,3 @@
-
-
 // src/pages/admin/ItemAdmin.jsx
 // Página de administración para crear o editar tapas
 
@@ -15,6 +13,7 @@ import { Allergens } from './itemsComponents/Allargens';
 import { DietaryOptions } from './itemsComponents/DietaryOptions';
 import { ItemPhotoSection } from './itemsComponents/ItemPhotoSection';
 import { ViewItemInAppButton } from './itemsComponents/ViewItemInApp';
+import { useGeolocation } from '../../hooks/useGeolocation.js';
 
 import './styles/admin.css';
 import './styles/itemAdmin.css';
@@ -32,10 +31,12 @@ export const ItemAdmin = () => {
    const location = useLocation();
    const establishmentIdFromState = location.state?.establishmentId;
 
+   const { coords } = useGeolocation();
+
    const [form, setForm] = useState({
       name: '',
       description: '',
-      modalities: [{ label: 'Tapa', price: 0, isFree: false, available: true }], 
+      modalities: [{ label: 'Tapa', price: 0, isFree: false, available: true }],
       categories: [],
       allergens: [],
       dietaryOptions: [],
@@ -59,7 +60,7 @@ export const ItemAdmin = () => {
          setForm({
             name: data.name || '',
             description: data.description || '',
-            modalities: data.modalities?.length  
+            modalities: data.modalities?.length
                ? data.modalities
                : [{ label: 'Tapa', price: 0, isFree: false, available: true }],
             categories: data.categories || [],
@@ -93,14 +94,13 @@ export const ItemAdmin = () => {
             modalities: form.modalities.map(m => ({
                ...m,
                isFree: m.price === 0,
-            })), 
+            })),
             ...(isNew && establishmentIdFromState ? { establishment: establishmentIdFromState } : {}),
          };
          if (isNew) {
             const res = await itemService.create(payload);
             const newId = res.data._id;
-            // Redirigir a edición con el ID real, manteniendo el establishmentId en state
-            navigate(`/admin/items/${newId}`, { 
+            navigate(`/admin/items/${newId}`, {
                replace: true,
                state: { establishmentId: establishmentIdFromState }
             });
@@ -146,7 +146,7 @@ export const ItemAdmin = () => {
 
          <form onSubmit={handleSubmit} className="admin-form">
 
-            {/* Foto principal — ancho completo, protagonista */}
+            {/* Foto principal */}
             <div className="admin-section">
                <h2 className="admin-section-title">Fotos</h2>
                <ItemPhotoSection
@@ -156,21 +156,19 @@ export const ItemAdmin = () => {
                />
             </div>
 
-            {/* Fila 1: Info básica + Precio */}
+            {/* Fila 1 */}
             <div className="admin-row">
                <BasicInformationItem form={form} handleChange={handleChange} />
                <StateAndVisibility form={form} handleChange={handleChange} />
-              
             </div>
 
-            {/* Fila 2: Estado y visibilidad + Categorías */}
+            {/* Fila 2 */}
             <div className="admin-row">
-               
                <PriceInformation form={form} handleChange={handleChange} />
                <Categories form={form} handleChange={handleChange} />
             </div>
 
-            {/* Fila 3: Alérgenos + Opciones dietéticas */}
+            {/* Fila 3 */}
             <div className="admin-row">
                <Allergens form={form} handleChange={handleChange} />
                <DietaryOptions form={form} handleChange={handleChange} />
@@ -178,7 +176,12 @@ export const ItemAdmin = () => {
 
             <div className="admin-form-footer">
                <SaveButton saving={saving} />
-               {!isNew && <ViewItemInAppButton slug={item?.slug} />}
+               {!isNew && (
+                  <ViewItemInAppButton
+                     slug={item?.slug}
+                     coords={coords}
+                  />
+               )}
             </div>
 
          </form>
