@@ -246,7 +246,7 @@ export const Establishment = () => {
                )}
             </div>
 
-            <Section title="Nuestras Tapas">
+            <Section >
                <ItemGallery 
                   establishmentId={establishment._id}
                   currentItemId={establishment.tapas?.[0]?._id} // Si queremos destacar la primera tapa

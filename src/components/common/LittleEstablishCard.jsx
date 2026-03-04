@@ -17,7 +17,7 @@ export const LittleEstablishCard = ({ name, address, distance, slug }) => {
 
    return (
       <div
-         onClick={() => slug && navigate(`/establishment/${slug}`, { state: { distance } })}
+       
          className="flex items-center gap-3 p-4 bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer"
       >
          <div className="flex-shrink-0 w-10 h-10 bg-neutral-800 rounded-xl flex items-center justify-center">
@@ -32,7 +32,9 @@ export const LittleEstablishCard = ({ name, address, distance, slug }) => {
             </p>
          </div>
 
-         <ChevronRight className="w-4 h-4 text-neutral-300 flex-shrink-0" />
+         <ChevronRight 
+            onClick={() => slug && navigate(`/establishment/${slug}`, { state: { distance } })}
+            className="w-4 h-4 text-neutral-300 flex-shrink-0" />
       </div>
    );
 };

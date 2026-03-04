@@ -1,10 +1,7 @@
 
 
-
 // src/components/admin/adminComponents/ItemsAdmin.jsx
 // componente para listar y gestionar las tapas de un establecimiento en el panel admin
-
-// src/components/admin/adminComponents/ItemsAdmin.jsx
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -44,7 +41,6 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
 
    return (
       <tr ref={setNodeRef} style={style}>
-         {/* Handle de arrastre */}
          <td>
             <span
                className="drag-handle"
@@ -58,7 +54,6 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
          <td>{item.name}</td>
          <td>
             {item.modalities?.length === 1 ? (
-            // Una sola modalidad: mostrar inline
                <span>
                   {item.modalities[0].label} · {' '}
                   {item.modalities[0].isFree || item.modalities[0].price === 0
@@ -67,7 +62,6 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
                   }
                </span>
             ) : (
-            // Varias modalidades: select
                <select
                   style={{
                      border: '1px solid var(--admin-border)',
@@ -79,7 +73,7 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
                      cursor: 'default',
                   }}
                   defaultValue=""
-                  onChange={e => e.target.value = ""} // solo lectura
+                  onChange={e => e.target.value = ""}
                >
                   <option value="" disabled>
                      {item.modalities.length} Opciones
@@ -118,15 +112,9 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
                >
                   Editar
                </button>
-               {/* <button
-                  className="admin-btn admin-btn-secondary admin-btn-sm"
-                  onClick={() => onToggleAvailable(item._id, item.available)}
-               >
-                  {item.available ? 'Desactivar' : 'Activar'}
-               </button> */}
                <button
                   className="admin-btn admin-btn-danger admin-btn-sm"
-                  onClick={() => onDelete(item._id)}
+                  onClick={() => onDelete(item._id, item.name)}
                >
                   Borrar
                </button>
@@ -146,6 +134,9 @@ export const EstablishmentItems = ({ establishmentId }) => {
    const [error, setError] = useState(null);
    const [successMsg, setSuccessMsg] = useState(null);
    const [orderChanged, setOrderChanged] = useState(false);
+
+   // Modal de confirmación
+   const [deletingItem, setDeletingItem] = useState(null); // { id, name }
 
    const sensors = useSensors(
       useSensor(PointerSensor, {
@@ -179,7 +170,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
    // ── Drag end ────────────────────────────────────────────────────────────
    const handleDragEnd = useCallback((event) => {
       const { active, over } = event;
-      if (!over || active.id === over.id) { return; }
+      if (!over || active.id === over.id) {return;}
 
       setItems(prev => {
          const oldIndex = prev.findIndex(i => i._id === active.id);
@@ -229,21 +220,52 @@ export const EstablishmentItems = ({ establishmentId }) => {
       }
    };
 
-   // ── Delete (soft) ───────────────────────────────────────────────────────
-   const handleDelete = async (itemId) => {
-      if (!confirm('¿Seguro que quieres eliminar esta tapa?')) { return; }
+   // ── Delete — abre modal ─────────────────────────────────────────────────
+   const handleDeleteRequest = (itemId, itemName) => {
+      setDeletingItem({ id: itemId, name: itemName });
+   };
+
+   const handleDeleteConfirm = async () => {
       try {
-         await itemService.delete(itemId);
-         setItems(prev => prev.filter(item => item._id !== itemId));
-         showSuccess('Tapa eliminada');
+         await itemService.delete(deletingItem.id);
+         setItems(prev => prev.filter(item => item._id !== deletingItem.id));
+         showSuccess('Tapa eliminada correctamente');
       } catch (err) {
          setError('Error al eliminar la tapa', err);
+      } finally {
+         setDeletingItem(null);
       }
    };
 
    // ── Render ──────────────────────────────────────────────────────────────
    return (
       <section className="admin-section admin-items-section">
+
+         {/* Modal de confirmación */}
+         {deletingItem && (
+            <div className="admin-modal-overlay">
+               <div className="admin-modal">
+                  <h3 className="admin-modal-title">¿Eliminar tapa?</h3>
+                  <p className="admin-modal-body">
+                     Vas a eliminar <strong>{deletingItem.name}</strong>. Esta acción es irreversible.
+                  </p>
+                  <div className="admin-modal-actions">
+                     <button
+                        className="admin-btn admin-btn-secondary admin-btn-sm"
+                        onClick={() => setDeletingItem(null)}
+                     >
+                        Cancelar
+                     </button>
+                     <button
+                        className="admin-btn admin-btn-danger admin-btn-sm"
+                        onClick={handleDeleteConfirm}
+                     >
+                        Sí, eliminar
+                     </button>
+                  </div>
+               </div>
+            </div>
+         )}
 
          <div className="admin-section-header">
             <h2 className="admin-section-title" style={{ marginBottom: 0, borderBottom: 'none' }}>
@@ -304,7 +326,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
                                  item={item}
                                  onToggleAvailable={handleToggleAvailable}
                                  onToggleFeatured={handleToggleFeatured}
-                                 onDelete={handleDelete}
+                                 onDelete={handleDeleteRequest}
                                  onEdit={(id) => navigate(`/admin/items/${id}`)}
                               />
                            ))}

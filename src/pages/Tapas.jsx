@@ -276,7 +276,7 @@ export const Tapas = () => {
             {/* INFORMACIÓN DEL ESTABLECIMIENTO */}
             <LittleEstablishCard
                name={tapa.establishment.name}
-               address={`${tapa.establishment.address.street}, ${tapa.establishment.address.number} - ${tapa.establishment.address.city}`}
+               address={`${tapa.establishment.address.street}, ${tapa.establishment.address.number} - ${tapa.establishment.address.city} - ${tapa.establishment.address.province}`}
                distance={distance}
                slug={tapa.establishment.slug}
             />
