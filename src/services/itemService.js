@@ -27,13 +27,9 @@ export const itemService = {
    },
    getAllItems: async (filters = {}) => {
       try {
-         const params = new URLSearchParams();  
-         if (filters.type) {params.append('type', filters.type);}
-         if (filters.available !== undefined) {params.append('available', filters.available);}  
-         if (filters.featured !== undefined) {params.append('featured', filters.featured);}
-         const queryString = params.toString();
-         const url = `/items${queryString ? `?${queryString}` : ''}`;
-         const response = await api.get(url);
+         const response = await api.get('/items', { 
+            params: filters 
+         });
          return response.data;
       } catch (error) {
          console.error('Error al obtener items:', error);
