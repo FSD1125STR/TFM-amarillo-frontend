@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Badge from "../common/Badge";
 import { establishmentService } from "../../services/establishmentService";
 import { useGeolocation } from "../../hooks/useGeolocation";
+import { cloudinaryPresets } from "../../utils/cloudinaryHelpers.js";
 import { CircleChevronLeft, CircleChevronRight, MapPinOff } from "lucide-react";
 
 export default function NearbySection() {
@@ -19,10 +20,7 @@ export default function NearbySection() {
    const loadNearby = useCallback(async (location) => {
       setLoading(true);
       try {
-         const response = await establishmentService.getNearby({
-            lat: location.lat,
-            lng: location.lng,
-         });
+         const response = await establishmentService.getNearby({ lat: location.lat, lng: location.lng });
          setEstablishments(response.data || []);
          setUsingFallback(false);
       } catch (error) {
@@ -36,8 +34,7 @@ export default function NearbySection() {
       setLoading(true);
       try {
          const response = await establishmentService.getAll();
-         const data = (response.data || []).slice(0, 10);
-         setEstablishments(data);
+         setEstablishments((response.data || []).slice(0, 10));
          setUsingFallback(true);
       } catch (error) {
          console.error("Error cargando establecimientos:", error);
@@ -47,20 +44,14 @@ export default function NearbySection() {
    }, []);
 
    useEffect(() => {
-      if (geoLoading) {return;} // Esperar a que la geo resuelva
-
-      if (coords) {
-         loadNearby(coords);
-      } else {
-         // Sin ubicación (denegada o no disponible) → fallback sin coordenadas
-         loadFallback();
-      }
+      if (geoLoading) {return;}
+      if (coords) {loadNearby(coords);}
+      else {loadFallback();}
    }, [coords, geoLoading, loadNearby, loadFallback]);
 
    const nextSlide = () => setCurrentIndex((prev) => prev === establishments.length - 1 ? 0 : prev + 1);
    const prevSlide = () => setCurrentIndex((prev) => prev === 0 ? establishments.length - 1 : prev - 1);
 
-   // 1. ESTADO: Cargando
    if (geoLoading || (loading && establishments.length === 0)) {
       return (
          <section className="px-4 mt-8">
@@ -72,15 +63,12 @@ export default function NearbySection() {
       );
    }
 
-   // 2. ESTADO: Sin resultados
    if (!loading && establishments.length === 0) {
       return (
          <section className="px-4 mt-8">
             <h2 className="text-lg font-semibold mb-4">Establecimientos cercanos</h2>
             <div className="bg-neutral-900 rounded-2xl p-8 text-center border border-neutral-800">
-               <p className="text-sm text-neutral-400">
-                  No hemos encontrado establecimientos disponibles.
-               </p>
+               <p className="text-sm text-neutral-400">No hemos encontrado establecimientos disponibles.</p>
             </div>
          </section>
       );
@@ -93,7 +81,6 @@ export default function NearbySection() {
                <h2 className="text-lg font-semibold">
                   {usingFallback ? "Establecimientos destacados" : "Establecimientos cercanos"}
                </h2>
-               {/* Aviso sutil si estamos en modo fallback y hay error de geo */}
                {usingFallback && geoError && (
                   <div className="flex items-center gap-1.5 mt-0.5">
                      <MapPinOff size={11} className="text-neutral-500" />
@@ -133,7 +120,6 @@ export default function NearbySection() {
                               !isOpen ? "opacity-60" : ""
                            }`}
                         >
-                           {/* Badge cerrado */}
                            {!isOpen && (
                               <div className="absolute top-3 left-3 z-10">
                                  <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm">
@@ -142,15 +128,13 @@ export default function NearbySection() {
                               </div>
                            )}
 
+                           {/* IMAGEN — card: 600×400 fill — slider ocupa ancho completo pero h-56, no necesita más */}
                            <div className="relative">
                               <img
-                                 src={establishment.mainImage || "/Logo.jpg"}
+                                 src={cloudinaryPresets.card(establishment.mainImage || "/Logo.jpg")}
                                  alt={establishment.name}
                                  className="h-56 w-full object-cover"
-                                 onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = "/Logo.jpg";
-                                 }}
+                                 onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
                               />
                               <div className="absolute top-3 right-3">
                                  <Badge className="bg-black/60 backdrop-blur-md border-none">
@@ -160,14 +144,11 @@ export default function NearbySection() {
                            </div>
 
                            <div className="p-4 space-y-1">
-                              <h3 className="font-bold text-lg truncate text-white">
-                                 {establishment.name}
-                              </h3>
+                              <h3 className="font-bold text-lg truncate text-white">{establishment.name}</h3>
                               <div className="flex justify-between items-center">
                                  <p className="text-sm text-neutral-400">
                                     {establishment.cuisineType?.[0] || "Restaurante"}
                                  </p>
-                                 {/* Distancia solo si viene del endpoint de proximidad */}
                                  {typeof establishment.distance === "number" && (
                                     <p className="text-sm font-semibold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-lg">
                                        {establishment.distance < 1000
