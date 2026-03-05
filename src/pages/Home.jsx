@@ -9,7 +9,7 @@ import NearbySection from "../components/home/NearbySection";
 import { FeaturedSection } from "../components/home/FeaturedSection";
 import TopCities from "../components/home/TopCities";
 
-export default function Home() {
+export const Home = () => {
    return (
       <>
          <Header />
@@ -21,4 +21,4 @@ export default function Home() {
          <Footer />
       </>
    );
-}
+};
