@@ -1,7 +1,6 @@
 
 
 //establishmentService.js - Servicio para manejar operaciones relacionadas con establecimientos en el frontend
-// Este servicio se encarga de realizar las llamadas a la API para obtener, crear, actualizar, eliminar y reactivar establecimientos.
 import { api } from './api';
 
 export const establishmentService = { 
@@ -11,6 +10,7 @@ export const establishmentService = {
          if (filters.province) {params.append('province', filters.province);}
          if (filters.city) {params.append('city', filters.city);}
          if (filters.includeInactive) {params.append('includeInactive', 'true');}
+         if (filters.includeDeleted) {params.append('includeDeleted', 'true');}
       
          const queryString = params.toString();
          const url = `/establishment${queryString ? `?${queryString}` : ''}`;
@@ -54,6 +54,7 @@ export const establishmentService = {
          throw error;
       }
    },
+
    create: async (establishmentData) => {
       try {
          const response = await api.post('/establishment', establishmentData);
@@ -74,12 +75,24 @@ export const establishmentService = {
       }
    },
 
+   // Borrado definitivo (soft delete en backend)
    delete: async (id) => {
       try {
          const response = await api.delete(`/establishment/${id}`);
          return response.data;
       } catch (error) {
          console.error('Error al eliminar establecimiento:', error);
+         throw error;
+      }
+   },
+
+   // Desactivar temporalmente — sigue existiendo pero no aparece en público
+   deactivate: async (id) => {
+      try {
+         const response = await api.patch(`/establishment/${id}/deactivate`);
+         return response.data;
+      } catch (error) {
+         console.error('Error al desactivar establecimiento:', error);
          throw error;
       }
    },

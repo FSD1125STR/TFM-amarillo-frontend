@@ -47,9 +47,9 @@ export const itemService = {
       }
    }, 
 
-   getBySlug: async (slug) => {
+   getBySlug: async (slug, params = {}) => {
       try {
-         const response = await api.get(`/items/slug/${slug}`); 
+         const response = await api.get(`/items/slug/${slug}`, { params });
          return response.data;
       } catch (error) {
          console.error('Error al obtener item por slug:', error);

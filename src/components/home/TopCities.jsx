@@ -16,7 +16,11 @@ export default function TopCities({ onCitySelect }) {
    const [canLeft, setCanLeft]   = useState(false);
    const [canRight, setCanRight] = useState(true);
 
+<<<<<<< HEAD
    const checkScroll = useCallback(() => {
+=======
+   const checkScroll = useCallback(() => { // Tendrá sentido cuando haya más ciudades y recibamos un fech dinámico del backend
+>>>>>>> integracion-distancias
       const el = scrollRef.current;
       if (!el) {return;}
       setCanLeft(el.scrollLeft > 8);

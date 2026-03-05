@@ -1,3 +1,7 @@
+
+
+// src/pages/AllEstablishment.jsx
+// Página que muestra todos los establecimientos disponibles, ordenados por proximidad al usuario
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
@@ -9,28 +13,49 @@ import Badge from "../components/common/Badge";
 import { Footer } from "../components/layout/Footer";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { establishmentService } from "../services/establishmentService";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
 import { MapPinOff } from "lucide-react";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
+// MapPreview: un mapa por establecimiento — se monta solo cuando entra en viewport
+// gracias a IntersectionObserver, evitando instanciar N mapas a la vez
 const MapPreview = ({ coordinates }) => {
    const mapContainer = useRef(null);
+   const mapInstance = useRef(null);
+   const observerRef = useRef(null);
 
    useEffect(() => {
-      if (!coordinates) {return;}
-      const [lng, lat] = coordinates;
+      if (!coordinates || !mapContainer.current) {return;}
 
-      const map = new mapboxgl.Map({
-         container: mapContainer.current,
-         style: "mapbox://styles/mapbox/dark-v11",
-         center: [lng, lat],
-         zoom: 14,
-         interactive: false,
-      });
+      observerRef.current = new IntersectionObserver(
+         ([entry]) => {
+            if (entry.isIntersecting && !mapInstance.current) {
+               const [lng, lat] = coordinates;
+               mapInstance.current = new mapboxgl.Map({
+                  container: mapContainer.current,
+                  style: "mapbox://styles/mapbox/dark-v11",
+                  center: [lng, lat],
+                  zoom: 14,
+                  interactive: false,
+               });
+               new mapboxgl.Marker({ color: "#f97316" })
+                  .setLngLat([lng, lat])
+                  .addTo(mapInstance.current);
+               // Una vez montado, dejar de observar
+               observerRef.current.disconnect();
+            }
+         },
+         { threshold: 0.1 }
+      );
 
-      new mapboxgl.Marker({ color: "#f97316" }).setLngLat([lng, lat]).addTo(map);
+      observerRef.current.observe(mapContainer.current);
 
-      return () => map.remove();
+      return () => {
+         observerRef.current?.disconnect();
+         mapInstance.current?.remove();
+         mapInstance.current = null;
+      };
    }, [coordinates]);
 
    return <div ref={mapContainer} className="w-full h-full min-h-45" />;
@@ -75,14 +100,10 @@ export const AllEstablishment = () => {
 
    useEffect(() => {
       if (geoLoading) {return;}
-      if (coords) {
-         loadNearby();
-      } else {
-         loadFallback();
-      }
+      if (coords) {loadNearby();}
+      else {loadFallback();}
    }, [coords, geoLoading, loadNearby, loadFallback]);
 
-   // ESTADO: Cargando
    if (geoLoading || loading) {
       return (
          <div className="bg-neutral-950 min-h-screen text-white">
@@ -103,7 +124,6 @@ export const AllEstablishment = () => {
          <Header />
 
          <Container>
-            {/* Aviso si no hay ubicación */}
             {usingFallback && (
                <div className="flex items-center gap-2 py-4 mt-2">
                   <MapPinOff size={14} className="text-neutral-500 shrink-0" />
@@ -133,7 +153,6 @@ export const AllEstablishment = () => {
                            !isOpen ? "opacity-60" : ""
                         }`}
                      >
-                        {/* Badge cerrado */}
                         {!isOpen && (
                            <div className="absolute top-3 left-3 z-10">
                               <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm">
@@ -143,14 +162,14 @@ export const AllEstablishment = () => {
                         )}
 
                         <div className="flex flex-col md:flex-row">
-                           {/* IMAGEN PRINCIPAL */}
+                           {/* IMAGEN — card: 600×400 fill, ~40-80 KB vs 2000px original */}
                            {est.mainImage && (
                               <div
                                  className="md:w-56 h-52 md:h-auto shrink-0 cursor-pointer relative overflow-hidden"
-                                 onClick={() => navigate(`/establishment/${est.slug}`,{ state: { distance: est.distance }  })}
+                                 onClick={() => navigate(`/establishment/${est.slug}`, { state: { distance: est.distance } })}
                               >
                                  <img
-                                    src={est.mainImage}
+                                    src={cloudinaryPresets.card(est.mainImage)}
                                     alt={est.name}
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                                  />
@@ -176,8 +195,6 @@ export const AllEstablishment = () => {
                                  </div>
 
                                  <p className="text-sm text-neutral-400 mt-2 line-clamp-3">
-                                    {/* {est.description} */}
-                                    {/* Distancia en mtrs o km */}
                                     {typeof est.distance === "number" && (
                                        <span className="text-sm text-orange-400">
                                           {est.distance < 1000
@@ -189,27 +206,18 @@ export const AllEstablishment = () => {
 
                                  <div className="flex gap-2 flex-wrap mt-3">
                                     {est.categories?.map((cat, i) => (
-                                       <Badge key={i} variant="feature">
-                                          {cat}
-                                       </Badge>
+                                       <Badge key={i} variant="feature">{cat}</Badge>
                                     ))}
                                  </div>
                               </div>
 
                               <div className="mt-4 flex items-center justify-between flex-wrap gap-3">
-                                 <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1 text-sm">
-                                       <span className="text-yellow-400 text-base">⭐</span>
-                                       <span className="font-semibold text-white">
-                                          {Number(est.averageRating || 0).toFixed(1)}
-                                       </span>
-                                       <span className="text-neutral-500"></span>
-                                       
-                                    </div>
-
-                                    
-                                 </div> 
- 
+                                 <div className="flex items-center gap-1 text-sm">
+                                    <span className="text-yellow-400 text-base">⭐</span>
+                                    <span className="font-semibold text-white">
+                                       {Number(est.averageRating || 0).toFixed(1)}
+                                    </span>
+                                 </div>
                                  <button
                                     onClick={(e) => {
                                        e.stopPropagation();
@@ -221,21 +229,15 @@ export const AllEstablishment = () => {
                                     }}
                                     className="flex items-center gap-1.5 text-xs px-3 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 rounded-lg transition font-medium text-white"
                                  >
-                                    <svg
-                                       xmlns="http://www.w3.org/2000/svg"
-                                       className="w-3.5 h-3.5"
-                                       viewBox="0 0 24 24"
-                                       fill="currentColor"
-                                    >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z" />
                                     </svg>
-                                       Abrir en Maps
+                                    Abrir en Maps
                                  </button>
-                                 
                               </div>
                            </div>
 
-                           {/* MAPA */}
+                           {/* MAPA — lazy, se monta solo al entrar en viewport */}
                            {estCoords && (
                               <div className="md:w-72 h-52 md:h-auto shrink-0 border-t border-neutral-800 md:border-t-0 md:border-l">
                                  <MapPreview coordinates={estCoords} />

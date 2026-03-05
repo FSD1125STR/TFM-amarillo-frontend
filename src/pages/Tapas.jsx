@@ -1,5 +1,3 @@
-
-
 // src/pages/Tapas.jsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -15,7 +13,11 @@ import { itemService } from "../services/itemService";
 import { photoService } from "../services/photoService";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { useGeolocation } from "../hooks/useGeolocation.js";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
 import {
+   X,
+   ChevronLeft,
+   ChevronRight,
    CheckCircle,
    XCircle,
    HeartHandshake,
@@ -25,6 +27,63 @@ import {
    Leaf,
 } from "lucide-react";
 
+// ============================================
+// LIGHTBOX
+// ============================================
+const Lightbox = ({ images, startIndex, onClose }) => {
+   const [current, setCurrent] = useState(startIndex);
+   const prev = () => setCurrent((i) => (i - 1 + images.length) % images.length);
+   const next = () => setCurrent((i) => (i + 1) % images.length);
+
+   useEffect(() => {
+      const onKey = (e) => {
+         if (e.key === "Escape") { onClose(); }
+         if (e.key === "ArrowLeft") { prev(); }
+         if (e.key === "ArrowRight") { next(); }
+      };
+      window.addEventListener("keydown", onKey);
+      return () => window.removeEventListener("keydown", onKey);
+   }, [onClose]);
+
+   return (
+      <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
+         <div className="flex justify-end p-4">
+            <button onClick={onClose} className="text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors">
+               <X size={24} />
+            </button>
+         </div>
+         <div className="flex-1 flex items-center justify-between px-4 gap-4" onClick={(e) => e.stopPropagation()}>
+            <button onClick={prev} className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0">
+               <ChevronLeft size={28} />
+            </button>
+            <img
+               src={images[current]}
+               alt={`Foto ${current + 1}`}
+               className="max-h-full max-w-full object-contain rounded-xl flex-1"
+               style={{ maxHeight: "75vh" }}
+            />
+            <button onClick={next} className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0">
+               <ChevronRight size={28} />
+            </button>
+         </div>
+         <div className="flex justify-center pb-6 pt-3">
+            <div className="flex gap-1.5">
+               {images.map((_, i) => (
+                  <button
+                     key={i}
+                     onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                     className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`}
+                  />
+               ))}
+            </div>
+         </div>
+      </div>
+   );
+};
+
+// ============================================
+// TAPAS
+// ============================================
 export const Tapas = () => {
    const navigate = useNavigate();
    const { slug } = useParams();
@@ -36,6 +95,9 @@ export const Tapas = () => {
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [photos, setPhotos] = useState([]);
+   const [lightboxOpen, setLightboxOpen] = useState(false);
+   const [lightboxIndex, setLightboxIndex] = useState(0);
+
    const { coords, loading: geoLoading } = useGeolocation();
 
    useEffect(() => {
@@ -69,8 +131,16 @@ export const Tapas = () => {
       }
    };
 
-   const primaryImage =
-      photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || "/Logo.jpg";
+   const openLightbox = (index = 0) => {
+      setLightboxIndex(index);
+      setLightboxOpen(true);
+   };
+
+   const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || null;
+   const heroUrl = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl) : "/Logo.jpg";
+   const lightboxUrls = photos.length > 0
+      ? photos.map((p) => cloudinaryPresets.detail(p.url))
+      : (rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : []);
 
    const distance = distanceFromState ?? tapa?.establishment?.distance ?? null;
    const isAvailableToday = tapa?.available && (tapa?.servedToday ?? true);
@@ -96,21 +166,29 @@ export const Tapas = () => {
       );
    }
 
-   const hasImage = !!primaryImage && primaryImage !== "/fallback.png";
-
    return (
       <div>
-         {/* HERO */}
+         {/* ── Lightbox ── */}
+         {lightboxOpen && lightboxUrls.length > 0 && (
+            <Lightbox
+               images={lightboxUrls}
+               startIndex={lightboxIndex}
+               onClose={() => setLightboxOpen(false)}
+            />
+         )}
+
+         {/* ── Hero ── */}
          <div className="relative max-w-3xl mx-auto mt-4 h-96">
-            {hasImage ? (
+            {rawPrimaryUrl ? (
                <>
                   <img
-                     src={primaryImage}
+                     src={heroUrl}
                      alt={tapa.name}
-                     className="w-full h-full object-cover rounded-xl shadow-md"
+                     className="w-full h-full object-cover rounded-xl shadow-md cursor-pointer"
+                     onClick={() => openLightbox(0)}
                      onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
                   />
-                  <div className="absolute inset-0 bg-black/20 rounded-xl" />
+                  <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
                </>
             ) : (
                <div className="w-full h-full rounded-xl bg-neutral-800 overflow-hidden">
@@ -118,11 +196,9 @@ export const Tapas = () => {
                </div>
             )}
 
+            {/* Top bar */}
             <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-               <button
-                  onClick={() => navigate(-1)}
-                  className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center"
-               >
+               <button onClick={() => navigate(-1)} className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center">
                   <SquareArrowLeft />
                </button>
                <span className="text-white font-semibold">nexTapa</span>
@@ -130,24 +206,31 @@ export const Tapas = () => {
                   <HeartHandshake />
                </button>
             </div>
+
+            {/* Indicador de galería */}
+            {lightboxUrls.length > 1 && (
+               <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                  1 / {lightboxUrls.length}
+               </div>
+            )}
          </div>
 
-         {/* CARRUSEL DE FOTOS */}
+         {/* ── Carrusel de thumbnails ── */}
          {photos.length > 1 && (
             <div className="max-w-3xl mx-auto mt-3 px-2">
                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                   {photos.map((photo, i) => (
                      <button
                         key={photo._id || i}
-                        onClick={() => setTapa((prev) => ({ ...prev, mainImage: photo.url }))}
+                        onClick={() => openLightbox(i)}
                         className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                           primaryImage === photo.url
+                           i === 0
                               ? "border-orange-500 opacity-100"
                               : "border-transparent opacity-60 hover:opacity-90"
                         }`}
                      >
                         <img
-                           src={photo.url}
+                           src={cloudinaryPresets.thumbnail(photo.url)}
                            alt={`Foto ${i + 1}`}
                            className="w-full h-full object-cover"
                            onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
@@ -158,7 +241,7 @@ export const Tapas = () => {
             </div>
          )}
 
-         {/* MODALIDADES + DISPONIBILIDAD */}
+         {/* ── Modalidades + disponibilidad ── */}
          <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row gap-3 p-4 items-center bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
             {tapa.modalities?.length > 0 && (
                <div className="flex flex-wrap gap-2 flex-1">
@@ -231,6 +314,7 @@ export const Tapas = () => {
          </div>
 
          <Container>
+            {/* ── Descripción ── */}
             {tapa.description && (
                <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
                   <div className="mb-6 text-center">
@@ -258,7 +342,9 @@ export const Tapas = () => {
                      <div className="flex flex-wrap justify-center gap-2 grow items-center">
                         {tapa.categories?.length > 0 ? (
                            tapa.categories.map((cat, i) => (
-                              <span key={i} className="text-xs bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1 rounded-full">{cat}</span>
+                              <span key={i} className="text-xs bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1 rounded-full">
+                                 {cat}
+                              </span>
                            ))
                         ) : <span className="text-xs text-neutral-500">—</span>}
                      </div>
@@ -272,7 +358,9 @@ export const Tapas = () => {
                      <div className="flex flex-wrap justify-center gap-2 grow items-center">
                         {tapa.allergens?.length > 0 ? (
                            tapa.allergens.map((allergen, i) => (
-                              <span key={i} className="text-xs bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1 rounded-full">{allergen}</span>
+                              <span key={i} className="text-xs bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1 rounded-full">
+                                 {allergen}
+                              </span>
                            ))
                         ) : <span className="text-xs text-neutral-500">—</span>}
                      </div>
@@ -286,7 +374,9 @@ export const Tapas = () => {
                      <div className="flex flex-wrap justify-center gap-2 grow items-center">
                         {tapa.dietaryOptions?.length > 0 ? (
                            tapa.dietaryOptions.map((diet, i) => (
-                              <span key={i} className="text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1 rounded-full">{diet}</span>
+                              <span key={i} className="text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1 rounded-full">
+                                 {diet}
+                              </span>
                            ))
                         ) : <span className="text-xs text-neutral-500">—</span>}
                      </div>
