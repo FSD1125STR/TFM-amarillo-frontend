@@ -1,11 +1,14 @@
+
+
 // src/pages/AllTapas.jsx
-// Página principal que muestra todas las tapas disponibles, ordenadas por proximidad
+// Página que muestra todas las tapas disponibles, ordenadas por proximidad al usuario
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import { itemService } from "../services/itemService";
 import { useGeolocation } from "../hooks/useGeolocation.js";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
 import { MapPin } from "lucide-react";
 
 export const AllTapas = () => {
@@ -19,8 +22,7 @@ export const AllTapas = () => {
          setLoading(true);
          const params = coords ? { lat: coords.lat, lng: coords.lng } : {};
          const response = await itemService.getAllItems(params);
-         const data = response.data || [];
-         setItems(data);
+         setItems(response.data || []);
       } catch (error) {
          console.error("Error cargando items:", error);
       } finally {
@@ -29,19 +31,15 @@ export const AllTapas = () => {
    }, [coords]);
 
    useEffect(() => {
-      if (!geoLoading) {
-         loadItems();
-      }
+      if (!geoLoading) {loadItems();}
    }, [loadItems, geoLoading]);
 
    if (loading && items.length === 0) {
       return (
          <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white">
-            <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4" />
             <p className="text-neutral-400 italic">
-               {geoLoading
-                  ? "Obteniendo tu ubicación..."
-                  : "Buscando las mejores tapas cerca de ti..."}
+               {geoLoading ? "Obteniendo tu ubicación..." : "Buscando las mejores tapas cerca de ti..."}
             </p>
          </div>
       );
@@ -59,16 +57,11 @@ export const AllTapas = () => {
 
             <div className="grid grid-cols-2 gap-3">
                {items.map((item) => {
-                  // Tapa desactivada por el hostelero
                   const tapaUnavailable = item.available === false;
-                  // Tapa activa pero no se sirve hoy (specialDays)
                   const notServedToday = item.servedToday === false;
-                  // Local cerrado
                   const establishmentClosed = item.establishment?.isOpen === false;
-
                   const unavailable = tapaUnavailable || notServedToday || establishmentClosed;
 
-                  // Mensaje diferenciado según el motivo
                   const closedLabel = tapaUnavailable
                      ? "Tapa no disponible"
                      : notServedToday
@@ -82,22 +75,18 @@ export const AllTapas = () => {
                            unavailable ? "opacity-50" : ""
                         }`}
                      >
-                        {/* IMAGEN */}
+                        {/* IMAGEN — tapaCard: 400×300 fill, ~30-50 KB vs 2000px original */}
                         <div
                            className="relative cursor-pointer group"
                            onClick={() => navigate(`/items/${item.slug}`, { state: { distance: item.distance } })}
                         >
                            <img
-                              src={item.mainImage || "/Logo.jpg"}
+                              src={cloudinaryPresets.tapaCard(item.mainImage || "/Logo.jpg")}
                               alt={item.name}
                               className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
-                              onError={(e) => {
-                                 e.target.onerror = null;
-                                 e.target.src = "/Logo.jpg";
-                              }}
+                              onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
                            />
 
-                           {/* Badge precio */}
                            <div className="absolute top-2 right-2">
                               <span className="bg-neutral-900/90 text-orange-400 text-xs font-bold px-2 py-1 rounded-full border border-orange-500/40 backdrop-blur-sm">
                                  {item.modalities?.[0]?.price === 0
@@ -106,7 +95,6 @@ export const AllTapas = () => {
                               </span>
                            </div>
 
-                           {/* Badge estado — encima de la imagen */}
                            {unavailable && (
                               <div className="absolute inset-0 flex items-center justify-center">
                                  <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm text-center">
@@ -125,7 +113,6 @@ export const AllTapas = () => {
                               >
                                  {item.name}
                               </h3>
-
                               <div className="flex items-center justify-between mt-2">
                                  {item.averageRating > 0 ? (
                                     <div className="flex items-center gap-1">
@@ -137,7 +124,6 @@ export const AllTapas = () => {
                                  ) : (
                                     <span />
                                  )}
-
                                  {typeof item.distance === "number" && (
                                     <span className="text-[10px] text-orange-500/80 font-medium">
                                        {item.distance < 1000
@@ -148,12 +134,10 @@ export const AllTapas = () => {
                               </div>
                            </div>
 
-                           {/* Separador y Local */}
                            <div className="border-t border-neutral-800 mt-3 pt-3">
                               <p className="text-[11px] text-neutral-500 truncate mb-2">
                                  📍 {item.establishment?.name || "Local desconocido"}
                               </p>
-
                               <button
                                  onClick={(e) => {
                                     e.stopPropagation();

@@ -1,7 +1,4 @@
-
-
 // src/pages/Tapas.jsx
-// Página de detalle de una tapa individual, con toda su información, fotos, valoración y enlaces relacionados.
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
@@ -16,7 +13,11 @@ import { itemService } from "../services/itemService";
 import { photoService } from "../services/photoService";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { useGeolocation } from "../hooks/useGeolocation.js";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
 import {
+   X,
+   ChevronLeft,
+   ChevronRight,
    CheckCircle,
    XCircle,
    HeartHandshake,
@@ -26,18 +27,91 @@ import {
    Leaf,
 } from "lucide-react";
 
+// ============================================
+// LIGHTBOX — mismo patrón que Establishment.jsx
+// ============================================
+const Lightbox = ({ images, startIndex, onClose }) => {
+   const [current, setCurrent] = useState(startIndex);
+   const prev = () => setCurrent((i) => (i - 1 + images.length) % images.length);
+   const next = () => setCurrent((i) => (i + 1) % images.length);
+
+   useEffect(() => {
+      const onKey = (e) => {
+         if (e.key === "Escape") { onClose(); }
+         if (e.key === "ArrowLeft") { prev(); }
+         if (e.key === "ArrowRight") { next(); }
+      };
+      window.addEventListener("keydown", onKey);
+      return () => window.removeEventListener("keydown", onKey);
+   }, [onClose]);
+
+   return (
+      <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
+         <div className="flex justify-end p-4">
+            <button
+               onClick={onClose}
+               className="text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
+            >
+               <X size={24} />
+            </button>
+         </div>
+         <div
+            className="flex-1 flex items-center justify-between px-4 gap-4"
+            onClick={(e) => e.stopPropagation()}
+         >
+            <button
+               onClick={prev}
+               className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0"
+            >
+               <ChevronLeft size={28} />
+            </button>
+            <img
+               src={images[current]}
+               alt={`Foto ${current + 1}`}
+               className="max-h-full max-w-full object-contain rounded-xl flex-1"
+               style={{ maxHeight: "75vh" }}
+            />
+            <button
+               onClick={next}
+               className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0"
+            >
+               <ChevronRight size={28} />
+            </button>
+         </div>
+         <div className="flex justify-center pb-6 pt-3">
+            <div className="flex gap-1.5">
+               {images.map((_, i) => (
+                  <button
+                     key={i}
+                     onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                     className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                        i === current ? "bg-orange-400" : "bg-white/30"
+                     }`}
+                  />
+               ))}
+            </div>
+         </div>
+      </div>
+   );
+};
+
+// ============================================
+// TAPAS
+// ============================================
 export const Tapas = () => {
    const navigate = useNavigate();
    const { slug } = useParams();
    const location = useLocation();
 
-   // Distancia pre-calculada desde el listado o desde el establecimiento
    const distanceFromState = location.state?.distance ?? null;
 
    const [tapa, setTapa] = useState(null);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [photos, setPhotos] = useState([]);
+   const [lightboxOpen, setLightboxOpen] = useState(false);
+   const [lightboxIndex, setLightboxIndex] = useState(0);
+
    const { coords, loading: geoLoading } = useGeolocation();
 
    useEffect(() => {
@@ -71,13 +145,25 @@ export const Tapas = () => {
       }
    };
 
-   const primaryImage =
-      photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || "/fallback.png";
+   const openLightbox = (index = 0) => {
+      setLightboxIndex(index);
+      setLightboxOpen(true);
+   };
 
-   // Prioriza distancia del state (ya calculada), si no la del backend
+   // ─── URLs transformadas ──────────────────────────────────────────────────
+   // rawPrimaryUrl: foto marcada como principal, o mainImage del item, o fallback
+   const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || null;
+
+   // hero: detail (1200px limit) — contenedor h-96, suficiente para retina
+   const heroUrl = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl) : "/Logo.jpg";
+
+   // lightbox: detail en todas las fotos de la galería
+   // Si no hay fotos pero sí mainImage, el lightbox la incluye igualmente
+   const lightboxUrls = photos.length > 0
+      ? photos.map((p) => cloudinaryPresets.detail(p.url))
+      : (rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : []);
+
    const distance = distanceFromState ?? tapa?.establishment?.distance ?? null;
-
-   // Disponibilidad real: activa por el hostelero Y se sirve hoy
    const isAvailableToday = tapa?.available && (tapa?.servedToday ?? true);
 
    if (loading) {
@@ -94,33 +180,36 @@ export const Tapas = () => {
       return (
          <Container>
             <div className="flex flex-col items-center justify-center h-screen">
-               <p className="text-lg text-red-500 mb-4">
-                  {error || "Tapa no encontrada"}
-               </p>
+               <p className="text-lg text-red-500 mb-4">{error || "Tapa no encontrada"}</p>
                <Button onClick={() => navigate("/")}>Volver al inicio</Button>
             </div>
          </Container>
       );
    }
 
-   const hasImage = !!primaryImage && primaryImage !== "/fallback.png";
-
    return (
       <div>
-         {/* HERO */}
+         {/* ── Lightbox ── */}
+         {lightboxOpen && lightboxUrls.length > 0 && (
+            <Lightbox
+               images={lightboxUrls}
+               startIndex={lightboxIndex}
+               onClose={() => setLightboxOpen(false)}
+            />
+         )}
+
+         {/* ── Hero ── */}
          <div className="relative max-w-3xl mx-auto mt-4 h-96">
-            {hasImage ? (
+            {rawPrimaryUrl ? (
                <>
                   <img
-                     src={primaryImage}
+                     src={heroUrl}
                      alt={tapa.name}
-                     className="w-full h-full object-cover rounded-xl shadow-md"
-                     onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/Logo.jpg";
-                     }}
+                     className="w-full h-full object-cover rounded-xl shadow-md cursor-pointer"
+                     onClick={() => openLightbox(0)}
+                     onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
                   />
-                  <div className="absolute inset-0 bg-black/20 rounded-xl" />
+                  <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
                </>
             ) : (
                <div className="w-full h-full rounded-xl bg-neutral-800 overflow-hidden">
@@ -132,7 +221,7 @@ export const Tapas = () => {
                </div>
             )}
 
-            {/* TOP BAR */}
+            {/* Top bar */}
             <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
                <button
                   onClick={() => navigate(-1)}
@@ -145,32 +234,34 @@ export const Tapas = () => {
                   <HeartHandshake />
                </button>
             </div>
+
+            {/* Indicador de galería cuando hay más de una foto */}
+            {lightboxUrls.length > 1 && (
+               <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                  1 / {lightboxUrls.length}
+               </div>
+            )}
          </div>
 
-         {/* CARRUSEL DE FOTOS DE LA TAPA */}
+         {/* ── Carrusel de thumbnails (solo si hay más de 1 foto) ── */}
          {photos.length > 1 && (
             <div className="max-w-3xl mx-auto mt-3 px-2">
                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                   {photos.map((photo, i) => (
                      <button
                         key={photo._id || i}
-                        onClick={() => {
-                           setTapa((prev) => ({ ...prev, mainImage: photo.url }));
-                        }}
+                        onClick={() => openLightbox(i)}   // ← abre lightbox en esa foto
                         className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                           primaryImage === photo.url
+                           i === 0   // primera foto = la principal
                               ? "border-orange-500 opacity-100"
                               : "border-transparent opacity-60 hover:opacity-90"
                         }`}
                      >
                         <img
-                           src={photo.url}
+                           src={cloudinaryPresets.thumbnail(photo.url)}   // 200×150 fill
                            alt={`Foto ${i + 1}`}
                            className="w-full h-full object-cover"
-                           onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/Logo.jpg";
-                           }}
+                           onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
                         />
                      </button>
                   ))}
@@ -178,10 +269,8 @@ export const Tapas = () => {
             </div>
          )}
 
-         {/* MODALIDADES + DISPONIBILIDAD */}
+         {/* ── Modalidades + disponibilidad ── */}
          <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row gap-3 p-4 items-center bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
-
-            {/* Modalidades */}
             {tapa.modalities?.length > 0 && (
                <div className="flex flex-wrap gap-2 flex-1">
                   {tapa.modalities.map((mod, i) => (
@@ -210,10 +299,7 @@ export const Tapas = () => {
                </div>
             )}
 
-            {/* Disponibilidad */}
             <div className="flex flex-col gap-2 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-3 self-start">
-
-               {/* Estado de la tapa */}
                <div className="flex items-center gap-2.5">
                   {isAvailableToday ? (
                      <>
@@ -222,7 +308,7 @@ export const Tapas = () => {
                      </>
                   ) : tapa.availableOnlyOn?.length > 0 ? (
                      <>
-                        <XCircle className="text-red-400 w-4 h-4 " />
+                        <XCircle className="text-red-400 w-4 h-4" />
                         <span className="text-sm text-red-400 font-medium">
                            Disponible los: {tapa.availableOnlyOn.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')}
                         </span>
@@ -234,8 +320,6 @@ export const Tapas = () => {
                      </>
                   )}
                </div>
-
-               {/* Estado del local */}
                <div className="flex items-center gap-2.5">
                   {tapa.establishment?.isOpen ? (
                      <>
@@ -249,8 +333,6 @@ export const Tapas = () => {
                      </>
                   )}
                </div>
-
-               {/* Aviso combinado */}
                {isAvailableToday && !tapa.establishment?.isOpen && (
                   <p className="text-[11px] text-yellow-400/80 border-t border-neutral-800 pt-2 mt-1">
                      ⚠️ Disponible pero el local está cerrado
@@ -260,20 +342,17 @@ export const Tapas = () => {
          </div>
 
          <Container>
-            {/* DESCRIPCIÓN */}
+            {/* ── Descripción ── */}
             {tapa.description && (
-               <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border   border-neutral-800  hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
+               <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
                   <div className="mb-6 text-center">
                      <h2 className="text-3xl font-bold text-white">{tapa.name}</h2>
                      <div className="w-16 h-1 bg-orange-500 rounded-full mt-3 mx-auto" />
                   </div>
-                  <p className="text-sm text-white leading-relaxed text-center">
-                     {tapa.description}
-                  </p>
+                  <p className="text-sm text-white leading-relaxed text-center">{tapa.description}</p>
                </div>
             )}
 
-            {/* INFORMACIÓN DEL ESTABLECIMIENTO */}
             <LittleEstablishCard
                name={tapa.establishment.name}
                address={`${tapa.establishment.address.street}, ${tapa.establishment.address.number} - ${tapa.establishment.address.city} - ${tapa.establishment.address.province}`}
@@ -281,10 +360,8 @@ export const Tapas = () => {
                slug={tapa.establishment.slug}
             />
 
-            {/* INFORMACIÓN ADICIONAL */}
             <Section title="Información adicional">
                <div className="mt-6 flex flex-col md:flex-row gap-4">
-                  {/* CATEGORÍAS */}
                   <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-blue-500 text-center min-h-55 flex flex-col">
                      <div>
                         <Tags className="w-6 h-6 text-blue-400 mx-auto mb-2" />
@@ -303,7 +380,6 @@ export const Tapas = () => {
                      </div>
                   </div>
 
-                  {/* ALÉRGENOS */}
                   <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-red-500 text-center min-h-55 flex flex-col">
                      <div>
                         <AlertTriangle className="w-6 h-6 text-red-400 mx-auto mb-2" />
@@ -322,7 +398,6 @@ export const Tapas = () => {
                      </div>
                   </div>
 
-                  {/* DIETA */}
                   <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-green-500 text-center min-h-55 flex flex-col">
                      <div>
                         <Leaf className="w-6 h-6 text-green-400 mx-auto mb-2" />
@@ -343,7 +418,6 @@ export const Tapas = () => {
                </div>
             </Section>
 
-            {/* RATING */}
             <Section title="Valoración">
                <RatingBar
                   average={tapa.averageRating}
@@ -352,7 +426,6 @@ export const Tapas = () => {
                />
             </Section>
 
-            {/* GALERÍA DE TAPAS DEL ESTABLECIMIENTO */}
             <ItemGallery
                establishmentId={tapa.establishment._id}
                currentItemId={tapa._id}
@@ -360,7 +433,6 @@ export const Tapas = () => {
                distance={distance}
             />
 
-            {/* BOTÓN BAR */}
             <div className="mt-8 mb-6">
                <Button
                   onClick={() => navigate(`/establishment/${tapa.establishment.slug}`)}

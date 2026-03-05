@@ -1,3 +1,5 @@
+
+
 // src/pages/Establishment.jsx
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -28,9 +30,15 @@ import { ServiceKitchen } from "../components/common/ServiceKitchen";
 import { PriceMedium } from "../components/common/PriceMedium";
 import { Contact } from "../components/common/Contact";
 import { useGeolocation } from "../hooks/useGeolocation.js";
+import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
+// ============================================
+// LIGHTBOX
+// El lightbox usa detail (1200px) — resolución alta para pantalla completa.
+// Las URLs del array allImages ya vienen transformadas desde el componente padre.
+// ============================================
 function Lightbox({ images, startIndex, onClose }) {
    const [current, setCurrent] = useState(startIndex);
    const prev = () => setCurrent((i) => (i - 1 + images.length) % images.length);
@@ -38,9 +46,9 @@ function Lightbox({ images, startIndex, onClose }) {
 
    useEffect(() => {
       const onKey = (e) => {
-         if (e.key === "Escape") {onClose();}
-         if (e.key === "ArrowLeft") {prev();}
-         if (e.key === "ArrowRight") {next();}
+         if (e.key === "Escape") { onClose(); }
+         if (e.key === "ArrowLeft") { prev(); }
+         if (e.key === "ArrowRight") { next(); }
       };
       window.addEventListener("keydown", onKey);
       return () => window.removeEventListener("keydown", onKey);
@@ -57,7 +65,12 @@ function Lightbox({ images, startIndex, onClose }) {
             <button onClick={prev} className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0">
                <ChevronLeft size={28} />
             </button>
-            <img src={images[current]} alt={`Foto ${current + 1}`} className="max-h-full max-w-full object-contain rounded-xl flex-1" style={{ maxHeight: "75vh" }} />
+            <img
+               src={images[current]}
+               alt={`Foto ${current + 1}`}
+               className="max-h-full max-w-full object-contain rounded-xl flex-1"
+               style={{ maxHeight: "75vh" }}
+            />
             <button onClick={next} className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0">
                <ChevronRight size={28} />
             </button>
@@ -65,7 +78,9 @@ function Lightbox({ images, startIndex, onClose }) {
          <div className="flex justify-center pb-6 pt-3">
             <div className="flex gap-1.5">
                {images.map((_, i) => (
-                  <button key={i} onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+                  <button
+                     key={i}
+                     onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
                      className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`}
                   />
                ))}
@@ -95,10 +110,9 @@ export const Establishment = () => {
 
    const loadEstablishmentData = useCallback(async () => {
       try {
-         if (!establishment) {setLoading(true);}
+         if (!establishment) { setLoading(true); }
          setError(null);
 
-         // Si ya tenemos distancia del listado, no necesitamos coords → petición más ligera sin $geoNear
          const params = (!preloadedDistance && coords?.lat)
             ? { lat: coords.lat, lng: coords.lng }
             : {};
@@ -121,7 +135,7 @@ export const Establishment = () => {
    }, [loadEstablishmentData]);
 
    const mapContainer = useCallback((node) => {
-      if (!node || mapInstance.current || !establishment?.location?.coordinates) {return;}
+      if (!node || mapInstance.current || !establishment?.location?.coordinates) { return; }
       const [lng, lat] = establishment.location.coordinates;
       const map = new mapboxgl.Map({
          container: node,
@@ -139,16 +153,22 @@ export const Establishment = () => {
       };
    }, [establishment]);
 
-   const primaryUrl = photos.find((p) => p.isPrimary)?.url || establishment?.mainImage;
-   const otherPhotos = photos.filter((p) => !p.isPrimary).map((p) => p.url).filter(Boolean);
-   const allImages = [...(primaryUrl ? [primaryUrl] : []), ...otherPhotos];
+   // ─── URLs transformadas por Cloudinary ───────────────────────────────────
+   const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || establishment?.mainImage;
+
+   const heroUrl      = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl)    : "/Logo.jpg";
+   const lightboxUrls = photos.map((p) => cloudinaryPresets.detail(p.url)).filter(Boolean);
+
+   // Si no hay fotos pero sí mainImage, el lightbox también la incluye
+   const allLightboxImages = lightboxUrls.length > 0
+      ? lightboxUrls
+      : (rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : []);
 
    const openLightbox = (index = 0) => {
       setLightboxIndex(index);
       setLightboxOpen(true);
    };
 
-   // Distancia a mostrar: precargada del listado o calculada por el backend
    const displayDistance = () => {
       const dist = Number(preloadedDistance ?? establishment?.distance);
       if (isNaN(dist) || dist <= 0) {
@@ -182,20 +202,28 @@ export const Establishment = () => {
 
    return (
       <div className="bg-neutral-950 min-h-screen text-white">
-         {lightboxOpen && allImages.length > 0 && (
-            <Lightbox images={allImages} startIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
+         {lightboxOpen && allLightboxImages.length > 0 && (
+            <Lightbox
+               images={allLightboxImages}
+               startIndex={lightboxIndex}
+               onClose={() => setLightboxOpen(false)}
+            />
          )}
 
+         {/* ── Hero ── */}
          <div className="relative h-72 max-w-3xl mx-auto">
             <img
-               src={primaryUrl || "/Logo.jpg"}
+               src={heroUrl}
                className="w-full h-full object-cover rounded-xl cursor-pointer"
                alt={establishment.name}
                onClick={() => openLightbox(0)}
             />
             <div className="absolute inset-0 bg-black/40 rounded-xl pointer-events-none" />
             <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-               <button onClick={() => navigate(-1)} className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80">
+               <button
+                  onClick={() => navigate(-1)}
+                  className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80"
+               >
                   <SquareArrowLeft />
                </button>
                <span className="text-white font-semibold">nexTapa</span>
@@ -206,39 +234,42 @@ export const Establishment = () => {
             <div className="absolute bottom-4 left-4 right-4">
                {establishment.verified && <Badge className="mb-2 inline-block">VERIFICADO</Badge>}
                <h1 className="text-3xl font-bold text-white">{establishment.name}</h1>
-               <span className="text-l text-white font-bold">
-                  {displayDistance()}
-               </span>
+               <span className="text-l text-white font-bold">{displayDistance()}</span>
                <p className="text-sm text-white flex items-center gap-1 font-bold">
                   <span className="text-yellow-400">★</span>
                   {Number(establishment.averageRating || 0).toFixed(1)} · {establishment.totalReviews || 0} reviews
-               </p>              
+               </p>
             </div>
          </div>
 
          <Container>
+            {/* ── Strip de thumbnails ── */}
             <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
                {photos.length > 0 ? (
                   photos.map((photo, i) => (
-                     <img key={photo._id} src={photo.url}
+                     <img
+                        key={photo._id}
+                        src={cloudinaryPresets.thumbnail(photo.url)}   // 200×150 fill — ~15-20 KB c/u
                         className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80"
-                        onClick={() => openLightbox(i)} alt="Tapa"
+                        onClick={() => openLightbox(i)}
+                        alt="Foto del establecimiento"
                      />
                   ))
                ) : (
-                  primaryUrl && (
-                     <img src={primaryUrl}
+                  rawPrimaryUrl && (
+                     <img
+                        src={cloudinaryPresets.thumbnail(rawPrimaryUrl)}
                         className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer"
-                        onClick={() => openLightbox(0)} alt="Default"
+                        onClick={() => openLightbox(0)}
+                        alt="Foto del establecimiento"
                      />
                   )
                )}
             </div>
 
-            <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm   hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
+            <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
                <div className="mb-6">
                   <h2 className="text-xl font-bold text-white">Descripción</h2>
-                  
                   <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
                </div>
                {establishment.description && (
@@ -246,12 +277,12 @@ export const Establishment = () => {
                )}
             </div>
 
-            <Section >
-               <ItemGallery 
+            <Section>
+               <ItemGallery
                   establishmentId={establishment._id}
-                  currentItemId={establishment.tapas?.[0]?._id} // Si queremos destacar la primera tapa
-                  establishmentName={establishment.name} 
-                  distance={preloadedDistance ?? establishment.distance} // Pasamos la distancia pre-calculada o la calculada por el backend
+                  currentItemId={establishment.tapas?.[0]?._id}
+                  establishmentName={establishment.name}
+                  distance={preloadedDistance ?? establishment.distance}
                />
             </Section>
 

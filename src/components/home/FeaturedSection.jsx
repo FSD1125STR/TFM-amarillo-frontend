@@ -1,93 +1,206 @@
-import Card from "../common/Card";
-import { useState, useEffect } from "react";
+// src/components/home/FeaturedSection.jsx
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { itemService } from "../../services/itemService";
-import Container from "../layout/Container";
+import { cloudinaryPresets } from "../../utils/cloudinaryHelpers.js";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+const DEFAULT_IMAGE = "/Logo.jpg";
 
 export const FeaturedSection = () => {
    const [featuredItems, setFeaturedItems] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
-
+   const [canLeft, setCanLeft] = useState(false);
+   const [canRight, setCanRight] = useState(true);
+   const scrollRef = useRef(null);
    const navigate = useNavigate();
 
    useEffect(() => {
-      loadAllItems();
+      const load = async () => {
+         try {
+            setLoading(true);
+            setError(null);
+            const response = await itemService.getTopRatedItems();
+            setFeaturedItems((response.data || response).slice(0, 10));
+         } catch (err) {
+            setError("Error al cargar las tapas destacadas.");
+         } finally {
+            setLoading(false);
+         }
+      };
+      load();
    }, []);
 
-   const loadAllItems = async () => {
-      try {
-         setLoading(true);
-         setError(null);
-         const response = await itemService.getTopRatedItems();
-         setFeaturedItems(response.data || response);
-      } catch (err) {
-         setError("Error al cargar las tapas destacadas.", err);
-      } finally {
-         setLoading(false);
-      }
+   const checkScroll = () => {
+      const el = scrollRef.current;
+      if (!el) {return;}
+      setCanLeft(el.scrollLeft > 8);
+      setCanRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 8);
+   };
+
+   useEffect(() => {
+      const el = scrollRef.current;
+      if (!el) {return;}
+      checkScroll();
+      el.addEventListener("scroll", checkScroll, { passive: true });
+      window.addEventListener("resize", checkScroll);
+      return () => {
+         el.removeEventListener("scroll", checkScroll);
+         window.removeEventListener("resize", checkScroll);
+      };
+   }, [featuredItems]);
+
+   const scroll = (dir) => {
+      scrollRef.current?.scrollBy({ left: dir * 200, behavior: "smooth" });
    };
 
    if (loading) {
       return (
-         <Container>
-            <div className="flex items-center justify-center h-40">
-               <p className="text-lg">Cargando tapas...</p>
+         <section className="px-4 mt-6">
+            <div className="flex items-center justify-between mb-3">
+               <h2 className="text-lg font-semibold">Las Mejores Tapas</h2>
             </div>
-         </Container>
+            <div className="flex gap-3 overflow-hidden">
+               {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex-none w-36 rounded-2xl bg-neutral-900 animate-pulse h-40" />
+               ))}
+            </div>
+         </section>
       );
    }
 
-   if (error) {
-      return (
-         <Container>
-            <p className="text-red-500 p-4 text-center">{error}</p>
-         </Container>
-      );
-   }
+   if (error) {return (
+      <section className="px-4 mt-6">
+         <p className="text-red-500 text-sm text-center">{error}</p>
+      </section>
+   );}
 
-   const displayedItems = featuredItems.slice(0, 8);
+   if (featuredItems.length === 0) {return null;}
 
    return (
       <section className="px-4 mt-6">
-         {/* Header */}
          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold">Las Mejores Tapas</h2>
+            <h2 className="text-lg font-semibold">Tapas mejor valoradas</h2>
             <button
                onClick={() => navigate("/items")}
-               className="text-orange-400 cursor-pointer hover:text-orange-500 transition-colors"
+               className="text-orange-400 text-sm font-medium hover:text-orange-300 transition-colors"
             >
                Ver todas
             </button>
          </div>
 
-         {displayedItems.length === 0 ? (
-            <p>No hay tapas disponibles en este momento.</p>
-         ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-               {displayedItems.map((item, index) => (
-                  <Card
-                     key={item.id || index}
-                     onClick={() => navigate(`/items/${item.slug}`)}
-                     className="cursor-pointer hover:shadow-lg transition-shadow"
-                  >
-                     <img
-                        src={item.mainImage || "/Logo.jpg"}
-                        alt={item.name}
-                        className="h-32 w-full object-cover"
-                     />
-                     <div className="p-2">
-                        <p className="font-semibold">{item.name}</p>
-                        <p className="text-orange-400">
-                           {item.modalities[0]?.price > 0
-                              ? `${item.modalities[0].price}€`
-                              : "Gratis"}
-                        </p>
-                     </div>
-                  </Card>
-               ))}
+         <div className="relative group">
+            {canLeft && (
+               <button
+                  onClick={() => scroll(-1)}
+                  className="
+                     absolute -left-3 top-1/2 -translate-y-5 z-10
+                     w-8 h-8 rounded-full
+                     flex items-center justify-center
+                     bg-neutral-800 border border-neutral-700 text-neutral-400
+                     opacity-0 group-hover:opacity-100
+                     hover:bg-orange-500 hover:border-orange-500 hover:text-white
+                     transition-all duration-200 shadow-lg
+                  "
+                  aria-label="Anterior"
+               >
+                  <ChevronLeft size={16} />
+               </button>
+            )}
+
+            {canRight && (
+               <button
+                  onClick={() => scroll(1)}
+                  className="
+                     absolute -right-3 top-1/2 -translate-y-5 z-10
+                     w-8 h-8 rounded-full
+                     flex items-center justify-center
+                     bg-neutral-800 border border-neutral-700 text-neutral-400
+                     opacity-0 group-hover:opacity-100
+                     hover:bg-orange-500 hover:border-orange-500 hover:text-white
+                     transition-all duration-200 shadow-lg
+                  "
+                  aria-label="Siguiente"
+               >
+                  <ChevronRight size={16} />
+               </button>
+            )}
+
+            <div
+               ref={scrollRef}
+               className="
+                  flex gap-3 overflow-x-auto pb-2
+                  snap-x snap-mandatory
+                  [&::-webkit-scrollbar]:hidden
+                  [-ms-overflow-style:none]
+                  [scrollbar-width:none]
+               "
+            >
+               {featuredItems.map((item, index) => {
+                  // Tapa no disponible o local cerrado
+                  const unavailable =
+                     item.available === false ||
+                     item.servedToday === false ||
+                     item.establishment?.isOpen === false;
+
+                  // Etiqueta mínima — solo el motivo más relevante
+                  const unavailableLabel =
+                     item.establishment?.isOpen === false
+                        ? "Cerrado"
+                        : item.servedToday === false
+                           ? "Hoy No"
+                           : "No disponible";
+
+                  return (
+                     <button
+                        key={item._id || index}
+                        onClick={() => navigate(`/items/${item.slug}`)}
+                        className="
+                           group/card relative flex-none w-36
+                           snap-start overflow-hidden rounded-2xl
+                           bg-neutral-900 border border-neutral-800
+                           hover:border-orange-500/40
+                           transition-all duration-300
+                        "
+                     >
+                        {/* Imagen */}
+                        <div className="relative overflow-hidden">
+                           <img
+                              src={cloudinaryPresets.tapaCard(item.mainImage || DEFAULT_IMAGE)}
+                              alt={item.name}
+                              className={`w-full h-28 object-cover group-hover/card:scale-105 transition-transform duration-500 ${
+                                 unavailable ? "brightness-50" : ""
+                              }`}
+                              onError={(e) => { e.target.onerror = null; e.target.src = DEFAULT_IMAGE; }}
+                           />
+
+                           {/* Overlay sutil — solo cuando no disponible */}
+                           {unavailable && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                 <span className="text-[10px] font-semibold text-white/80 tracking-wide uppercase">
+                                    {unavailableLabel}
+                                 </span>
+                              </div>
+                           )}
+                        </div>
+
+                        {/* Datos */}
+                        <div className="p-2.5">
+                           <p className={`text-xs font-semibold line-clamp-1 ${unavailable ? "text-neutral-500" : "text-white"}`}>
+                              {item.name}
+                           </p>
+                           <p className={`text-xs mt-0.5 font-medium ${unavailable ? "text-neutral-600" : "text-orange-400"}`}>
+                              {item.modalities?.[0]?.price > 0
+                                 ? `${item.modalities[0].price}€`
+                                 : "Gratis"}
+                           </p>
+                        </div>
+                     </button>
+                  );
+               })}
             </div>
-         )}
+         </div>
       </section>
    );
 };

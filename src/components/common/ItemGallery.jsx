@@ -1,8 +1,11 @@
-// ItemGallery.jsx
+
+
+// src/components/common/ItemGallery.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { itemService } from '../../services/itemService.js';
-import  Section  from '../layout/Section.jsx';
+import Section from '../layout/Section.jsx';
+import { cloudinaryPresets } from '../../utils/cloudinaryHelpers.js';
 
 const DEFAULT_IMAGE = '/Logo.jpg';
 
@@ -10,13 +13,11 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName,
    const [items, setItems] = useState([]);
    const [loading, setLoading] = useState(true);
    const navigate = useNavigate();
-   
+
    useEffect(() => {
       const fetchItems = async () => {
          try {
-            const response = await itemService.getByEstablishment(establishmentId, {
-               available: true
-            });
+            const response = await itemService.getByEstablishment(establishmentId, { available: true });
             setItems(response.data || []);
          } catch (error) {
             console.error('Error fetching items:', error);
@@ -27,11 +28,9 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName,
       if (establishmentId) {fetchItems();}
    }, [establishmentId]);
 
-   const filtered = currentItemId 
-      ? items.filter(item => item._id !== currentItemId) 
-      : items;
-   if (loading) { return null; }
-   if (filtered.length === 0) { return null; }
+   const filtered = currentItemId ? items.filter(item => item._id !== currentItemId) : items;
+
+   if (loading || filtered.length === 0) {return null;}
 
    return (
       <Section title={`Más tapas de ${establishmentName}`}>
@@ -45,27 +44,28 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName,
             [&::-webkit-scrollbar-thumb]:rounded-full
             [scrollbar-width:thin]
             [scrollbar-color:#d4d4d4_#f5f5f5]
-         ">    {filtered.map((item) => (
+         ">
+            {filtered.map((item) => (
                <button
                   key={item._id}
                   onClick={() => navigate(`/items/${item.slug}`, { state: { distance } })}
                   className="
-          group relative 
-          flex-none 
-          w-[45%] md:w-[calc(25%-12px)] 
-          snap-start
-          aspect-square
-          overflow-hidden rounded-xl bg-neutral-100
-        "
+                     group relative
+                     flex-none
+                     w-[45%] md:w-[calc(25%-12px)]
+                     snap-start
+                     aspect-square
+                     overflow-hidden rounded-xl bg-neutral-100
+                  "
                >
-               
+                  {/* tapaCard: 400×300 fill — cuadrado en aspecto, bien cubierto */}
                   <img
-                     src={item.mainImage || DEFAULT_IMAGE}
+                     src={cloudinaryPresets.tapaCard(item.mainImage || DEFAULT_IMAGE)}
                      alt={item.name}
                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                      onError={(e) => { e.currentTarget.src = DEFAULT_IMAGE; }}
                   />
-                  <div className="absolute inset-0  from-black/60 to-transparent flex items-end">
+                  <div className="absolute inset-0 from-black/60 to-transparent flex items-end">
                      <p className="text-white text-[10px] md:text-xs font-medium p-2 md:p-3 line-clamp-1 w-full text-left">
                         {item.name}
                      </p>
@@ -74,6 +74,5 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName,
             ))}
          </div>
       </Section>
-      
    );
 };
