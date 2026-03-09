@@ -9,25 +9,47 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
 import { ItemAdmin } from './pages/admin/ItemAdmin';
+import { LoginPage } from "./pages/auth/LoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { ProtectedRoute } from "./components/routes/ProtectedRoute";
+import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
+import { AdminRoute } from "./components/routes/AdminRoute";
 
-export default function App() {
+export function App() {
    return (
-      <> 
+      <>
          <BrowserRouter>
             <Routes>
-               {/* Public routes */}
+               {/* Rutas públicas reales */}
                <Route path="/" element={<Home />} />
                <Route path="/establishments" element={<AllEstablishment />} />
-               <Route path="/establishment/:slug" element={<Establishment />} /> 
+               <Route path="/establishment/:slug" element={<Establishment />} />
                <Route path="/items" element={<AllTapas />} />
                <Route path="/items/:slug" element={<Tapas />} />
 
-               {/* Admin routes */}
-               <Route path="/admin" element={<AdminPanel />}>
+               {/* Auth: solo accesibles si NO estás logueado */}
+               <Route path="/login" element={
+                  <PublicOnlyRoute>
+                     <LoginPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/register" element={
+                  <PublicOnlyRoute>
+                     <RegisterPage />
+                  </PublicOnlyRoute>
+               } />
+
+               {/* Admin: protegido por login */}
+               <Route path="/admin" element={
+                  <AdminRoute>
+                     <AdminPanel />
+                  </AdminRoute>
+               }>
                   <Route index element={<Dashboard />} />
                   <Route path="establishments" element={<AdminEstablishments />} />
                   <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
-                  <Route path="/admin/items/:id" element={<ItemAdmin />} />
+                  <Route path="items/:id" element={<ItemAdmin />} />
                </Route>
             </Routes>
          </BrowserRouter>
