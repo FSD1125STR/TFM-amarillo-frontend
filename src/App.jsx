@@ -9,6 +9,7 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
 import { ItemAdmin } from './pages/admin/ItemAdmin';
+import { SearchPage } from './pages/SearchPage';
 
 export default function App() {
    return (
@@ -21,6 +22,7 @@ export default function App() {
                <Route path="/establishment/:slug" element={<Establishment />} /> 
                <Route path="/items" element={<AllTapas />} />
                <Route path="/items/:slug" element={<Tapas />} />
+               <Route path="/search" element={<SearchPage />} />
 
                {/* Admin routes */}
                <Route path="/admin" element={<AdminPanel />}>

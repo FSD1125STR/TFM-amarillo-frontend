@@ -1,15 +1,16 @@
 
 
+// src/components/layout/Footer.jsx
 
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Compass, Heart, User } from "lucide-react";
+import { Home, Search, Heart, User } from "lucide-react";
 
 const items = [
-   { id: "home",    label: "Home",    Icon: Home,    path: "/" },
-   { id: "explore", label: "Explore", Icon: Compass, path: "/explore" },
-   { id: "saved",   label: "Saved",   Icon: Heart,   path: "/saved" },
-   { id: "profile", label: "Profile", Icon: User,    path: "/login" },
+   { id: "home",    label: "Home",    Icon: Home,   path: "/" },
+   { id: "search",  label: "Search",  Icon: Search, path: "/search" },
+   { id: "saved",   label: "Saved",   Icon: Heart,  path: "/saved" },
+   { id: "profile", label: "Profile", Icon: User,   path: "/login" },
 ];
 
 export const Footer = () => {
@@ -30,7 +31,7 @@ export const Footer = () => {
 
    return (
       <>
-         <div className="h-16" /> 
+         <div className="h-16" />
          <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50">
             <div className="flex justify-around items-center px-4 py-2 max-w-3xl mx-auto">
                {items.map(({ id, label, Icon, path }) => {
