@@ -1,11 +1,12 @@
 
 
 // src/pages/admin/AdminEstablishmentDetail.jsx
+// Página de detalle/edición de un establecimiento en el panel de administración
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { establishmentService } from '../../services/establishmentService';
 import './styles/admin.css';
-import './styles/itemPhotoSection.css';
 
 import { EstablishmentItems } from './adminComponents/EstablishmentItemsAdmin';
 import { EstablishmentStatus } from './adminComponents/StatusAdmin';
@@ -19,9 +20,15 @@ import { FeaturesAdmin } from './adminComponents/FeaturesAdmin';
 import { ViewInAppButton } from './adminComponents/ViewInAppButton';
 import { EstablishmentPhotosAdmin } from './adminComponents/EstablishmentPhotosAdmin';
 
+
 const makeDay = (closed = false, open = '09:00', close = '00:00') => ({
-   open, close, split: false, afternoon: { open: '', close: '' }, closed,
+   open,
+   close,
+   split: false,
+   afternoon: { open: '', close: '' },
+   closed,
 });
+
 
 const mapDay = (d) => ({
    open:      d?.open      || '',
@@ -31,42 +38,60 @@ const mapDay = (d) => ({
    closed:    d?.closed    ?? true,
 });
 
+// ── Formulario vacío (default para nuevo establecimiento) ──────────────────────
+
 const EMPTY_FORM = {
-   name: '', slug: '', description: '', mainImage: '', type: 'bar',
+   name: '',
+   slug: '',
+   description: '',
+   mainImage: '',
+   type: 'bar',
    cuisineType: [],
    address: { street: '', number: '', city: '', province: '', postalCode: '', country: 'España' },
    location: { type: 'Point', coordinates: [-3.7038, 40.4168] },
-   phone: '', email: '', website: '',
+   phone: '',
+   email: '',
+   website: '',
    schedule: {
-      lunes:     makeDay(true),
-      martes:    makeDay(false),
+      lunes:     makeDay(true),           // Lunes cerrado por defecto
+      martes:    makeDay(false),          // Mar–Dom: 09:00–00:00
       miercoles: makeDay(false),
       jueves:    makeDay(false),
       viernes:   makeDay(false),
       sabado:    makeDay(false),
       domingo:   makeDay(false),
    },
-   features: [], priceRange: '€€', owner: '', verified: false, active: true,
+   features: [],
+   priceRange: '€€',
+   owner: '',
+   verified: false,
+   active: true,
 };
+
+// ── Componente principal ───────────────────────────────────────────────────────
 
 export const AdminEstablishmentDetail = () => {
    const { id } = useParams();
    const navigate = useNavigate();
    const isNew = id === 'new';
 
-   const [loading, setLoading]       = useState(!isNew);
-   const [saving, setSaving]         = useState(false);
-   const [error, setError]           = useState(null);
+   const [loading, setLoading]     = useState(!isNew);
+   const [saving, setSaving]       = useState(false);
+   const [error, setError]         = useState(null);
    const [successMsg, setSuccessMsg] = useState(null);
-   const [form, setForm]             = useState(EMPTY_FORM);
+   const [form, setForm]           = useState(EMPTY_FORM);
+
+   // ── Carga del establecimiento existente ──────────────────────────────────────
 
    useEffect(() => {
-      if (isNew) {return;}
+      if (isNew) { return; }
+
       const load = async () => {
          try {
             setLoading(true);
             const res = await establishmentService.getById(id);
             const est = res.data;
+
             setForm({
                name:        est.name        || '',
                slug:        est.slug        || '',
@@ -86,6 +111,7 @@ export const AdminEstablishmentDetail = () => {
                phone:   est.phone   || '',
                email:   est.email   || '',
                website: est.website || '',
+               // mapDay garantiza compatibilidad con documentos sin split/afternoon
                schedule: {
                   lunes:     mapDay(est.schedule?.lunes),
                   martes:    mapDay(est.schedule?.martes),
@@ -107,8 +133,11 @@ export const AdminEstablishmentDetail = () => {
             setLoading(false);
          }
       };
+
       load();
    }, [id]);
+
+   // ── Handlers ─────────────────────────────────────────────────────────────────
 
    const handleChange = (e) => {
       const { name, value, type, checked } = e.target;
@@ -124,23 +153,48 @@ export const AdminEstablishmentDetail = () => {
       setForm(prev => {
          const prevDay = prev.schedule[day] || {};
          const updatedDay = field === 'afternoon'
-            ? { ...prevDay, afternoon: { open: prevDay.afternoon?.open || '', close: prevDay.afternoon?.close || '', ...value } }
+            ? {
+               ...prevDay,
+               afternoon: {
+                  open:  prevDay.afternoon?.open  || '',
+                  close: prevDay.afternoon?.close || '',
+                  ...value, 
+               }
+            }
             : { ...prevDay, [field]: value };
-         return { ...prev, schedule: { ...prev.schedule, [day]: updatedDay } };
+
+         return {
+            ...prev,
+            schedule: {
+               ...prev.schedule,
+               [day]: updatedDay, 
+            },
+         };
       });
    };
 
-   const handleMapCoordinates   = (c) => setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: c } }));
-   const handleAddressFromMap   = (a) => setForm(prev => ({ ...prev, address: { ...prev.address, ...a } }));
-   const handleCoordsFromAddress= (c) => setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: c } }));
+   const handleMapCoordinates = (newCoords) => {
+      setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: newCoords } }));
+   };
+
+   const handleAddressFromMap = (newAddress) => {
+      setForm(prev => ({ ...prev, address: { ...prev.address, ...newAddress } }));
+   };
+
+   const handleCoordinatesFromAddress = (newCoords) => {
+      setForm(prev => ({ ...prev, location: { type: 'Point', coordinates: newCoords } }));
+   };
 
    const handleSubmit = async (e) => {
       e.preventDefault();
-      setError(null); setSuccessMsg(null); setSaving(true);
+      setError(null);
+      setSuccessMsg(null);
+      setSaving(true);
       try {
          if (isNew) {
             const res = await establishmentService.create(form);
-            navigate(`/admin/establishments/${res.data._id}`);
+            const newId = res.data._id;
+            navigate(`/admin/establishments/${newId}`);
          } else {
             await establishmentService.update(id, form);
             setSuccessMsg('Establecimiento actualizado correctamente');
@@ -153,12 +207,12 @@ export const AdminEstablishmentDetail = () => {
       }
    };
 
-   if (loading) {return <p className="admin-loading">Cargando...</p>;}
+   // ── Render ────────────────────────────────────────────────────────────────────
+
+   if (loading) { return <p className="admin-loading">Cargando...</p>; }
 
    return (
       <div className="admin-page">
-
-         {/* Header */}
          <div className="admin-page-header">
             <button className="admin-btn admin-btn-secondary" onClick={() => navigate('/admin/establishments')}>
                ← Volver
@@ -174,71 +228,99 @@ export const AdminEstablishmentDetail = () => {
 
          <form onSubmit={handleSubmit} className="admin-form">
 
-       
-            {/* Status + Contacto */}
+            {/* Owner: solo visible al crear */}
+            {isNew && (
+               <div className="admin-section">
+                  <h2 className="admin-section-title">Propietario</h2>
+                  <div className="admin-field">
+                     <label className="admin-label">Owner ID</label>
+                     <input
+                        className="admin-input"
+                        name="owner"
+                        value={form.owner}
+                        onChange={handleChange}
+                        placeholder="Dejar vacío o ingresar ID de usuario propietario"
+                     />
+                     <span className="admin-hint">Puedes obtenerlo desde la sección Usuarios</span>
+                  </div>
+               </div>
+            )}
+
+            {/* Fila 1: Status + Contact */}
             <div className="admin-row">
                {!isNew && (
-                  <EstablishmentStatus active={form.active} verified={form.verified}
-                     onChange={handleChange} name={form.name} saving={saving} />
+                  <EstablishmentStatus
+                     active={form.active}
+                     verified={form.verified}
+                     onChange={handleChange}
+                     name={form.name}
+                     saving={saving}
+                  />
                )}
                <ContactAdmin
                   contact={{ phone: form.phone, email: form.email, website: form.website }}
-                  onChange={handleChange} saving={saving} />
+                  onChange={handleChange}
+                  saving={saving}
+               />
             </div>
 
-            {/* Info básica + Horarios */}
+            {/* Fila 2: Basic Info + Schedule */}
             <div className="admin-row">
                <BasicInformationAdmin form={form} onChange={handleChange} saving={saving} />
                <ScheduleAdmin schedule={form.schedule} onChange={handleScheduleChange} saving={saving} />
             </div>
 
-            {/* Features + Cocina */}
+            {/* Fila 3: Features + Cuisine Type */}
             <div className="admin-row">
                <FeaturesAdmin
                   features={form.features}
-                  onAdd={f  => setForm(prev => ({ ...prev, features: [...prev.features, f] }))}
-                  onRemove={f => setForm(prev => ({ ...prev, features: prev.features.filter(ft => ft !== f) }))}
-                  saving={saving} />
+                  onAdd={f  => setForm(prev => ({ ...prev, features:    [...prev.features,    f] }))}
+                  onRemove={f => setForm(prev => ({ ...prev, features:    prev.features.filter(ft  => ft  !== f) }))}
+                  saving={saving}
+               />
                <CuisineTypeAdmin
                   cuisineType={form.cuisineType}
                   onAdd={c  => setForm(prev => ({ ...prev, cuisineType: [...prev.cuisineType, c] }))}
                   onRemove={c => setForm(prev => ({ ...prev, cuisineType: prev.cuisineType.filter(ct => ct !== c) }))}
-                  saving={saving} />
+                  saving={saving}
+               />
             </div>
 
-            {/* Dirección — columna única en móvil, 2 en desktop */}
+            {/* Fila 4: Dirección + Mapa */}
             <div className="admin-row">
                <AdressAdmin
                   address={form.address}
                   onChange={handleAddress}
-                  onCoordinatesChange={handleCoordsFromAddress}
-                  saving={saving} />
-               {/* Mapa: ocupa columna completa en móvil */}
-               <div className="admin-section" style={{ minHeight: 0 }}>
-                  <MapboxPicker
-                     coordinates={form.location.coordinates}
-                     onChange={handleMapCoordinates}
-                     onAddressChange={handleAddressFromMap}
-                     saving={saving} />
-               </div>
+                  onCoordinatesChange={handleCoordinatesFromAddress}
+                  saving={saving}
+               />
+               <MapboxPicker
+                  coordinates={form.location.coordinates}
+                  onChange={handleMapCoordinates}
+                  onAddressChange={handleAddressFromMap}
+                  saving={saving}
+               />
             </div>
 
             <div className="admin-form-footer">
                <button type="submit" disabled={saving} className="admin-btn admin-btn-primary">
                   {saving
                      ? (isNew ? 'Creando...'   : 'Guardando...')
-                     : (isNew ? 'Crear Establecimiento' : 'Guardar Cambios')}
+                     : (isNew ? 'Crear Establecimiento' : 'Guardar Cambios')
+                  }
                </button>
             </div>
+
          </form>
 
-         {/* Fotos e Items: solo en edición */}
+         {/* Sección de medios e items: solo en modo edición */}
          {!isNew && (
             <div className="admin-row">
                <EstablishmentPhotosAdmin
                   establishmentId={id}
                   mainImage={form.mainImage}
-                  onMainImageChange={(url) => setForm(prev => ({ ...prev, mainImage: url }))} />
+                  onMainImageChange={(url) => setForm(prev => ({ ...prev, mainImage: url }))}
+               />
                <EstablishmentItems establishmentId={id} />
             </div>
          )}
