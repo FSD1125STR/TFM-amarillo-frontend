@@ -1,6 +1,3 @@
-
-
-// src/components/common/ItemGallery.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { itemService } from '../../services/itemService.js';
@@ -33,7 +30,7 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName,
    if (loading || filtered.length === 0) {return null;}
 
    return (
-      <Section title={`Más tapas de ${establishmentName}`}>
+      <Section title={`Tapas de ${establishmentName}`}>
          <div className="flex gap-3 mt-3
             overflow-x-auto pb-4
             snap-x snap-mandatory
