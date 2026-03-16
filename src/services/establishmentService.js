@@ -45,6 +45,16 @@ export const establishmentService = {
       }
    },
 
+   getMine: async () => {
+      try {
+         const response = await api.get('/establishment/mine');
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener establecimiento del hostelero:', error);
+         throw error;
+      }
+   },
+
    getBySlug: async (slug, params) => { 
       try {
          const response = await api.get(`/establishment/slug/${slug}`, { params });

@@ -11,9 +11,13 @@ import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail
 import { ItemAdmin } from './pages/admin/ItemAdmin';
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
-import { ProtectedRoute } from "./components/routes/ProtectedRoute";
+import { HostLoginPage } from "./pages/auth/HostLoginPage";
+import { HostRegisterPage } from "./pages/auth/HostRegisterPage";
+import { HostDashboard } from "./pages/host/HostDashboard";
+import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
 import { AdminRoute } from "./components/routes/AdminRoute";
+import { HostRoute } from "./components/routes/HostRoute";
 
 export function App() {
    return (
@@ -39,6 +43,26 @@ export function App() {
                      <RegisterPage />
                   </PublicOnlyRoute>
                } />
+
+               <Route path="/host/login" element={
+                  <PublicOnlyRoute>
+                     <HostLoginPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/host/register" element={
+                  <PublicOnlyRoute>
+                     <HostRegisterPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/host/dashboard" element={
+                  <HostRoute>
+                     <HostDashboard />
+                  </HostRoute>
+               } />
+
+               <Route path="/403" element={<ForbiddenPage />} />
 
                {/* Admin: protegido por login */}
                <Route path="/admin" element={

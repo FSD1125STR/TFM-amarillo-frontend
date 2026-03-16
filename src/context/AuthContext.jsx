@@ -31,8 +31,8 @@ export function AuthProvider({ children }) {
     return response;
   };
 
-  const register = async ({ name, email, password }) => {
-    const response = await authService.register({ name, email, password });
+  const register = async (payload) => {
+    const response = await authService.register(payload);
     const newToken = response.token;
 
     localStorage.setItem("token", newToken);

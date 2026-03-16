@@ -7,7 +7,7 @@ import { itemService } from '../../services/itemService.js';
 import Section from '../layout/Section.jsx';
 import { cloudinaryPresets } from '../../utils/cloudinaryHelpers.js';
 
-const DEFAULT_IMAGE = '/Logo.jpg';
+const DEFAULT_IMAGE = '/Logo.png';
 
 export const ItemGallery = ({ establishmentId, currentItemId, establishmentName, distance }) => {
    const [items, setItems] = useState([]);

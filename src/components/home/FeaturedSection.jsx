@@ -5,7 +5,7 @@ import { itemService } from "../../services/itemService";
 import { cloudinaryPresets } from "../../utils/cloudinaryHelpers.js";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const DEFAULT_IMAGE = "/Logo.jpg";
+const DEFAULT_IMAGE = "/Logo.png";
 
 export const FeaturedSection = () => {
    const [featuredItems, setFeaturedItems] = useState([]);

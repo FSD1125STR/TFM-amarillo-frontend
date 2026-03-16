@@ -156,7 +156,7 @@ export const Establishment = () => {
    // ─── URLs transformadas por Cloudinary ───────────────────────────────────
    const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || establishment?.mainImage;
 
-   const heroUrl      = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl)    : "/Logo.jpg";
+   const heroUrl      = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl)    : "/Logo.png";
    const lightboxUrls = photos.map((p) => cloudinaryPresets.detail(p.url)).filter(Boolean);
 
    // Si no hay fotos pero sí mainImage, el lightbox también la incluye
