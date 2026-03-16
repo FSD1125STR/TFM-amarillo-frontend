@@ -1,6 +1,8 @@
-import { Search, CircleUserRound, Circle} from "lucide-react";
-import Input from "../common/Input";
-import Button from "../common/Button";
+// src/components/layout/Header.jsx
+
+import { Circle, CircleUserRound } from 'lucide-react';
+import { SearchDropdown } from '../search/SearchDropdown';
+import Button from '../common/Button';
 
 export default function Header() {
    return (
@@ -10,23 +12,18 @@ export default function Header() {
             <div className="flex items-center gap-1.5">
                <Circle className="text-orange-500 text-2xl leading-none" />
                <h1 className="text-2xl font-black tracking-tight text-white">
-                  nex<span className="text-orange-500">Tapa</span>
+            nex<span className="text-orange-500">Tapa</span>
                </h1>
             </div>
 
             <Button className="flex items-center gap-2 px-5 py-2 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors text-sm font-semibold text-white">
                <CircleUserRound className="w-4 h-4" />
-               Login
+          Login
             </Button>
          </div>
 
-         <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
-            <Input
-               placeholder="Tu próxima tapa aquí..."
-               className="pl-9"
-            />
-         </div>
+         {/* Barra de búsqueda con dropdown integrado */}
+         <SearchDropdown placeholder="Tu próxima tapa aquí..." />
 
       </header>
    );

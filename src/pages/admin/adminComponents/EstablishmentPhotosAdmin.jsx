@@ -149,7 +149,7 @@ export const EstablishmentPhotosAdmin = ({ establishmentId, mainImage, onMainIma
       if (!file) { return; }
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
       if (!allowedTypes.includes(file.type)) { setError('Formato no válido. Usa JPG, PNG o WEBP.'); return; }
-      if (file.size > 5 * 1024 * 1024) { setError('La imagen no puede superar los 5MB.'); return; }
+      if (file.size > 15 * 1024 * 1024) { setError('La imagen no puede superar los 15MB.'); return; }
       try {
          setUploading(true);
          setError(null);

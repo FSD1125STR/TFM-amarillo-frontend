@@ -14,6 +14,7 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { ProtectedRoute } from "./components/routes/ProtectedRoute";
 import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
 import { AdminRoute } from "./components/routes/AdminRoute";
+import { SearchPage } from './pages/SearchPage';
 
 export function App() {
    return (
@@ -26,6 +27,7 @@ export function App() {
                <Route path="/establishment/:slug" element={<Establishment />} />
                <Route path="/items" element={<AllTapas />} />
                <Route path="/items/:slug" element={<Tapas />} />
+               <Route path="/search" element={<SearchPage />} />
 
                {/* Auth: solo accesibles si NO estás logueado */}
                <Route path="/login" element={
