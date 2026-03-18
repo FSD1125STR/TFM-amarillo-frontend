@@ -4,3 +4,9 @@ export const getDefaultRouteByRole = (role) => {
   return "/";
 };
 
+export const getAccountRouteByRole = (role) => {
+  if (role === "admin") return "/admin";
+  if (role === "hostelero") return "/host/dashboard";
+  if (role === "cliente") return "/profile";
+  return "/login";
+};

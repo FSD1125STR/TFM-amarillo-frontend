@@ -14,10 +14,12 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import { HostLoginPage } from "./pages/auth/HostLoginPage";
 import { HostRegisterPage } from "./pages/auth/HostRegisterPage";
 import { HostDashboard } from "./pages/host/HostDashboard";
+import { ProfilePage } from "./pages/profile/ProfilePage";
 import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
 import { AdminRoute } from "./components/routes/AdminRoute";
 import { HostRoute } from "./components/routes/HostRoute";
+import { ClientRoute } from "./components/routes/ClientRoute";
 
 export function App() {
    return (
@@ -60,6 +62,12 @@ export function App() {
                   <HostRoute>
                      <HostDashboard />
                   </HostRoute>
+               } />
+
+               <Route path="/profile" element={
+                  <ClientRoute>
+                     <ProfilePage />
+                  </ClientRoute>
                } />
 
                <Route path="/403" element={<ForbiddenPage />} />

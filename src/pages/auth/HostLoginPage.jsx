@@ -36,7 +36,7 @@ export function HostLoginPage() {
     setError("");
 
     if (!form.email || !form.password) {
-      setError("Completa correo electronico y contrasena");
+      setError("Completa correo electrónico y contraseña");
       return;
     }
 
@@ -71,7 +71,7 @@ export function HostLoginPage() {
               boxShadow: "0 14px 28px rgba(247, 105, 34, 0.35)",
             }}
           >
-            <img src="/Logo.png" alt="Logo nexTapa" className="h-[60px] w-[60px] object-contain" />
+            <img src="/Logo.png" alt="Logo nexTapa" className="h-[80px] w-[80px] object-contain" />
           </div>
           <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">nexTapa Host</h1>
           <p className="mt-1.5 text-base text-orange-400 sm:text-lg">Gestiona tu local y tus tapas</p>
@@ -101,7 +101,7 @@ export function HostLoginPage() {
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Contrasena</span>
+            <span className="text-base font-semibold text-slate-300">Contraseña</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -120,7 +120,7 @@ export function HostLoginPage() {
                 type="button"
                 className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
               </button>

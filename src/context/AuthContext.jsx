@@ -50,6 +50,11 @@ export function AuthProvider({ children }) {
     setAuthToken(null);
   };
 
+  const refreshUser = async () => {
+    if (!token) return null;
+    return fetchMe(token);
+  };
+
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -75,6 +80,7 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+      refreshUser,
     }),
     [user, token, loading]
   );

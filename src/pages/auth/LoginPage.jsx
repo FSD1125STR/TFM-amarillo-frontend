@@ -36,7 +36,7 @@ export function LoginPage() {
     setError("");
 
     if (!form.email || !form.password) {
-      setError("Completa correo electronico y contraseña");
+      setError("Completa correo electrónico y contraseña");
       return;
     }
 
@@ -69,9 +69,9 @@ export function LoginPage() {
               boxShadow: "0 14px 28px rgba(247, 105, 34, 0.35)",
             }}
           >
-            <img src="/Logo.png" alt="Logo nexTapa" className="h-[60px] w-[60px] object-contain" />
+            <img src="/Logo.png" alt="Logo nexTapa" className="h-[80px] w-[80px] object-contain" />
           </div>
-          <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">nexTapa</h1>
+          <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">nex<span className="text-orange-500">Tapa</span></h1>
           <p className="mt-1.5 text-base text-orange-400 sm:text-lg">
             Tus tapas favoritas a un click
           </p>
@@ -82,7 +82,7 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Correo electronico</span>
+            <span className="text-base font-semibold text-slate-300">Correo electrónico</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -104,7 +104,7 @@ export function LoginPage() {
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-base font-semibold text-slate-300">Contraseña</span>
               <a href="#" className="text-sm font-semibold text-[#f77827] no-underline">
-                Olvidaste tu contraseña?
+                ¿Olvidaste tu contraseña?
               </a>
             </span>
             <span
@@ -140,20 +140,20 @@ export function LoginPage() {
             className="inline-flex min-h-16 items-center justify-center gap-2 rounded-2xl border-0 text-2xl font-bold tracking-tight text-white transition active:translate-y-[2px] disabled:cursor-not-allowed disabled:opacity-75 sm:text-3xl"
             style={primaryButtonStyle}
           >
-            {submitting ? "Entrando..." : "Iniciar sesion"}
+            {submitting ? "Entrando..." : "Iniciar sesión"}
           </button>
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          No tienes cuenta?{" "}
+          ¿No tienes cuenta?{" "}
           <Link to="/register" className="font-bold text-[#ff7a2f] no-underline">
-            Registrate
+            Regístrate
           </Link>
         </p>
 
         <div className="my-5 flex items-center gap-3 text-center text-xs uppercase tracking-[0.2em] text-slate-400">
           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
-          <span>o continua con</span>
+          <span>o continúa con</span>
           <span className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
         </div>
 
@@ -189,7 +189,7 @@ export function LoginPage() {
               <Store size={22} />
             </span>
             <span>
-              <p className="m-0 text-2xl font-bold">Eres hostelero?</p>
+              <p className="m-0 text-2xl font-bold">¿Eres hostelero?</p>
               <p className="mt-0.5 text-sm text-slate-400">Gestiona tu local y tus tapas</p>
             </span>
           </span>

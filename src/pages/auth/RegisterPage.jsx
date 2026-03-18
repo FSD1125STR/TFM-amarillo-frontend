@@ -56,11 +56,11 @@ export function RegisterPage() {
     }
 
     if (form.password.length < 6) {
-      return "La contrasena debe tener al menos 6 caracteres";
+      return "La contraseña debe tener al menos 6 caracteres";
     }
 
     if (form.password !== form.confirmPassword) {
-      return "Las contrasenas no coinciden";
+      return "Las contraseñas no coinciden";
     }
 
     return "";
@@ -105,7 +105,7 @@ export function RegisterPage() {
         </Link>
 
         <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">Crea tu cuenta</h1>
-        <p className="mb-6 mt-2 text-lg text-slate-400">Unete a la comunidad foodie de nexTapa</p>
+        <p className="mb-6 mt-2 text-lg text-slate-400">Únete a la comunidad foodie de nexTapa</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-2">
@@ -118,7 +118,7 @@ export function RegisterPage() {
               <input
                 type="text"
                 name="name"
-                placeholder="Ej. Juan Perez"
+                placeholder="Ej. Cristian Fernandez"
                 value={form.name}
                 onChange={handleChange}
                 autoComplete="name"
@@ -147,7 +147,7 @@ export function RegisterPage() {
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Correo electronico</span>
+            <span className="text-base font-semibold text-slate-300">Correo electrónico</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -166,7 +166,7 @@ export function RegisterPage() {
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Contrasena</span>
+            <span className="text-base font-semibold text-slate-300">Contraseña</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -185,7 +185,7 @@ export function RegisterPage() {
                 type="button"
                 className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -193,7 +193,7 @@ export function RegisterPage() {
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Confirmar contrasena</span>
+            <span className="text-base font-semibold text-slate-300">Confirmar contraseña</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -212,7 +212,7 @@ export function RegisterPage() {
                 type="button"
                 className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
                 onClick={() => setShowConfirmPassword((prev) => !prev)}
-                aria-label={showConfirmPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -226,7 +226,7 @@ export function RegisterPage() {
                 <button
                   type="button"
                   key={avatarPath}
-                  className={`h-[68px] w-[68px] shrink-0 rounded-full border-2 bg-transparent p-1 transition hover:-translate-y-0.5 ${
+                  className={`h-[68px] w-[68px] shrink-0 rounded-full border-2 bg-transparent p-1 mt-1 transition hover:-translate-y-0.5 ${
                     selectedAvatar === avatarPath
                       ? "border-[#f77827] ring-2 ring-[#f77827]/20"
                       : "border-transparent"
@@ -259,16 +259,16 @@ export function RegisterPage() {
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          Ya tienes cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
-            Inicia sesion
+            Inicia sesión
           </Link>
         </p>
 
         <p className="mb-0 mt-3 text-center text-lg text-slate-400">
-          Eres hostelero?{" "}
+          ¿Eres hostelero?{" "}
           <Link to="/host/register" className="font-bold text-[#ff7a2f] no-underline">
-            Registrate como hostelero
+            Regístrate como hostelero
           </Link>
         </p>
       </div>

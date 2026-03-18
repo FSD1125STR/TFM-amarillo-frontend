@@ -76,11 +76,11 @@ export function HostRegisterPage() {
     }
 
     if (form.password.length < 6) {
-      return "La contrasena debe tener al menos 6 caracteres";
+      return "La contraseña debe tener al menos 6 caracteres";
     }
 
     if (form.password !== form.confirmPassword) {
-      return "Las contrasenas no coinciden";
+      return "Las contraseñas no coinciden";
     }
 
     return "";
@@ -177,7 +177,7 @@ export function HostRegisterPage() {
 
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
             <label className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-slate-300">Contrasena</span>
+              <span className="text-base font-semibold text-slate-300">Contraseña</span>
               <span
                 className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
                 style={inputWrapStyle}
@@ -196,7 +196,7 @@ export function HostRegisterPage() {
                   type="button"
                   className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
@@ -204,7 +204,7 @@ export function HostRegisterPage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-slate-300">Confirmar contrasena</span>
+              <span className="text-base font-semibold text-slate-300">Confirmar contraseña</span>
               <span
                 className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
                 style={inputWrapStyle}
@@ -223,7 +223,7 @@ export function HostRegisterPage() {
                   type="button"
                   className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  aria-label={showConfirmPassword ? "Ocultar contrasena" : "Mostrar contrasena"}
+                  aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
