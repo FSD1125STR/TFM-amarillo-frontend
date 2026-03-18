@@ -1,6 +1,6 @@
-﻿import { useLocation, useNavigate } from "react-router-dom";
+﻿import { useAuth } from "../../context/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Home, Compass, Heart, User } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
 import { getAccountRouteByRole } from "../../utils/authRedirect";
 
 const baseItems = [
@@ -33,22 +33,19 @@ export const Footer = () => {
       return location.pathname === path;
    };
 
-   const handleItemClick = (path) => {
-      navigate(path);
-   };
-
    return (
       <>
          <div className="h-16" />
          <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-800 z-50">
             <div className="flex justify-around items-center px-4 py-2 max-w-3xl mx-auto">
-               {items.map(({ id, label, Icon, path }) => {
-                  const isActive = isPathActive(path);
+               {items.map((item) => {
+                  const isActive = isPathActive(item.path);
+                  const ItemIcon = item.Icon;
 
                   return (
                      <button
-                        key={id}
-                        onClick={() => handleItemClick(path)}
+                        key={item.id}
+                        onClick={() => navigate(item.path)}
                         className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-200 active:scale-90 ${
                            isActive
                               ? "text-orange-500"
@@ -56,7 +53,7 @@ export const Footer = () => {
                         }`}
                      >
                         <div className="relative">
-                           <Icon
+                           <ItemIcon
                               size={22}
                               strokeWidth={isActive ? 2.5 : 1.8}
                               fill={isActive ? "currentColor" : "none"}
@@ -66,7 +63,7 @@ export const Footer = () => {
                            )}
                         </div>
                         <span className={`text-[10px] tracking-wide ${isActive ? "font-semibold" : "font-normal"}`}>
-                           {label}
+                           {item.label}
                         </span>
                      </button>
                   );

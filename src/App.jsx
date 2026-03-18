@@ -18,6 +18,7 @@ import { ProfilePage } from "./pages/profile/ProfilePage";
 import { ForbiddenPage } from "./pages/ForbiddenPage";
 import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
 import { AdminRoute } from "./components/routes/AdminRoute";
+import { SearchPage } from './pages/SearchPage';
 import { HostRoute } from "./components/routes/HostRoute";
 import { ClientRoute } from "./components/routes/ClientRoute";
 
@@ -32,6 +33,7 @@ export function App() {
                <Route path="/establishment/:slug" element={<Establishment />} />
                <Route path="/items" element={<AllTapas />} />
                <Route path="/items/:slug" element={<Tapas />} />
+               <Route path="/search" element={<SearchPage />} />
 
                {/* Auth: solo accesibles si NO estás logueado */}
                <Route path="/login" element={

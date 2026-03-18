@@ -1,5 +1,7 @@
 
 
+//src/components/common/ScheduleDisplay.jsx
+// Componente para mostrar el horario de un establecimiento, con agrupación de días y estado actual
 const formatTime = (t) => t?.slice(0, 5) || "";
 
 const serializeDay = (d) => {

@@ -6,14 +6,13 @@ import {
    ChevronDown,
    LogOut,
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getAccountRouteByRole } from "../../utils/authRedirect";
 import Input from "../common/Input";
 
 export default function Header() {
    const navigate = useNavigate();
-   const location = useLocation();
    const { isAuthenticated, user, logout } = useAuth();
    const [menuOpen, setMenuOpen] = useState(false);
    const menuRef = useRef(null);
@@ -34,10 +33,6 @@ export default function Header() {
       };
    }, []);
 
-   useEffect(() => {
-      setMenuOpen(false);
-   }, [location.pathname]);
-
    const handleLogout = () => {
       logout();
       setMenuOpen(false);
@@ -50,7 +45,7 @@ export default function Header() {
             <div className="flex items-center gap-1.5">
                <Circle className="text-orange-500 text-2xl leading-none" />
                <h1 className="text-2xl font-black tracking-tight text-white">
-                  nex<span className="text-orange-500">Tapa</span>
+            nex<span className="text-orange-500">Tapa</span>
                </h1>
             </div>
 
@@ -89,6 +84,7 @@ export default function Header() {
 
                         <Link
                            to={accountPath}
+                           onClick={() => setMenuOpen(false)}
                            className="flex items-center gap-2 px-4 py-3 text-sm text-neutral-100 no-underline transition-colors hover:bg-neutral-800"
                         >
                            <CircleUserRound className="h-4 w-4 text-orange-400" />
@@ -111,8 +107,12 @@ export default function Header() {
 
          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
-            <Input placeholder="Tu proxima tapa aqui..." className="pl-9" />
+            <Input
+               placeholder="Tu próxima tapa aquí..."
+               className="pl-9"
+            />
          </div>
+
       </header>
    );
 }

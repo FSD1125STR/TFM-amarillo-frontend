@@ -1,7 +1,4 @@
-
-
-// src/pages/Establishment.jsx
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+﻿import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef, useCallback } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -13,6 +10,7 @@ import {
    SquareArrowLeft,
    Clock,
    MapPinHouse,
+   Banknote,
 } from "lucide-react";
 
 import Container from "../components/layout/Container";
@@ -21,28 +19,29 @@ import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
 import { Footer } from "../components/layout/Footer.jsx";
+import { SocialLinks } from "../components/common/SocialLinks.jsx";
 
 import { establishmentService } from "../services/establishmentService.js";
 import { ItemGallery } from "../components/common/ItemGallery";
 import { photoService } from "../services/photoService.js";
 import { ScheduleDisplay } from "../components/common/ScheduleDisplay";
 import { ServiceKitchen } from "../components/common/ServiceKitchen";
-import { PriceMedium } from "../components/common/PriceMedium";
 import { Contact } from "../components/common/Contact";
 import { useGeolocation } from "../hooks/useGeolocation.js";
 import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-// ============================================
-// LIGHTBOX
-// El lightbox usa detail (1200px) — resolución alta para pantalla completa.
-// Las URLs del array allImages ya vienen transformadas desde el componente padre.
-// ============================================
 function Lightbox({ images, startIndex, onClose }) {
    const [current, setCurrent] = useState(startIndex);
-   const prev = () => setCurrent((i) => (i - 1 + images.length) % images.length);
-   const next = () => setCurrent((i) => (i + 1) % images.length);
+   const prev = useCallback(
+      () => setCurrent((i) => (i - 1 + images.length) % images.length),
+      [images.length]
+   );
+   const next = useCallback(
+      () => setCurrent((i) => (i + 1) % images.length),
+      [images.length]
+   );
 
    useEffect(() => {
       const onKey = (e) => {
@@ -52,7 +51,7 @@ function Lightbox({ images, startIndex, onClose }) {
       };
       window.addEventListener("keydown", onKey);
       return () => window.removeEventListener("keydown", onKey);
-   }, [onClose]);
+   }, [onClose, prev, next]);
 
    return (
       <div className="fixed inset-0 z-50 bg-black/95 flex flex-col" onClick={onClose}>
@@ -95,7 +94,6 @@ export const Establishment = () => {
    const { slug } = useParams();
    const location = useLocation();
 
-   // Distancia pre-calculada desde el listado — evita recalcular con $geoNear
    const preloadedDistance = location.state?.distance ?? null;
 
    const [establishment, setEstablishment] = useState(null);
@@ -110,7 +108,7 @@ export const Establishment = () => {
 
    const loadEstablishmentData = useCallback(async () => {
       try {
-         if (!establishment) { setLoading(true); }
+         setLoading(true);
          setError(null);
 
          const params = (!preloadedDistance && coords?.lat)
@@ -153,16 +151,12 @@ export const Establishment = () => {
       };
    }, [establishment]);
 
-   // ─── URLs transformadas por Cloudinary ───────────────────────────────────
    const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || establishment?.mainImage;
-
-   const heroUrl      = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl)    : "/Logo.png";
+   const heroUrl = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl) : "/Logo.png";
    const lightboxUrls = photos.map((p) => cloudinaryPresets.detail(p.url)).filter(Boolean);
-
-   // Si no hay fotos pero sí mainImage, el lightbox también la incluye
    const allLightboxImages = lightboxUrls.length > 0
       ? lightboxUrls
-      : (rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : []);
+      : rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : [];
 
    const openLightbox = (index = 0) => {
       setLightboxIndex(index);
@@ -174,9 +168,7 @@ export const Establishment = () => {
       if (isNaN(dist) || dist <= 0) {
          return geoLoading ? "Calculando distancia..." : "Distancia no disponible";
       }
-      return dist < 1000
-         ? `${Math.round(dist)} m`
-         : `${(dist / 1000).toFixed(1)} km`;
+      return dist < 1000 ? `${Math.round(dist)} m` : `${(dist / 1000).toFixed(1)} km`;
    };
 
    if (loading && !establishment) {
@@ -210,7 +202,6 @@ export const Establishment = () => {
             />
          )}
 
-         {/* ── Hero ── */}
          <div className="relative h-72 max-w-3xl mx-auto">
             <img
                src={heroUrl}
@@ -243,35 +234,45 @@ export const Establishment = () => {
          </div>
 
          <Container>
-            {/* ── Strip de thumbnails ── */}
             <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
-               {photos.length > 0 ? (
-                  photos.map((photo, i) => (
+               {photos.length > 0
+                  ? photos.map((photo, i) => (
                      <img
                         key={photo._id}
-                        src={cloudinaryPresets.thumbnail(photo.url)}   // 200×150 fill — ~15-20 KB c/u
+                        src={cloudinaryPresets.thumbnail(photo.url)}
                         className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80"
                         onClick={() => openLightbox(i)}
                         alt="Foto del establecimiento"
                      />
                   ))
-               ) : (
-                  rawPrimaryUrl && (
+                  : rawPrimaryUrl && (
                      <img
                         src={cloudinaryPresets.thumbnail(rawPrimaryUrl)}
                         className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer"
                         onClick={() => openLightbox(0)}
                         alt="Foto del establecimiento"
                      />
-                  )
-               )}
+                  )}
             </div>
 
-            <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
-               <div className="mb-6">
-                  <h2 className="text-xl font-bold text-white">Descripción</h2>
-                  <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
+            <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm hover:border-orange-500/30 transition-colors duration-200">
+               <div className="flex items-start justify-between mb-4">
+                  <div>
+                     <h2 className="text-xl font-bold text-white">Descripcion</h2>
+                     <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
+                  </div>
+
+                  {establishment.priceRange && (
+                     <div className="flex items-center gap-2 bg-neutral-800 border border-neutral-700/60 rounded-xl px-3 py-2 shrink-0 ml-4">
+                        <Banknote size={16} className="text-green-400 shrink-0" strokeWidth={1.8} />
+                        <div className="flex flex-col leading-tight">
+                           <span className="text-[10px] text-neutral-500 uppercase tracking-widest">Precio medio</span>
+                           <span className="text-sm font-bold text-white">{establishment.priceRange}</span>
+                        </div>
+                     </div>
+                  )}
                </div>
+
                {establishment.description && (
                   <p className="text-sm text-white leading-relaxed">{establishment.description}</p>
                )}
@@ -286,11 +287,25 @@ export const Establishment = () => {
                />
             </Section>
 
-            <ServiceKitchen features={establishment.features || []} cuisineType={establishment.cuisineType || []} />
+            <ServiceKitchen
+               features={establishment.features || []}
+               cuisineType={establishment.cuisineType || []}
+            />
 
-            <div className="grid md:grid-cols-2 gap-6 mt-8">
-               <Contact phone={establishment.phone} email={establishment.email} website={establishment.website} />
-               <PriceMedium priceRange={establishment.priceRange} />
+            <div className="mt-8 grid grid-cols-2 gap-4">
+               <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-sm hover:border-orange-500/30 transition-colors duration-200">
+                  <div className="mb-5">
+                     <h3 className="text-xl font-bold text-white">Contacto</h3>
+                     <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
+                  </div>
+                  <Contact
+                     phone={establishment.phone}
+                     email={establishment.email}
+                     website={establishment.website}
+                  />
+               </div>
+
+               <SocialLinks socialLinks={establishment.socialLinks || {}} />
             </div>
 
             <div className="mt-4 rounded-2xl p-5 shadow-sm">
@@ -301,7 +316,7 @@ export const Establishment = () => {
                   <div className="flex flex-col justify-between gap-6">
                      <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
                         <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3">
-                           <MapPinHouse className="text-orange-500" /> Dirección
+                           <MapPinHouse className="text-orange-500" /> Direccion
                         </h3>
                         <p className="text-sm text-neutral-200">
                            {establishment.address?.street}, {establishment.address?.number}<br />
@@ -314,7 +329,7 @@ export const Establishment = () => {
                            }}
                            className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all text-sm font-medium"
                         >
-                           Cómo llegar
+                  Como llegar
                         </button>
                      </div>
                      <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
@@ -327,13 +342,13 @@ export const Establishment = () => {
                </div>
             </div>
 
-            <Section title="Valoración">
+            <Section title="Valoracion">
                <RatingBar average={establishment.averageRating} totalReviews={establishment.totalReviews} />
             </Section>
 
             <div className="mt-8 mb-6">
                <Button className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600">
-                  Regístrate Aquí
+            Registrate Aqui
                </Button>
             </div>
             <Footer />
