@@ -79,6 +79,7 @@ export function RegisterPage() {
     try {
       setSubmitting(true);
       const response = await register({
+        role: "cliente",
         name: form.name,
         username: form.username || undefined,
         email: form.email,
@@ -275,4 +276,3 @@ export function RegisterPage() {
     </section>
   );
 }
-

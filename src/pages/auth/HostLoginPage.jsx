@@ -45,6 +45,7 @@ export function HostLoginPage() {
       const response = await login({
         email: form.email,
         password: form.password,
+        loginType: "hostelero",
       });
 
       const role = response?.data?.role;

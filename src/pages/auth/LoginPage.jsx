@@ -45,6 +45,7 @@ export function LoginPage() {
       const response = await login({
         email: form.email,
         password: form.password,
+        loginType: "cliente",
       });
 
       const role = response?.data?.role;
