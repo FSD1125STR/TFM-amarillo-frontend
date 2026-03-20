@@ -16,10 +16,15 @@ import {
 import {
    SortableContext,
    useSortable,
-   arrayMove,
    verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import {
+   assignSequentialOrder,
+   buildOrderPayload,
+   moveByDndIds,
+   sortByOrder,
+} from '../utils/sortableOrder';
 
 // ── Fila sortable ──────────────────────────────────────────────────────────
 const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEdit }) => {
@@ -152,8 +157,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
       try {
          setLoading(true);
          const res = await itemService.getByEstablishment(establishmentId, { available: undefined });
-         const sorted = [...(res.data || [])].sort((a, b) => a.order - b.order);
-         setItems(sorted);
+         setItems(sortByOrder(res.data || []));
          setOrderChanged(false);
       } catch (err) {
          setError('Error loading tapas', err);
@@ -172,11 +176,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
       const { active, over } = event;
       if (!over || active.id === over.id) {return;}
 
-      setItems(prev => {
-         const oldIndex = prev.findIndex(i => i._id === active.id);
-         const newIndex = prev.findIndex(i => i._id === over.id);
-         return arrayMove(prev, oldIndex, newIndex);
-      });
+      setItems(prev => moveByDndIds(prev, active.id, over.id));
       setOrderChanged(true);
    }, []);
 
@@ -185,9 +185,9 @@ export const EstablishmentItems = ({ establishmentId }) => {
       try {
          setSaving(true);
          setError(null);
-         const payload = items.map((item, index) => ({ id: item._id, order: index }));
+         const payload = buildOrderPayload(items);
          await itemService.reorder(payload);
-         setItems(prev => prev.map((item, i) => ({ ...item, order: i })));
+         setItems(prev => assignSequentialOrder(prev));
          setOrderChanged(false);
          showSuccess('Orden guardado correctamente');
       } catch (err) {

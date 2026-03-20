@@ -1,13 +1,10 @@
-
-
-// src/components/common/ItemGallery.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { itemService } from '../../services/itemService.js';
 import Section from '../layout/Section.jsx';
 import { cloudinaryPresets } from '../../utils/cloudinaryHelpers.js';
 
-const DEFAULT_IMAGE = '/Logo.jpg';
+const DEFAULT_IMAGE = '/Logo.png';
 
 export const ItemGallery = ({ establishmentId, currentItemId, establishmentName, distance }) => {
    const [items, setItems] = useState([]);
@@ -33,7 +30,7 @@ export const ItemGallery = ({ establishmentId, currentItemId, establishmentName,
    if (loading || filtered.length === 0) {return null;}
 
    return (
-      <Section title={`Más tapas de ${establishmentName}`}>
+      <Section title={`Tapas de ${establishmentName}`}>
          <div className="flex gap-3 mt-3
             overflow-x-auto pb-4
             snap-x snap-mandatory

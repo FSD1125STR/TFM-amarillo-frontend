@@ -9,27 +9,81 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
 import { ItemAdmin } from './pages/admin/ItemAdmin';
+import { LoginPage } from "./pages/auth/LoginPage";
+import { RegisterPage } from "./pages/auth/RegisterPage";
+import { HostLoginPage } from "./pages/auth/HostLoginPage";
+import { HostRegisterPage } from "./pages/auth/HostRegisterPage";
+import { HostDashboard } from "./pages/host/HostDashboard";
+import { ProfilePage } from "./pages/profile/ProfilePage";
+import { ForbiddenPage } from "./pages/ForbiddenPage";
+import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
+import { AdminRoute } from "./components/routes/AdminRoute";
 import { SearchPage } from './pages/SearchPage';
+import { HostRoute } from "./components/routes/HostRoute";
+import { ClientRoute } from "./components/routes/ClientRoute";
 
-export default function App() {
+export function App() {
    return (
-      <> 
+      <>
          <BrowserRouter>
             <Routes>
-               {/* Public routes */}
+               {/* Rutas públicas reales */}
                <Route path="/" element={<Home />} />
                <Route path="/establishments" element={<AllEstablishment />} />
-               <Route path="/establishment/:slug" element={<Establishment />} /> 
+               <Route path="/establishment/:slug" element={<Establishment />} />
                <Route path="/items" element={<AllTapas />} />
                <Route path="/items/:slug" element={<Tapas />} />
                <Route path="/search" element={<SearchPage />} />
 
-               {/* Admin routes */}
-               <Route path="/admin" element={<AdminPanel />}>
+               {/* Auth: solo accesibles si NO estás logueado */}
+               <Route path="/login" element={
+                  <PublicOnlyRoute>
+                     <LoginPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/register" element={
+                  <PublicOnlyRoute>
+                     <RegisterPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/host/login" element={
+                  <PublicOnlyRoute>
+                     <HostLoginPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/host/register" element={
+                  <PublicOnlyRoute>
+                     <HostRegisterPage />
+                  </PublicOnlyRoute>
+               } />
+
+               <Route path="/host/dashboard" element={
+                  <HostRoute>
+                     <HostDashboard />
+                  </HostRoute>
+               } />
+
+               <Route path="/profile" element={
+                  <ClientRoute>
+                     <ProfilePage />
+                  </ClientRoute>
+               } />
+
+               <Route path="/403" element={<ForbiddenPage />} />
+
+               {/* Admin: protegido por login */}
+               <Route path="/admin" element={
+                  <AdminRoute>
+                     <AdminPanel />
+                  </AdminRoute>
+               }>
                   <Route index element={<Dashboard />} />
                   <Route path="establishments" element={<AdminEstablishments />} />
                   <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
-                  <Route path="/admin/items/:id" element={<ItemAdmin />} />
+                  <Route path="items/:id" element={<ItemAdmin />} />
                </Route>
             </Routes>
          </BrowserRouter>

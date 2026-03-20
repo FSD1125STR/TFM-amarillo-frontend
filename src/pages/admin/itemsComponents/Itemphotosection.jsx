@@ -1,83 +1,23 @@
-
-
-// src/pages/admin/itemsComponents/ItemPhotoSection.jsx
-// Componente para gestionar las fotos de un establecimiento: subir, eliminar, ordenar y marcar principal
-import { useState, useEffect, useRef, useCallback } from 'react';// React DnD Kit para drag & drop
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
    DndContext,
    closestCenter,
    PointerSensor,
    useSensor,
    useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import { photoService } from "../../../services/photoService";
+import { cloudinaryPresets } from "../../../utils/cloudinaryHelpers";
+import { SortablePhotoThumb } from "../shared/SortablePhotoThumb";
 import {
-   SortableContext,
-   useSortable,
-   arrayMove,
-   rectSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { photoService } from '../../../services/photoService';
-import { cloudinaryPresets } from '../../../utils/cloudinaryHelpers';
-import '../styles/itemPhotoSection.css';
+   assignSequentialOrder,
+   buildOrderPayload,
+   moveByDndIds,
+   sortByOrder,
+} from "../utils/sortableOrder";
+import "../styles/itemPhotoSection.css";
 
-// ── Miniatura sortable ─────────────────────────────────────────────────────
-const SortableThumb = ({ photo, onDelete, onSetPrimary, deletingId }) => {
-   const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-   } = useSortable({ id: photo._id });
-
-   const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-   };
-
-   return (
-      <div
-         ref={setNodeRef}
-         style={style}
-         className={`iph-thumb ${photo.isPrimary ? 'iph-thumb--primary' : ''} ${isDragging ? 'iph-thumb--dragging' : ''}`}
-         {...attributes}
-         {...listeners}
-      >
-         <img
-            // preset thumbnail: 200x150 crop fill, WebP automático
-            src={cloudinaryPresets.thumbnail(photo.url)}
-            alt={photo.alt || ''}
-            className="iph-thumb-img"
-            loading="lazy"
-         />
-         {photo.isPrimary && <span className="iph-thumb-badge">Principal</span>}
-
-         <div className="iph-thumb-actions">
-            {!photo.isPrimary && (
-               <button
-                  type="button"
-                  className="iph-icon-btn"
-                  title="Establecer como principal"
-                  onClick={(e) => { e.stopPropagation(); onSetPrimary(photo); }}
-               >⭐</button>
-            )}
-            <button
-               type="button"
-               className="iph-icon-btn iph-icon-btn--delete"
-               title="Eliminar"
-               onClick={(e) => { e.stopPropagation(); onDelete(photo._id); }}
-               disabled={deletingId === photo._id}
-            >
-               {deletingId === photo._id ? '⏳' : '🗑️'}
-            </button>
-         </div>
-      </div>
-   );
-};
-
-// ── Componente principal ───────────────────────────────────────────────────
 export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
    const [photos, setPhotos] = useState([]);
    const [loading, setLoading] = useState(false);
@@ -91,11 +31,13 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
    const fileInputRef = useRef(null);
 
    const sensors = useSensors(
-      useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+      useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
    );
 
    useEffect(() => {
-      if (itemId) { fetchPhotos(); }
+      if (itemId) {
+         fetchPhotos();
+      }
    }, [itemId]);
 
    const fetchPhotos = async () => {
@@ -103,11 +45,10 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
          setLoading(true);
          setError(null);
          const data = await photoService.getByItem(itemId);
-         const sorted = [...(data || [])].sort((a, b) => a.order - b.order);
-         setPhotos(sorted);
+         setPhotos(sortByOrder(data || []));
          setOrderChanged(false);
       } catch {
-         setError('Error al cargar las fotos');
+         setError("Error al cargar las fotos");
       } finally {
          setLoading(false);
       }
@@ -120,64 +61,81 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
 
    const handleDragEnd = useCallback((event) => {
       const { active, over } = event;
-      if (!over || active.id === over.id) { return; }
-      setPhotos(prev => {
-         const oldIndex = prev.findIndex(p => p._id === active.id);
-         const newIndex = prev.findIndex(p => p._id === over.id);
-         return arrayMove(prev, oldIndex, newIndex);
-      });
+      if (!over || active.id === over.id) {
+         return;
+      }
+
+      setPhotos((prev) => moveByDndIds(prev, active.id, over.id));
       setOrderChanged(true);
    }, []);
 
    const handleSaveOrder = async () => {
       try {
          setSaving(true);
-         const payload = photos.map((p, i) => ({ id: p._id, order: i }));
+         const payload = buildOrderPayload(photos);
          await photoService.reorder(payload);
-         setPhotos(prev => prev.map((p, i) => ({ ...p, order: i })));
+         setPhotos((prev) => assignSequentialOrder(prev));
          setOrderChanged(false);
-         showSuccess('Orden guardado');
+         showSuccess("Orden guardado");
       } catch {
-         setError('Error al guardar el orden');
+         setError("Error al guardar el orden");
       } finally {
          setSaving(false);
       }
    };
 
-   const handleFileChange = async (e) => {
-      const file = e.target.files[0];
-      if (!file) { return; }
-      if (!file.type.startsWith('image/')) { setError('Solo JPG, PNG o WEBP'); return; }
-      if (file.size > 5 * 1024 * 1024) { setError('Máximo 5MB'); return; }
+   const handleFileChange = async (event) => {
+      const file = event.target.files[0];
+      if (!file) {
+         return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+         setError("Solo JPG, PNG o WEBP");
+         return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+         setError("Máximo 5MB");
+         return;
+      }
+
       try {
          setUploading(true);
          setError(null);
          const isPrimary = photos.length === 0;
          await photoService.uploadToItem(file, itemId, { isPrimary });
-         showSuccess('Foto subida correctamente');
+         showSuccess("Foto subida correctamente");
          await fetchPhotos();
+
          if (isPrimary && onMainImageChange) {
             const updated = await photoService.getByItem(itemId);
-            const primary = updated?.find(p => p.isPrimary);
-            if (primary) { onMainImageChange(primary.url); }
+            const primary = updated?.find((photo) => photo.isPrimary);
+            if (primary) {
+               onMainImageChange(primary.url);
+            }
          }
       } catch {
-         setError('Error al subir la foto');
+         setError("Error al subir la foto");
       } finally {
          setUploading(false);
-         if (fileInputRef.current) { fileInputRef.current.value = ''; }
+         if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+         }
       }
    };
 
    const handleDelete = async (photoId) => {
-      if (!window.confirm('¿Eliminar esta foto?')) { return; }
+      if (!window.confirm("¿Eliminar esta foto?")) {
+         return;
+      }
+
       try {
          setDeletingId(photoId);
          await photoService.delete(photoId);
-         setPhotos(prev => prev.filter(p => p._id !== photoId));
-         showSuccess('Foto eliminada');
+         setPhotos((prev) => prev.filter((photo) => photo._id !== photoId));
+         showSuccess("Foto eliminada");
       } catch {
-         setError('Error al eliminar la foto');
+         setError("Error al eliminar la foto");
       } finally {
          setDeletingId(null);
       }
@@ -187,22 +145,20 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
       try {
          await photoService.setPrimary(photo._id);
          await fetchPhotos();
-         if (onMainImageChange) { onMainImageChange(photo.url); }
-         showSuccess('Foto marcada como principal');
+         if (onMainImageChange) {
+            onMainImageChange(photo.url);
+         }
+         showSuccess("Foto marcada como principal");
       } catch {
-         setError('Error al marcar como principal');
+         setError("Error al marcar como principal");
       }
    };
 
    if (!itemId) {
-      return (
-         <div className="iph-new-notice">
-            💡 Guarda la tapa primero para poder añadir fotos.
-         </div>
-      );
+      return <div className="iph-new-notice">💡 Guarda la tapa primero para poder añadir fotos.</div>;
    }
 
-   const primaryPhoto = photos.find(p => p.isPrimary);
+   const primaryPhoto = photos.find((photo) => photo.isPrimary);
    const displayImage = primaryPhoto?.url || mainImage;
 
    return (
@@ -214,13 +170,10 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
             <p className="admin-loading">Cargando fotos...</p>
          ) : (
             <div className="iph-layout">
-
-               {/* Columna izquierda: foto principal + botón */}
                <div className="iph-col-main">
                   <div className="iph-main-img-wrapper">
                      {displayImage ? (
                         <img
-                           // preset tapaDetail: 800x600 limit, WebP automático
                            src={cloudinaryPresets.tapaDetail(displayImage)}
                            alt="Imagen principal"
                            className="iph-main-img"
@@ -237,7 +190,7 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
                      type="file"
                      accept="image/jpeg,image/jpg,image/png,image/webp"
                      onChange={handleFileChange}
-                     style={{ display: 'none' }}
+                     style={{ display: "none" }}
                   />
                   <button
                      type="button"
@@ -245,29 +198,21 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
                      onClick={() => fileInputRef.current?.click()}
                      disabled={uploading}
                   >
-                     {uploading ? '⏳ Subiendo...' : '+ Añadir foto'}
+                     {uploading ? "⏳ Subiendo..." : "+ Añadir foto"}
                   </button>
                </div>
 
-               {/* Columna derecha: miniaturas + drag footer */}
                <div className="iph-col-thumbs">
                   {photos.length === 0 ? (
                      <div className="iph-thumbs-empty">
                         <p>Las fotos aparecerán aquí</p>
                      </div>
                   ) : (
-                     <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                     >
-                        <SortableContext
-                           items={photos.map(p => p._id)}
-                           strategy={rectSortingStrategy}
-                        >
+                     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <SortableContext items={photos.map((photo) => photo._id)} strategy={rectSortingStrategy}>
                            <div className="iph-thumbs-grid">
-                              {photos.map(photo => (
-                                 <SortableThumb
+                              {photos.map((photo) => (
+                                 <SortablePhotoThumb
                                     key={photo._id}
                                     photo={photo}
                                     onDelete={handleDelete}
@@ -288,16 +233,16 @@ export const ItemPhotoSection = ({ itemId, mainImage, onMainImageChange }) => {
                            onClick={handleSaveOrder}
                            disabled={saving}
                         >
-                           {saving ? 'Guardando...' : '💾 Guardar orden'}
+                           {saving ? "Guardando..." : "💾 Guardar orden"}
                         </button>
                      ) : (
                         <p className="iph-drag-hint">⠿ Arrastra para cambiar el orden</p>
                      )}
                   </div>
                </div>
-
             </div>
          )}
       </div>
    );
 };
+

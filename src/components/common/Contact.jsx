@@ -4,11 +4,6 @@ export const Contact = ({ phone, email, website }) => {
   return (
     <div className="p-4 text-center">
 
-      {/* Título */}
-      <h3 className="text-white text-lg font-semibold mb-6">
-        Contacto
-      </h3>
-
       <div className="space-y-4 flex flex-col items-center">
 
         {/* Teléfono */}
