@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
-   Search,
+   
    CircleUserRound,
    Circle,
    ChevronDown,
@@ -9,7 +9,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getAccountRouteByRole } from "../../utils/authRedirect";
-import Input from "../common/Input";
+import { SearchDropdown } from "../search/SearchDropdown";
 
 export default function Header() {
    const navigate = useNavigate();
@@ -105,14 +105,7 @@ export default function Header() {
             )}
          </div>
 
-         <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
-            <Input
-               placeholder="Tu próxima tapa aquí..."
-               className="pl-9"
-            />
-         </div>
-
+         <SearchDropdown placeholder="Tu próxima tapa aquí..." />
       </header>
    );
 }

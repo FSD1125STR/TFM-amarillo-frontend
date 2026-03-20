@@ -1,12 +1,12 @@
 ﻿import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Compass, Heart, User } from "lucide-react";
+import { Home, Search, Heart, User } from "lucide-react"; 
 import { getAccountRouteByRole } from "../../utils/authRedirect";
 
 const baseItems = [
-   { id: "home", label: "Home", Icon: Home, path: "/" },
-   { id: "explore", label: "Explore", Icon: Compass, path: "/explore" },
-   { id: "saved", label: "Saved", Icon: Heart, path: "/saved" },
+   { id: "home",   label: "Home",   Icon: Home,   path: "/" },
+   { id: "search", label: "Search", Icon: Search, path: "/search" }, // ← esta línea
+   { id: "saved",  label: "Saved",  Icon: Heart,  path: "/saved" },
 ];
 
 export const Footer = () => {
