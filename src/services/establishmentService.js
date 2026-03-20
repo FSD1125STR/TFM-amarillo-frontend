@@ -1,6 +1,3 @@
-
-
-//establishmentService.js - Servicio para manejar operaciones relacionadas con establecimientos en el frontend
 import { api } from './api';
 
 export const establishmentService = { 
@@ -41,6 +38,16 @@ export const establishmentService = {
          return response.data;
       } catch (error) {
          console.error('Error al obtener establecimiento:', error);
+         throw error;
+      }
+   },
+
+   getMine: async () => {
+      try {
+         const response = await api.get('/establishment/mine');
+         return response.data;
+      } catch (error) {
+         console.error('Error al obtener establecimiento del hostelero:', error);
          throw error;
       }
    },
@@ -103,6 +110,16 @@ export const establishmentService = {
          return response.data;
       } catch (error) {
          console.error('Error al reactivar establecimiento:', error);
+         throw error;
+      }
+   },
+
+   updateSocialLinks: async (id, socialLinks) => {
+      try {
+         const response = await api.patch(`/establishment/${id}/social-links`, socialLinks);
+         return response.data;
+      } catch (error) {
+         console.error('Error al actualizar redes sociales:', error);
          throw error;
       }
    },

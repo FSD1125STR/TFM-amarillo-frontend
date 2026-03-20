@@ -131,10 +131,10 @@ export default function NearbySection() {
                            {/* IMAGEN — card: 600×400 fill — slider ocupa ancho completo pero h-56, no necesita más */}
                            <div className="relative">
                               <img
-                                 src={cloudinaryPresets.card(establishment.mainImage || "/Logo.jpg")}
+                                 src={cloudinaryPresets.card(establishment.mainImage || "/Logo.png")}
                                  alt={establishment.name}
                                  className="h-56 w-full object-cover"
-                                 onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
+                                 onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }}
                               />
                               <div className="absolute top-3 right-3">
                                  <Badge className="bg-black/60 backdrop-blur-md border-none">

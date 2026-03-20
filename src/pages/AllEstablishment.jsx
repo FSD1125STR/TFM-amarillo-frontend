@@ -190,7 +190,7 @@ export const AllEstablishment = () => {
                               )}
 
                               {/* Degradado + datos superpuestos — SOLO MÓVIL */}
-                              <div className="md:hidden absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+                              <div className="md:hidden absolute inset-0 bg-linear-to-t from-black/85 via-black/25 to-transparent" />
                               <div className="md:hidden absolute inset-0 flex flex-col justify-between p-3">
                                  {!isOpen && (
                                     <span className="self-start bg-black/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-neutral-600 backdrop-blur-sm">

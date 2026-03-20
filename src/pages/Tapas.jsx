@@ -137,7 +137,7 @@ export const Tapas = () => {
    };
 
    const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || null;
-   const heroUrl = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl) : "/Logo.jpg";
+   const heroUrl = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl) : "/Logo.png";
    const lightboxUrls = photos.length > 0
       ? photos.map((p) => cloudinaryPresets.detail(p.url))
       : (rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : []);
@@ -186,13 +186,13 @@ export const Tapas = () => {
                      alt={tapa.name}
                      className="w-full h-full object-cover rounded-xl shadow-md cursor-pointer"
                      onClick={() => openLightbox(0)}
-                     onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
+                     onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }}
                   />
                   <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
                </>
             ) : (
                <div className="w-full h-full rounded-xl bg-neutral-800 overflow-hidden">
-                  <img src="/Logo.jpg" alt="nexTapa" className="w-full h-full object-cover opacity-60" />
+                  <img src="/Logo.png" alt="nexTapa" className="w-full h-full object-cover opacity-60" />
                </div>
             )}
 
@@ -233,7 +233,7 @@ export const Tapas = () => {
                            src={cloudinaryPresets.thumbnail(photo.url)}
                            alt={`Foto ${i + 1}`}
                            className="w-full h-full object-cover"
-                           onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
+                           onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }}
                         />
                      </button>
                   ))}

@@ -81,10 +81,10 @@ export const AllTapas = () => {
                            onClick={() => navigate(`/items/${item.slug}`, { state: { distance: item.distance } })}
                         >
                            <img
-                              src={cloudinaryPresets.tapaCard(item.mainImage || "/Logo.jpg")}
+                              src={cloudinaryPresets.tapaCard(item.mainImage || "/Logo.png")}
                               alt={item.name}
                               className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-500"
-                              onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.jpg"; }}
+                              onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }}
                            />
 
                            <div className="absolute top-2 right-2">
