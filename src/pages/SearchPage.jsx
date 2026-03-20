@@ -6,8 +6,8 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-   Search, X, Loader2, Store, UtensilsCrossed,
-   Star, Gift, Sparkles, MapPin, BadgeCheck
+   Search, X, Loader2, UtensilsCrossed,
+   Star, Gift, Sparkles, MapPin,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useSearch } from '../hooks/useSearch';
@@ -43,9 +43,8 @@ const highlight = (text = '', query = '') => {
 // ── GridCard ──────────────────────────────────────────────────────────────────
 
 const GridCard = ({ item, onClick, index = 0 }) => {
-   const isEst = item._type === 'establishment';
    const meta  = categoryMeta[item._category] || categoryMeta.recent;
-   const price = !isEst ? getMainPrice(item.modalities) : null;
+   const price = getMainPrice(item.modalities);
    const img   = item.mainImage || null;
 
    return (
@@ -69,10 +68,7 @@ const GridCard = ({ item, onClick, index = 0 }) => {
             />
          ) : (
             <div className="w-full h-full flex items-center justify-center bg-neutral-800/60">
-               {isEst
-                  ? <Store className="w-8 h-8 text-neutral-700" />
-                  : <UtensilsCrossed className="w-8 h-8 text-neutral-700" />
-               }
+               <UtensilsCrossed className="w-8 h-8 text-neutral-700" />
             </div>
          )}
 
@@ -82,23 +78,10 @@ const GridCard = ({ item, onClick, index = 0 }) => {
             {meta.label}
          </span>
 
-         {isEst && (
-            <span className={`absolute top-1.5 right-1.5 text-[8px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-sm ${
-               item.isOpen
-                  ? 'bg-green-500/20 text-green-400'
-                  : 'bg-black/40 text-neutral-600'
-            }`}>
-               {item.isOpen ? '●' : '○'}
-            </span>
-         )}
-
          <div className="absolute bottom-0 left-0 right-0 p-2">
             <p className="text-white text-[11px] font-bold leading-tight truncate">{item.name}</p>
             <p className="text-neutral-400 text-[10px] truncate mt-0.5">
-               {isEst
-                  ? (item.address?.neighborhood || item.address?.city || '')
-                  : (item.establishment?.name || '')
-               }
+               {item.establishment?.name || ''}
             </p>
             {price && <span className="text-orange-400 text-[10px] font-bold">{price}</span>}
          </div>
@@ -109,8 +92,7 @@ const GridCard = ({ item, onClick, index = 0 }) => {
 // ── DropdownResult ────────────────────────────────────────────────────────────
 
 const DropdownResult = ({ item, query, onClick }) => {
-   const isEst = item._type === 'establishment';
-   const price = !isEst ? getMainPrice(item.modalities) : null;
+   const price = getMainPrice(item.modalities);
 
    return (
       <button
@@ -120,27 +102,16 @@ const DropdownResult = ({ item, query, onClick }) => {
          <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-800 flex items-center justify-center">
             {item.mainImage
                ? <img src={item.mainImage} alt={item.name} className="w-full h-full object-cover" />
-               : isEst
-                  ? <Store className="w-4 h-4 text-neutral-600" />
-                  : <UtensilsCrossed className="w-4 h-4 text-neutral-600" />
+               : <UtensilsCrossed className="w-4 h-4 text-neutral-600" />
             }
          </div>
          <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-white truncate">{highlight(item.name, query)}</p>
-            <p className="text-xs text-neutral-500 truncate">
-               {isEst ? (item.address?.neighborhood || item.address?.city) : item.establishment?.name}
-            </p>
+            <p className="text-xs text-neutral-500 truncate">{item.establishment?.name}</p>
          </div>
-         <div className="flex flex-col items-end gap-1 flex-shrink-0">
-            {price && <span className="text-[11px] font-bold text-orange-400">{price}</span>}
-            {isEst && (
-               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                  item.isOpen ? 'bg-green-500/15 text-green-400' : 'bg-neutral-800 text-neutral-600'
-               }`}>
-                  {item.isOpen ? 'Abierto' : 'Cerrado'}
-               </span>
-            )}
-         </div>
+         {price && (
+            <span className="text-[11px] font-bold text-orange-400 flex-shrink-0">{price}</span>
+         )}
       </button>
    );
 };
@@ -156,7 +127,7 @@ const SectionHeader = ({ icon: Icon, label, color }) => (
 
 // ── Grid skeleton ─────────────────────────────────────────────────────────────
 
-const GridSkeleton = ({ count = 9 }) => ( // muestra un grid de cards con animación de pulso para indicar carga
+const GridSkeleton = ({ count = 9 }) => (
    <div className="grid grid-cols-2 gap-1.5">
       {Array.from({ length: count }).map((_, i) => (
          <div
@@ -174,13 +145,13 @@ export const SearchPage = () => {
    const navigate   = useNavigate();
    const inputRef   = useRef(null);
    const wrapperRef = useRef(null);
-   const loaderRef  = useRef(null); // ref para el Intersection Observer
+   const loaderRef  = useRef(null);
 
-   const [initial, setInitial]         = useState([]);   // carga rápida
-   const [more, setMore]               = useState([]);    // carga lazy
+   const [initial, setInitial]               = useState([]);
+   const [more, setMore]                     = useState([]);
    const [loadingInitial, setLoadingInitial] = useState(true);
-   const [loadingMore, setLoadingMore]   = useState(false);
-   const [moreLoaded, setMoreLoaded]     = useState(false); // evitar cargar dos veces
+   const [loadingMore, setLoadingMore]       = useState(false);
+   const [moreLoaded, setMoreLoaded]         = useState(false);
 
    const { query, setQuery, results, loading, isOpen, clear, close, open } = useSearch({ limit: 6 });
 
@@ -189,7 +160,7 @@ export const SearchPage = () => {
       setTimeout(() => inputRef.current?.focus(), 100);
    }, []);
 
-   // ── Carga inicial: establecimientos cercanos + tapas gratis ───────────────
+   // ── Carga inicial ─────────────────────────────────────────────────────────
    useEffect(() => {
       const load = async () => {
          try {
@@ -200,31 +171,37 @@ export const SearchPage = () => {
                   navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 })
                );
                url = `/search/suggestions?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`;
-            } catch { /* sin coords, el backend devuelve verificados */ }
+            } catch { /* sin coords */ }
 
             const res = await api.get(url);
-            if (res.data.success) {setInitial(res.data.data.grid);}
+            if (res.data.success) {
+               // Solo tapas en el grid
+               setInitial(res.data.data.grid.filter(i => i._type !== 'establishment'));
+            }
          } catch { /* silencioso */ }
          finally { setLoadingInitial(false); }
       };
       load();
    }, []);
 
-   // ── Carga lazy: top rated + recientes al hacer scroll ────────────────────
+   // ── Carga lazy ────────────────────────────────────────────────────────────
    const loadMore = useCallback(async () => {
       if (moreLoaded || loadingMore) {return;}
       try {
          setLoadingMore(true);
          const res = await api.get('/search/suggestions/more');
-         if (res.data.success) {setMore(res.data.data.grid);}
+         if (res.data.success) {
+            // Solo tapas en el grid lazy
+            setMore(res.data.data.grid.filter(i => i._type !== 'establishment'));
+         }
          setMoreLoaded(true);
       } catch { /* silencioso */ }
       finally { setLoadingMore(false); }
    }, [moreLoaded, loadingMore]);
 
-   // Intersection Observer — dispara loadMore cuando el loader entra en viewport
+   // Intersection Observer
    useEffect(() => {
-      if (loadingInitial) {return;} // esperar a que cargue lo inicial
+      if (loadingInitial) {return;}
       const observer = new IntersectionObserver(
          (entries) => { if (entries[0].isIntersecting) {loadMore();} },
          { threshold: 0.1 }
@@ -244,14 +221,15 @@ export const SearchPage = () => {
 
    const handleSelect = (item) => {
       clear();
-      if (item._type === 'establishment') {navigate(`/establishment/${item.slug}`);}
-      else {navigate(`/items/${item.slug}`);}
+      navigate(`/items/${item.slug}`);
    };
 
    const hasDropdown = isOpen && query.length >= 2;
-   const hasResults  = results.establishments?.length > 0 || results.items?.length > 0;
+   // Solo tapas en el dropdown
+   const dropdownItems = results.items ?? [];
+   const hasResults = dropdownItems.length > 0;
 
-   // Agrupar más resultados por categoría para secciones
+   // Agrupar más resultados por categoría
    const moreGrouped = more.reduce((acc, item) => {
       const cat = item._category || 'recent';
       if (!acc[cat]) {acc[cat] = [];}
@@ -266,13 +244,12 @@ export const SearchPage = () => {
 
    return (
       <>
-         {/* Animación global para las cards */}
          <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+            @keyframes fadeUp {
+               from { opacity: 0; transform: translateY(6px); }
+               to   { opacity: 1; transform: translateY(0); }
+            }
+         `}</style>
 
          <div className="min-h-screen bg-neutral-950 max-w-3xl mx-auto">
 
@@ -299,7 +276,7 @@ export const SearchPage = () => {
                      )}
                   </div>
 
-                  {/* Dropdown */}
+                  {/* Dropdown — solo tapas */}
                   {hasDropdown && (
                      <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50">
                         {!hasResults && !loading && (
@@ -307,35 +284,20 @@ export const SearchPage = () => {
                               <p className="text-sm text-neutral-500">Sin resultados para <span className="text-white">"{query}"</span></p>
                            </div>
                         )}
-                        {results.establishments?.length > 0 && (
-                           <>
-                              <div className="px-4 pt-3 pb-1">
-                                 <p className="text-[10px] font-black tracking-widest text-neutral-600 uppercase">Establecimientos</p>
-                              </div>
-                              {results.establishments.map(item => (
-                                 <DropdownResult key={item._id} item={item} query={query} onClick={() => handleSelect(item)} />
-                              ))}
-                           </>
-                        )}
-                        {results.establishments?.length > 0 && results.items?.length > 0 && (
-                           <div className="mx-4 border-t border-neutral-800/60" />
-                        )}
-                        {results.items?.length > 0 && (
+                        {hasResults && (
                            <>
                               <div className="px-4 pt-3 pb-1">
                                  <p className="text-[10px] font-black tracking-widest text-neutral-600 uppercase">Tapas</p>
                               </div>
-                              {results.items.map(item => (
+                              {dropdownItems.map(item => (
                                  <DropdownResult key={item._id} item={item} query={query} onClick={() => handleSelect(item)} />
                               ))}
+                              <div className="px-4 py-2.5 border-t border-neutral-800/40 bg-neutral-950/60 text-center">
+                                 <p className="text-[11px] text-neutral-600">
+                                    {dropdownItems.length} resultado{dropdownItems.length !== 1 ? 's' : ''} para "{query}"
+                                 </p>
+                              </div>
                            </>
-                        )}
-                        {hasResults && (
-                           <div className="px-4 py-2.5 border-t border-neutral-800/40 bg-neutral-950/60 text-center">
-                              <p className="text-[11px] text-neutral-600">
-                                 {results.total} resultado{results.total !== 1 ? 's' : ''} para "{query}"
-                              </p>
-                           </div>
                         )}
                      </div>
                   )}
@@ -344,8 +306,6 @@ export const SearchPage = () => {
 
             {/* ── Contenido ── */}
             <div className="px-3 pb-24 pt-4">
-
-               {/* Carga inicial */}
                {loadingInitial ? (
                   <GridSkeleton count={9} />
                ) : initial.length === 0 ? (
@@ -355,10 +315,8 @@ export const SearchPage = () => {
                   </div>
                ) : (
                   <>
-                     {/* Sección inicial: cercanos + gratis intercalados */}
                      <div className="flex items-center gap-2 px-1 mb-3">
-                        <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                        <span className="text-[11px] font-black tracking-widest uppercase text-blue-400">Cerca de ti</span>
+                               
                         <span className="mx-1 text-neutral-700">·</span>
                         <Gift className="w-3.5 h-3.5 text-green-400" />
                         <span className="text-[11px] font-black tracking-widest uppercase text-green-400">Tapas gratis</span>
@@ -370,7 +328,6 @@ export const SearchPage = () => {
                         ))}
                      </div>
 
-                     {/* ── Trigger lazy load ── */}
                      <div ref={loaderRef} className="mt-6">
                         {loadingMore && (
                            <>
@@ -382,7 +339,6 @@ export const SearchPage = () => {
                            </>
                         )}
 
-                        {/* Secciones lazy ya cargadas */}
                         {moreLoaded && moreSections.map(({ key, icon, label, color }) => {
                            const items = moreGrouped[key];
                            if (!items?.length) {return null;}
