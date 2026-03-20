@@ -23,7 +23,7 @@ export const EstablishmentStatus = memo(({ active, verified, onChange, saving, n
                   {active ? 'Sí' : 'No'}
                </span>
             </label>
-            <label className="flex items-center gap-3 cursor-pointer">
+            {/* <label className="flex items-center gap-3 cursor-pointer">
                <input
                   type="checkbox"
                   name="verified"
@@ -35,9 +35,9 @@ export const EstablishmentStatus = memo(({ active, verified, onChange, saving, n
                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${verified ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-500'}`}>
                   {verified ? 'Sí' : 'No'}
                </span>
-            </label>
+            </label> */}
          </div>
-         <SaveButton saving={saving} />
+        
       </section>
    );
 });

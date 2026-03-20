@@ -340,3 +340,186 @@ textarea.admin-input { resize: vertical; }
   /* Acciones en tabla: apiladas */
   .admin-actions { flex-wrap: wrap; }
 }
+
+
+/* ══════════════════════════════════════════
+   AÑADIR AL FINAL DE admin.css
+══════════════════════════════════════════ */
+
+/* ── Top nav móvil (oculto en desktop) ── */
+.admin-topnav {
+  display: none;
+}
+
+/* ── Stats grid ── */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.admin-stat-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+}
+
+.admin-stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-blue   { background: #eff6ff; color: #2563eb; }
+.stat-orange { background: #fff7ed; color: #ea580c; }
+.stat-green  { background: #f0fdf4; color: #16a34a; }
+.stat-purple { background: #faf5ff; color: #9333ea; }
+
+.admin-stat-body     { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.admin-stat-label    { font-size: 0.75rem; font-weight: 500; color: #64748b; margin: 0; }
+.admin-stat-value    { font-size: 1.6rem; font-weight: 700; color: #1e2a3a; margin: 0; line-height: 1.2; }
+.admin-stat-sub      { font-size: 0.7rem; color: #94a3b8; margin: 0; }
+
+.admin-stat-loading {
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Pending rows ── */
+.admin-pending-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #475569;
+}
+.stat-orange-icon { color: #ea580c; }
+.stat-purple-icon { color: #9333ea; }
+
+/* ── Dashboard container ── */
+.admin-dashboard { display: flex; flex-direction: column; gap: 0; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — reemplaza / amplía el bloque existente
+══════════════════════════════════════════ */
+@media (max-width: 968px) {
+
+  /* Evita desbordamiento horizontal global */
+  .admin-layout,
+  .admin-main,
+  .admin-page { overflow-x: hidden; }
+
+  /* ── Topnav visible, sidebar y hamburger ocultos ── */
+  .admin-topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: #1e2a3a;
+    padding: 0 16px;
+    height: 52px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-topnav-brand {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .admin-topnav-links {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .admin-topnav-links a {
+    color: #a0aec0;
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+
+  .admin-topnav-links a:hover  { background: #2e3f54; color: #fff; }
+  .admin-topnav-links a.active { background: #2563eb; color: #fff; font-weight: 600; }
+
+  .admin-menu-toggle { display: none; }
+  .admin-sidebar     { display: none; }
+
+  /* Main sin margen, con espacio para topnav */
+  .admin-main {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 68px;
+  }
+
+  /* Grids a 1 columna */
+  .admin-row,
+  .admin-grid-2,
+  .admin-coords-grid { grid-template-columns: 1fr; }
+
+  /* Stats: 2 columnas en móvil */
+  .admin-stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .admin-stat-card  { padding: 12px; gap: 10px; }
+  .admin-stat-value { font-size: 1.3rem; }
+  .admin-stat-icon  { width: 34px; height: 34px; }
+
+  /* Page header en columna */
+  .admin-page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+
+  /* Secciones: menos padding */
+  .admin-section { padding: 12px; }
+
+  /* Mapa compacto */
+  .admin-map-container .mapboxgl-map { height: 200px !important; }
+
+  /* Horarios: cada fila en columna para que no desborde */
+  .admin-schedule-row   { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .admin-schedule-day   { width: auto; }
+  .admin-schedule-times { width: 100%; }
+  .admin-schedule-shift { flex-wrap: wrap; }
+  .admin-input-time     { width: 90px; }
+
+  /* Acciones en tabla: apiladas */
+  .admin-actions { flex-wrap: wrap; }
+
+  /* ── Tabla móvil: ocultar columnas secundarias ── */
+  .admin-table { font-size: 0.78rem; }
+  .admin-table th, .admin-table td { padding: 8px 8px; }
+
+  /* Ocultar Tipo, Ciudad, Provincia en móvil */
+  .admin-table .col-tipo,
+  .admin-table .col-ciudad,
+  .admin-table .col-provincia { display: none; }
+}

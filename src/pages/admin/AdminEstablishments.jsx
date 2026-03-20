@@ -1,5 +1,3 @@
-
-
 // AdminEstablishments.jsx - Página de administración para listar y gestionar establecimientos
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +8,7 @@ export const AdminEstablishments = () => {
    const [establishments, setEstablishments] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
-   const [deletingId, setDeletingId] = useState(null); // ID pendiente de confirmar borrado
+   const [deletingId, setDeletingId] = useState(null);
    const navigate = useNavigate();
 
    useEffect(() => {
@@ -29,7 +27,6 @@ export const AdminEstablishments = () => {
       }
    };
 
-   // Activo/inactivo — temporal, reversible
    const handleToggleActive = async (id, currentActive) => {
       try {
          if (currentActive) {
@@ -45,7 +42,17 @@ export const AdminEstablishments = () => {
       }
    };
 
-   // Borrado definitivo — soft delete, irreversible desde el panel
+   const handleToggleVerified = async (id, currentVerified) => {
+      try {
+         await establishmentService.update(id, { verified: !currentVerified });
+         setEstablishments(prev =>
+            prev.map(est => est._id === id ? { ...est, verified: !currentVerified } : est)
+         );
+      } catch (err) {
+         setError('Error al cambiar la verificación del establecimiento', err);
+      }
+   };
+
    const handleDelete = async (id) => {
       try {
          await establishmentService.delete(id);
@@ -62,7 +69,6 @@ export const AdminEstablishments = () => {
 
    return (
       <div>
-         {/* Modal de confirmación de borrado */}
          {deletingId && (
             <div className="admin-modal-overlay">
                <div className="admin-modal">
@@ -103,9 +109,9 @@ export const AdminEstablishments = () => {
                <thead>
                   <tr>
                      <th>Nombre</th>
-                     <th>Tipo</th>
-                     <th>Ciudad</th>
-                     <th>Provincia</th>
+                     <th className="col-tipo">Tipo</th>
+                     <th className="col-ciudad">Ciudad</th>
+                     <th className="col-provincia">Provincia</th>
                      <th>Activo</th>
                      <th>Verificado</th>
                      <th>Acción</th>
@@ -115,9 +121,9 @@ export const AdminEstablishments = () => {
                   {establishments.map((est) => (
                      <tr key={est._id}>
                         <td>{est.name}</td>
-                        <td>{est.type}</td>
-                        <td>{est.address?.city}</td>
-                        <td>{est.address?.province}</td>
+                        <td className="col-tipo">{est.type}</td>
+                        <td className="col-ciudad">{est.address?.city}</td>
+                        <td className="col-provincia">{est.address?.province}</td>
                         <td>
                            <span
                               className={`admin-badge ${est.active ? 'admin-badge-success' : 'admin-badge-danger'}`}
@@ -129,7 +135,12 @@ export const AdminEstablishments = () => {
                            </span>
                         </td>
                         <td>
-                           <span className={`admin-badge ${est.verified ? 'admin-badge-success' : 'admin-badge-warning'}`}>
+                           <span
+                              className={`admin-badge ${est.verified ? 'admin-badge-success' : 'admin-badge-warning'}`}
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => handleToggleVerified(est._id, est.verified)}
+                              title={est.verified ? 'Click para quitar verificación' : 'Click para verificar'}
+                           >
                               {est.verified ? 'Verificado' : 'Pendiente'}
                            </span>
                         </td>

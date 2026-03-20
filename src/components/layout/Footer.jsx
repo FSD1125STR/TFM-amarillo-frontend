@@ -1,12 +1,11 @@
 ﻿import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home, Search, Heart, User } from "lucide-react"; 
+import { Home, Search, User, ChefHat, LayoutDashboard } from "lucide-react";
 import { getAccountRouteByRole } from "../../utils/authRedirect";
 
 const baseItems = [
    { id: "home",   label: "Home",   Icon: Home,   path: "/" },
-   { id: "search", label: "Search", Icon: Search, path: "/search" }, // ← esta línea
-   { id: "saved",  label: "Saved",  Icon: Heart,  path: "/saved" },
+   { id: "search", label: "Search", Icon: Search, path: "/search" },
 ];
 
 export const Footer = () => {
@@ -14,22 +13,32 @@ export const Footer = () => {
    const location = useLocation();
    const { isAuthenticated, user } = useAuth();
 
-   const profilePath = isAuthenticated ? getAccountRouteByRole(user?.role) : "/login";
+   const profilePath = isAuthenticated ? "/profile" : "/profile";
+   const profileAvatar = isAuthenticated && user?.role === "cliente" ? user?.avatar : null;
 
-   const items = [
-      ...baseItems,
-      { id: "profile", label: "Profile", Icon: User, path: profilePath },
-   ];
+   const profileItem = {
+      id: "profile",
+      label: isAuthenticated ? "Perfil" : "Login",
+      Icon: User,
+      path: profilePath,
+      avatar: profileAvatar,
+   };
+
+   const adminItem = (() => {
+      if (user?.role === "admin") {
+         return { id: "admin", label: "Admin", Icon: LayoutDashboard, path: "/admin" };
+      }
+      if (user?.role === "hostelero") {
+         return { id: "admin", label: "Admin", Icon: ChefHat, path: "/host/dashboard" };
+      }
+      return null;
+   })();
+
+   const items = [...baseItems, ...(adminItem ? [adminItem] : []), profileItem];
 
    const isPathActive = (path) => {
-      if (path === "/admin") {
-         return location.pathname.startsWith("/admin");
-      }
-
-      if (path === "/host/dashboard") {
-         return location.pathname.startsWith("/host");
-      }
-
+      if (path === "/admin") {return location.pathname.startsWith("/admin");}
+      if (path === "/host/dashboard") {return location.pathname.startsWith("/host");}
       return location.pathname === path;
    };
 
@@ -53,11 +62,21 @@ export const Footer = () => {
                         }`}
                      >
                         <div className="relative">
-                           <ItemIcon
-                              size={22}
-                              strokeWidth={isActive ? 2.5 : 1.8}
-                              fill={isActive ? "currentColor" : "none"}
-                           />
+                           {item.id === "profile" && item.avatar ? (
+                              <img
+                                 src={item.avatar}
+                                 alt="avatar"
+                                 className={`w-6 h-6 rounded-full object-cover ${
+                                    isActive ? "ring-2 ring-orange-500" : "ring-1 ring-neutral-600"
+                                 }`}
+                              />
+                           ) : (
+                              <ItemIcon
+                                 size={22}
+                                 strokeWidth={isActive ? 2.5 : 1.8}
+                                 fill={isActive ? "currentColor" : "none"}
+                              />
+                           )}
                            {isActive && (
                               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-500" />
                            )}
