@@ -1,6 +1,6 @@
 // src/pages/admin/Dashboard.jsx
 import { useEffect, useState } from "react";
-import { Store, Ticket, Bell, Wifi, WifiOff } from "lucide-react";
+import { Store, Ticket, Bell } from "lucide-react";
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
 import { establishmentService } from "../../services/establishmentService";
@@ -85,7 +85,6 @@ export const Dashboard = () => {
   }, [notifications, clearNotification]);
 
   // ── Acciones ──────────────────────────────────────────────────────────────
-
   const handleVerifyEstablishment = async (notif) => {
     try {
       // await establishmentService.verify(notif.establishmentId);

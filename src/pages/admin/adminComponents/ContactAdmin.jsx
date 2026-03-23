@@ -22,7 +22,7 @@ export const ContactAdmin = memo(({ contact, onChange, saving }) => {
                <label>Website</label>
                <input className="admin-input" name="website" value={contact.website} onChange={onChange} />
             </div>
-            <SaveButton saving={saving} />
+            {/* <SaveButton saving={saving} /> */}
          </div>
       </section>
    );

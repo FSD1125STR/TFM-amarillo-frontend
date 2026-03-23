@@ -48,7 +48,7 @@ export const SocialLinksAdmin = memo(({ socialLinks = {}, establishmentId, isNew
    };
 
    const handleSave = async () => {
-      if (isNew) return;
+      if (isNew) {return;}
       try {
          setLocalSaving(true);
          setError(null);
@@ -92,13 +92,13 @@ export const SocialLinksAdmin = memo(({ socialLinks = {}, establishmentId, isNew
                {isNew
                   ? <p className="admin-hint">Las redes sociales se guardarán al crear el establecimiento.</p>
                   : <button
-                       type="button"
-                       className="admin-btn admin-btn-primary"
-                       onClick={handleSave}
-                       disabled={saving || localSaving}
-                    >
-                       {localSaving ? 'Guardando...' : 'Guardar Cambios'}
-                    </button>
+                     type="button"
+                     className="admin-btn admin-btn-primary"
+                     onClick={handleSave}
+                     disabled={saving || localSaving}
+                  >
+                     {localSaving ? 'Guardando...' : 'Guardar Cambios'}
+                  </button>
                }
             </div>
 

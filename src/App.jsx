@@ -21,13 +21,14 @@ import { AdminRoute } from "./components/routes/AdminRoute";
 import { SearchPage } from './pages/SearchPage';
 import { HostRoute } from "./components/routes/HostRoute";
 import { ClientRoute } from "./components/routes/ClientRoute";
+import { PrivateRoute } from "./components/routes/ClientRoute";
 
 export function App() {
    return (
       <>
          <BrowserRouter>
             <Routes>
-               {/* Rutas públicas reales */}
+               {/* Rutas públicas */}
                <Route path="/" element={<Home />} />
                <Route path="/establishments" element={<AllEstablishment />} />
                <Route path="/establishment/:slug" element={<Establishment />} />
@@ -41,40 +42,39 @@ export function App() {
                      <LoginPage />
                   </PublicOnlyRoute>
                } />
-
                <Route path="/register" element={
                   <PublicOnlyRoute>
                      <RegisterPage />
                   </PublicOnlyRoute>
                } />
-
                <Route path="/host/login" element={
                   <PublicOnlyRoute>
                      <HostLoginPage />
                   </PublicOnlyRoute>
                } />
-
                <Route path="/host/register" element={
                   <PublicOnlyRoute>
                      <HostRegisterPage />
                   </PublicOnlyRoute>
                } />
 
+               {/* Host */}
                <Route path="/host/dashboard" element={
                   <HostRoute>
                      <HostDashboard />
                   </HostRoute>
                } />
 
+               {/* Perfil — accesible para cualquier rol autenticado (PrivateRoute) */}
                <Route path="/profile" element={
-                  <ClientRoute>
+                  <PrivateRoute>
                      <ProfilePage />
-                  </ClientRoute>
+                  </PrivateRoute>
                } />
 
                <Route path="/403" element={<ForbiddenPage />} />
 
-               {/* Admin: protegido por login */}
+               {/* Admin — protegido por AdminRoute */}
                <Route path="/admin" element={
                   <AdminRoute>
                      <AdminPanel />

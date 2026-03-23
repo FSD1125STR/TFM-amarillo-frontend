@@ -178,7 +178,7 @@ export const MapboxPicker = ({ coordinates, onChange, onAddressChange, saving })
          </div>
 
          <div className="admin-form-footer">
-            <SaveButton saving={saving} />
+            {/* <SaveButton saving={saving} /> */}
          </div>
       </div>
    );
