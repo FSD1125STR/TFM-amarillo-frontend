@@ -65,7 +65,7 @@ export default function Header() {
                      className="flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
                   >
                      <CircleUserRound className="h-4 w-4" />
-                     <span className="max-w-[110px] truncate">
+                     <span className="max-w-27.5 truncate">
                         {user?.name || "Cuenta"}
                      </span>
                      <ChevronDown

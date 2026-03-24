@@ -123,4 +123,14 @@ export const establishmentService = {
          throw error;
       }
    },
+
+   getPending: async () => {
+    try {
+      const response = await api.get('/establishment/pending');
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener establecimientos pendientes:', error);
+      throw error;
+    }
+  },
 };

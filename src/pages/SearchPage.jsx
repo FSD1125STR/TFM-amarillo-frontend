@@ -1,5 +1,3 @@
-
-
 // src/pages/SearchPage.jsx
 // Página /search — carga inicial rápida + lazy loading al hacer scroll
 
@@ -72,7 +70,7 @@ const GridCard = ({ item, onClick, index = 0 }) => {
             </div>
          )}
 
-         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
+         <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/5 to-transparent" />
 
          <span className={`absolute top-1.5 left-1.5 text-[8px] font-black tracking-widest uppercase px-1.5 py-0.5 rounded-full backdrop-blur-sm ${meta.bg} ${meta.color}`}>
             {meta.label}
@@ -93,13 +91,14 @@ const GridCard = ({ item, onClick, index = 0 }) => {
 
 const DropdownResult = ({ item, query, onClick }) => {
    const price = getMainPrice(item.modalities);
+   const isEst = item._type === 'establishment';
 
    return (
       <button
          onMouseDown={onClick}
          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-800/50 transition-colors text-left"
       >
-         <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-800 flex items-center justify-center">
+         <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 bg-neutral-800 flex items-center justify-center">
             {item.mainImage
                ? <img src={item.mainImage} alt={item.name} className="w-full h-full object-cover" />
                : <UtensilsCrossed className="w-4 h-4 text-neutral-600" />
@@ -107,11 +106,20 @@ const DropdownResult = ({ item, query, onClick }) => {
          </div>
          <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-white truncate">{highlight(item.name, query)}</p>
-            <p className="text-xs text-neutral-500 truncate">{item.establishment?.name}</p>
+            <p className="text-xs text-neutral-500 truncate">
+               {isEst ? (item.address?.neighborhood || item.address?.city) : item.establishment?.name}
+            </p>
          </div>
-         {price && (
-            <span className="text-[11px] font-bold text-orange-400 flex-shrink-0">{price}</span>
-         )}
+         <div className="flex flex-col items-end gap-1 shrink-0">
+            {price && <span className="text-[11px] font-bold text-orange-400">{price}</span>}
+            {isEst && (
+               <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                  item.isOpen ? 'bg-green-500/15 text-green-400' : 'bg-neutral-800 text-neutral-600'
+               }`}>
+                  {item.isOpen ? 'Abierto' : 'Cerrado'}
+               </span>
+            )}
+         </div>
       </button>
    );
 };
@@ -175,7 +183,6 @@ export const SearchPage = () => {
 
             const res = await api.get(url);
             if (res.data.success) {
-               // Solo tapas en el grid
                setInitial(res.data.data.grid.filter(i => i._type !== 'establishment'));
             }
          } catch { /* silencioso */ }
@@ -191,7 +198,6 @@ export const SearchPage = () => {
          setLoadingMore(true);
          const res = await api.get('/search/suggestions/more');
          if (res.data.success) {
-            // Solo tapas en el grid lazy
             setMore(res.data.data.grid.filter(i => i._type !== 'establishment'));
          }
          setMoreLoaded(true);
@@ -225,11 +231,9 @@ export const SearchPage = () => {
    };
 
    const hasDropdown = isOpen && query.length >= 2;
-   // Solo tapas en el dropdown
    const dropdownItems = results.items ?? [];
    const hasResults = dropdownItems.length > 0;
 
-   // Agrupar más resultados por categoría
    const moreGrouped = more.reduce((acc, item) => {
       const cat = item._category || 'recent';
       if (!acc[cat]) {acc[cat] = [];}
@@ -258,8 +262,8 @@ export const SearchPage = () => {
                <div ref={wrapperRef} className="relative">
                   <div className="flex items-center gap-3 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-2.5 focus-within:border-orange-500/40 focus-within:ring-1 focus-within:ring-orange-500/10 transition-all">
                      {loading
-                        ? <Loader2 className="w-4 h-4 text-neutral-500 animate-spin flex-shrink-0" />
-                        : <Search className="w-4 h-4 text-neutral-500 flex-shrink-0" />
+                        ? <Loader2 className="w-4 h-4 text-neutral-500 animate-spin shrink-0" />
+                        : <Search className="w-4 h-4 text-neutral-500 shrink-0" />
                      }
                      <input
                         ref={inputRef}
@@ -270,13 +274,13 @@ export const SearchPage = () => {
                         className="flex-1 bg-transparent text-sm text-white placeholder:text-neutral-600 focus:outline-none"
                      />
                      {query && (
-                        <button onClick={clear} className="text-neutral-500 hover:text-neutral-300 transition-colors flex-shrink-0">
+                        <button onClick={clear} className="text-neutral-500 hover:text-neutral-300 transition-colors shrink-0">
                            <X className="w-4 h-4" />
                         </button>
                      )}
                   </div>
 
-                  {/* Dropdown — solo tapas */}
+                  {/* Dropdown */}
                   {hasDropdown && (
                      <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50">
                         {!hasResults && !loading && (
@@ -316,7 +320,6 @@ export const SearchPage = () => {
                ) : (
                   <>
                      <div className="flex items-center gap-2 px-1 mb-3">
-                               
                         <span className="mx-1 text-neutral-700">·</span>
                         <Gift className="w-3.5 h-3.5 text-green-400" />
                         <span className="text-[11px] font-black tracking-widest uppercase text-green-400">Tapas gratis</span>

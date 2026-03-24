@@ -1,113 +1,215 @@
 // src/pages/admin/Dashboard.jsx
-import { useEffect, useState } from 'react';
-import { api } from '../../services/api';
-import { Store, UtensilsCrossed, Users, ChefHat, TrendingUp, CheckCircle, XCircle } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Store, Ticket, Bell } from "lucide-react";
+import { useWebSocket } from "../../hooks/useWebSocket";
+import { couponService } from "../../services/couponService";
+import { establishmentService } from "../../services/establishmentService";
+import { WsStatusBadge } from "./adminComponents/WsStatusBadge";
+import { AdminEstablishmentCard } from "./adminComponents/AdminEstablishmentCard";
+import { AdminCouponCard } from "./adminComponents/AdminCouponCard";
 
-
-const StatCard = ({ icon: Icon, label, value, color, sub }) => (
-   <div className="admin-stat-card">
-      <div className={`admin-stat-icon ${color}`}>
-         <Icon size={20} />
-      </div>
-      <div className="admin-stat-body">
-         <p className="admin-stat-label">{label}</p>
-         <p className="admin-stat-value">
-            {value === null ? <span className="admin-stat-loading" /> : value}
-         </p>
-         {sub && <p className="admin-stat-sub">{sub}</p>}
-      </div>
-   </div>
-);
+const shellStyle = {
+  background:
+    "radial-gradient(900px 500px at 90% -10%, rgba(255, 116, 43, 0.12), transparent 58%), linear-gradient(180deg, #0d1219, #080d13 80%)",
+};
 
 export const Dashboard = () => {
-   const [stats, setStats] = useState(null);
-   const [error, setError] = useState(false);
+  const [establishments, setEstablishments] = useState([]);
+  const [coupons, setCoupons]               = useState([]);
 
-   useEffect(() => {
-      api.get('/admin/stats')
-         .then(res => setStats(res.data.data))
-         .catch(() => setError(true));
-   }, []);
+  const { connected, notifications, clearNotification } = useWebSocket({ role: "admin" });
 
-   const v = (key) => stats ? (stats[key] ?? 0) : null;
+  // ── Carga inicial — establecimientos y cupones pendientes ───────────────────
+  useEffect(() => {
+    const loadPendingEstablishments = async () => {
+      try {
+        const response = await establishmentService.getPending();
+        const items = response?.data || [];
+        setEstablishments(items.map((e) => ({
+          id:                e._id,
+          establishmentId:   e._id,
+          type:              "new_establishment_pending",
+          name:              e.name,
+          email:             e.email,
+          timestamp:         e.createdAt,
+        })));
+      } catch (err) {
+        console.error("Error al cargar establecimientos pendientes:", err);
+      }
+    };
+    loadPendingEstablishments();
+  }, []);
 
-   return (
-      <div className="admin-dashboard">
-         <div className="admin-page-header">
-            <h2 className="admin-title">Dashboard</h2>
-            <p style={{ color: '#64748b', fontSize: '0.875rem', margin: 0 }}>
-               Bienvenido al panel de administración
-            </p>
-         </div>
+  useEffect(() => {
+    const loadPending = async () => {
+      try {
+        const response = await couponService.getPending();
+        const items = response?.data || [];
+        setCoupons(items.map((c) => ({
+          id:             c._id,
+          couponId:       c._id,
+          type:           "coupon_pending_validation",
+          clientName:     c.client?.name  || "Cliente",
+          clientEmail:    c.client?.email || "",
+          establishment:  c.establishment?.name || "Establecimiento",
+          baseAmount:     c.reservation?.totalAmount || c.baseAmount,
+          discountAmount: c.discountAmount,
+          timestamp:      c.createdAt,
+        })));
+      } catch (err) {
+        console.error("Error al cargar cupones pendientes:", err);
+      }
+    };
+    loadPending();
+  }, []);
 
-         {error && (
-            <div className="admin-alert admin-alert-error" style={{ marginBottom: 16 }}>
-               No se pudieron cargar las estadísticas. Comprueba el endpoint <code>/admin/stats</code>.
+  // ── Procesar notificaciones WS ────────────────────────────────────────────
+  useEffect(() => {
+    notifications.forEach((notif) => {
+      if (notif.type === "new_establishment_pending") {
+        setEstablishments((prev) => {
+          const exists = prev.some((n) => n.establishmentId === notif.establishmentId);
+          return exists ? prev : [notif, ...prev];
+        });
+        clearNotification(notif.id);
+      }
+
+      if (notif.type === "coupon_pending_validation") {
+        setCoupons((prev) => {
+          const exists = prev.some((n) => n.couponId === notif.couponId);
+          return exists ? prev : [notif, ...prev];
+        });
+        clearNotification(notif.id);
+      }
+    });
+  }, [notifications, clearNotification]);
+
+  // ── Acciones ──────────────────────────────────────────────────────────────
+  const handleVerifyEstablishment = async (notif) => {
+    try {
+      // await establishmentService.verify(notif.establishmentId);
+      setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
+    } catch (err) {
+      console.error("Error al verificar establecimiento:", err);
+    }
+  };
+
+  const handleValidateCoupon = async (notif) => {
+    try {
+      await couponService.validate(notif.couponId);
+      setCoupons((prev) => prev.filter((n) => n.couponId !== notif.couponId));
+    } catch (err) {
+      console.error("Error al validar cupón:", err);
+    }
+  };
+
+  const handleRejectCoupon = async (notif, reason) => {
+    try {
+      await couponService.reject(notif.couponId, reason);
+      setCoupons((prev) => prev.filter((n) => n.couponId !== notif.couponId));
+    } catch (err) {
+      console.error("Error al rechazar cupón:", err);
+    }
+  };
+
+  const handleDismiss = (id) => {
+    setEstablishments((prev) => prev.filter((n) => n.id !== id));
+    setCoupons((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const totalPending = establishments.length + coupons.length;
+
+  return (
+    <div className="min-h-screen px-4 pb-12 pt-6 text-slate-100" style={shellStyle}>
+      <div className="mx-auto w-full max-w-3xl">
+
+        {/* ── Header ─────────────────────────────────────────────────────── */}
+        <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="m-0 text-2xl font-bold tracking-tight sm:text-3xl">Dashboard</h1>
+            <p className="mt-1 text-sm text-slate-400">Bienvenido al panel de administración</p>
+          </div>
+          <WsStatusBadge connected={connected} />
+        </header>
+
+        {/* ── Métricas ────────────────────────────────────────────────────── */}
+        <div className="mb-6 grid grid-cols-3 gap-3">
+          {[
+            { icon: <Store size={17} />,  label: "Establecimientos", value: establishments.length, color: "text-[#f77827]" },
+            { icon: <Ticket size={17} />, label: "Cupones",          value: coupons.length,        color: "text-emerald-400" },
+            { icon: <Bell size={17} />,   label: "Total pendiente",  value: totalPending,          color: "text-amber-400" },
+          ].map(({ icon, label, value, color }) => (
+            <div key={label} className="rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 px-4 py-3">
+              <div className={`mb-1 ${color}`}>{icon}</div>
+              <p className="text-2xl font-bold text-slate-100">{value}</p>
+              <p className="text-xs text-slate-500">{label}</p>
             </div>
-         )}
+          ))}
+        </div>
 
-         <div className="admin-stats-grid">
-            <StatCard
-               icon={Store}
-               label="Establecimientos"
-               value={v('establishments')}
-               color="stat-blue"
-               sub={stats ? `${stats.establishmentsActive ?? 0} activos · ${stats.establishmentsPending ?? 0} pendientes` : null}
-            />
-            <StatCard
-               icon={UtensilsCrossed}
-               label="Tapas"
-               value={v('items')}
-               color="stat-orange"
-               sub={stats ? `${stats.itemsActive ?? 0} activas` : null}
-            />
-            <StatCard
-               icon={Users}
-               label="Usuarios"
-               value={v('users')}
-               color="stat-green"
-               sub={stats ? `${stats.clients ?? 0} clientes` : null}
-            />
-            <StatCard
-               icon={ChefHat}
-               label="Hosteleros"
-               value={v('hosteleros')}
-               color="stat-purple"
-               sub={stats ? `${stats.hostelerosVerified ?? 0} verificados` : null}
-            />
-         </div>
-
-         {/* Mini resumen verificaciones pendientes */}
-         {stats && (stats.establishmentsPending > 0 || stats.hostelerosVerified < stats.hosteleros) && (
-            <div className="admin-section" style={{ marginTop: 24 }}>
-               <p className="admin-section-title" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <TrendingUp size={14} /> Pendiente de revisión
-               </p>
-               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {stats.establishmentsPending > 0 && (
-                     <div className="admin-pending-row">
-                        <XCircle size={14} className="stat-orange-icon" />
-                        <span>{stats.establishmentsPending} establecimiento{stats.establishmentsPending !== 1 ? 's' : ''} sin verificar</span>
-                     </div>
-                  )}
-                  {stats.hosteleros - stats.hostelerosVerified > 0 && (
-                     <div className="admin-pending-row">
-                        <XCircle size={14} className="stat-purple-icon" />
-                        <span>{stats.hosteleros - stats.hostelerosVerified} hostelero{stats.hosteleros - stats.hostelerosVerified !== 1 ? 's' : ''} sin verificar</span>
-                     </div>
-                  )}
-               </div>
+        {/* ── Sin notificaciones ──────────────────────────────────────────── */}
+        {totalPending === 0 && (
+          <div className="grid min-h-52 place-items-center rounded-2xl border border-dashed border-[#2a374f] text-center">
+            <div>
+              <Bell size={32} className="mx-auto mb-2 text-slate-700" />
+              <p className="text-sm text-slate-500">No hay notificaciones pendientes</p>
+              {!connected && (
+                <p className="mt-1.5 text-xs text-rose-400/70">
+                  Sin conexión — las notificaciones no llegarán en tiempo real
+                </p>
+              )}
             </div>
-         )}
+          </div>
+        )}
 
-         {stats && stats.establishmentsPending === 0 && stats.hostelerosVerified >= stats.hosteleros && (
-            <div className="admin-section" style={{ marginTop: 24 }}>
-               <div className="admin-pending-row">
-                  <CheckCircle size={14} style={{ color: '#16a34a' }} />
-                  <span style={{ color: '#16a34a', fontWeight: 600 }}>Todo al día, sin pendientes</span>
-               </div>
+        {/* ── Establecimientos pendientes ─────────────────────────────────── */}
+        {establishments.length > 0 && (
+          <section className="mb-5">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
+              <Store size={14} className="text-[#f77827]" />
+              Establecimientos pendientes
+              <span className="rounded-full bg-[#f77827] px-2 py-0.5 text-xs text-white">
+                {establishments.length}
+              </span>
+            </h2>
+            <div className="space-y-2.5">
+              {establishments.map((notif) => (
+                <AdminEstablishmentCard
+                  key={notif.establishmentId || notif.id}
+                  notif={notif}
+                  onVerify={handleVerifyEstablishment}
+                  onDismiss={handleDismiss}
+                />
+              ))}
             </div>
-         )}
+          </section>
+        )}
+
+        {/* ── Cupones pendientes ──────────────────────────────────────────── */}
+        {coupons.length > 0 && (
+          <section>
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
+              <Ticket size={14} className="text-emerald-400" />
+              Cupones pendientes de validación
+              <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-xs text-white">
+                {coupons.length}
+              </span>
+            </h2>
+            <div className="space-y-2.5">
+              {coupons.map((notif) => (
+                <AdminCouponCard
+                  key={notif.couponId || notif.id}
+                  notif={notif}
+                  onValidate={handleValidateCoupon}
+                  onReject={handleRejectCoupon}
+                  onDismiss={handleDismiss}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
       </div>
-   );
+    </div>
+  );
 };

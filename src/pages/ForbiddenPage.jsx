@@ -18,7 +18,7 @@ export function ForbiddenPage() {
       className="grid min-h-screen place-items-center px-5 text-slate-100"
       style={shellStyle}
     >
-      <div className="w-full max-w-[520px] rounded-2xl border border-[#2f3c55] bg-[#121824]/80 p-6">
+      <div className="w-full max-w-130 rounded-2xl border border-[#2f3c55] bg-[#121824]/80 p-6">
         <p className="m-0 text-5xl font-extrabold text-orange-500 sm:text-6xl">403</p>
         <h1 className="mb-2 mt-1 text-3xl font-bold tracking-tight">Acceso denegado</h1>
         <p className="mb-4 text-slate-400">
