@@ -76,7 +76,7 @@ export default function Header() {
                   {menuOpen && (
                      <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-56 overflow-hidden rounded-xl border border-neutral-700 bg-neutral-900 shadow-2xl">
                         <div className="border-b border-neutral-800 px-4 py-3">
-                           <p className="m-0 text-xs text-neutral-400">Sesion iniciada como</p>
+                           <p className="m-0 text-xs text-neutral-400">sesión iniciada como</p>
                            <p className="m-0 truncate text-sm font-semibold text-white">
                               {user?.email || "usuario"}
                            </p>
@@ -97,7 +97,7 @@ export default function Header() {
                            className="flex w-full items-center gap-2 border-t border-neutral-800 px-4 py-3 text-left text-sm text-rose-300 transition-colors hover:bg-neutral-800"
                         >
                            <LogOut className="h-4 w-4" />
-                           Cerrar sesion
+                           Cerrar sesión
                         </button>
                      </div>
                   )}

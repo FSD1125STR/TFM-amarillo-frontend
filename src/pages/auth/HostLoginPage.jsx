@@ -51,7 +51,7 @@ export function HostLoginPage() {
       const role = response?.data?.role;
       navigate(getDefaultRouteByRole(role), { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "No se pudo iniciar sesion");
+      setError(err?.response?.data?.message || "No se pudo iniciar sesión");
     } finally {
       setSubmitting(false);
     }
@@ -150,7 +150,7 @@ export function HostLoginPage() {
         <p className="mb-0 mt-3 text-center text-lg text-slate-400">
           Prefieres entrar como cliente?{" "}
           <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
-            Inicia sesion de cliente
+            Inicia sesión de cliente
           </Link>
         </p>
       </div>
