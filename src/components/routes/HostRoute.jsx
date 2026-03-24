@@ -8,7 +8,7 @@ export function HostRoute({ children }) {
   if (loading) return <p>Cargando...</p>;
 
   if (!isAuthenticated) {
-    return <Navigate to="/host/login" replace state={{ from: location.pathname }} />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
   if (user?.role !== "hostelero") {
@@ -17,4 +17,3 @@ export function HostRoute({ children }) {
 
   return children;
 }
-

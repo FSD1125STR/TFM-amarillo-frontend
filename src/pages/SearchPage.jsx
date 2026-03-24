@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useSearch } from '../hooks/useSearch';
-import { Footer } from '../components/layout/Footer.jsx';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -365,7 +364,6 @@ export const SearchPage = () => {
                   </>
                )}
             </div>
-            <Footer />
          </div>
       </>
    );

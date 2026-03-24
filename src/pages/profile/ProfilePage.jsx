@@ -15,7 +15,6 @@ import {
   Trash2,
 } from "lucide-react";
 import Header from "../../components/layout/Header";
-import { Footer } from "../../components/layout/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { userService } from "../../services/userService";
 import { useWebSocket } from "../../hooks/useWebSocket";
@@ -512,8 +511,6 @@ export function ProfilePage() {
           )}
         </section>
       </main>
-
-      <Footer />
 
       {/* ── Toast de notificación WS ───────────────────────────────────── */}
       {activeToast && (

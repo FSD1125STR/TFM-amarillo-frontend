@@ -6,7 +6,6 @@ import Container from "../components/layout/Container";
 import Section from "../components/layout/Section";
 import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
-import { Footer } from "../components/layout/Footer";
 import { LittleEstablishCard } from "../components/common/LittleEstablishCard";
 
 import { itemService } from "../services/itemService";
@@ -408,7 +407,6 @@ export const Tapas = () => {
                </Button>
             </div>
 
-            <Footer />
          </Container>
       </div>
    );

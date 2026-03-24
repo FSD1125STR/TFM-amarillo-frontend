@@ -34,10 +34,10 @@ export function ForbiddenPage() {
             Ir al inicio
           </Link>
           <Link
-            to="/host/login"
+            to="/login"
             className="inline-flex min-h-10 items-center justify-center rounded-[11px] border border-[#36455f] bg-[#181e2d] px-3.5 font-semibold text-slate-200 no-underline"
           >
-            Login hostelero
+            Iniciar sesión
           </Link>
         </div>
       </div>

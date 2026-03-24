@@ -13,7 +13,6 @@ import Section from "../components/layout/Section";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import RatingBar from "../components/common/RatingBar";
-import { Footer } from "../components/layout/Footer.jsx";
 import { SocialLinks } from "../components/common/SocialLinks.jsx";
 import { ReservationModal } from "../components/common/ReservationModal";
 
@@ -378,7 +377,6 @@ export const Establishment = () => {
                )}
             </div>
 
-            <Footer />
          </Container>
       </div>
    );

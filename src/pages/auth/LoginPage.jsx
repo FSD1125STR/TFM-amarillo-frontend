@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Lock, Mail, Store } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
 
@@ -45,7 +45,6 @@ export function LoginPage() {
       const response = await login({
         email: form.email,
         password: form.password,
-        loginType: "cliente",
       });
 
       const role = response?.data?.role;
@@ -72,7 +71,9 @@ export function LoginPage() {
           >
             <img src="/Logo.png" alt="Logo nexTapa" className="h-[80px] w-[80px] object-contain" />
           </div>
-          <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">nex<span className="text-orange-500">Tapa</span></h1>
+          <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">
+            nex<span className="text-orange-500">Tapa</span>
+          </h1>
           <p className="mt-1.5 text-base text-orange-400 sm:text-lg">
             Tus tapas favoritas a un click
           </p>
@@ -148,7 +149,7 @@ export function LoginPage() {
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
           ¿No tienes cuenta?{" "}
           <Link to="/register" className="font-bold text-[#ff7a2f] no-underline">
-            Regístrate
+            Registrate
           </Link>
         </p>
 
@@ -180,22 +181,6 @@ export function LoginPage() {
             Facebook
           </button>
         </div>
-
-        <Link
-          to="/host/login"
-          className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-[#f77827]/45 bg-[#722d12]/50 p-3.5 text-inherit no-underline"
-        >
-          <span className="flex items-center gap-3">
-            <span className="grid h-[46px] w-[46px] place-items-center rounded-xl bg-[#f77827]/20 text-[#ff893f]">
-              <Store size={22} />
-            </span>
-            <span>
-              <p className="m-0 text-2xl font-bold">¿Eres hostelero?</p>
-              <p className="mt-0.5 text-sm text-slate-400">Gestiona tu local y tus tapas</p>
-            </span>
-          </span>
-          <span className="text-2xl text-[#f77827]">›</span>
-        </Link>
 
         <div className="mt-6 flex justify-center gap-6">
           <a href="#" className="text-xs text-slate-400 no-underline">

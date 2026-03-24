@@ -11,7 +11,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import Container from "../components/layout/Container";
 import Header from "../components/layout/Header";
 import Badge from "../components/common/Badge";
-import { Footer } from "../components/layout/Footer";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { establishmentService } from "../services/establishmentService";
 import { cloudinaryPresets } from "../utils/cloudinaryHelpers.js";
@@ -297,7 +296,6 @@ export const AllEstablishment = () => {
                   );
                })}
             </div>
-            <Footer />
          </Container>
       </div>
    );

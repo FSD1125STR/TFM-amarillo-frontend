@@ -61,10 +61,8 @@ export function HostRegisterPage() {
       "password",
       "confirmPassword",
       "businessName",
-      "businessLogo",
       "phone",
       "cif",
-      "businessAddress",
     ];
 
     const hasEmptyRequired = requiredFields.some(
@@ -72,7 +70,7 @@ export function HostRegisterPage() {
     );
 
     if (hasEmptyRequired) {
-      return "Completa todos los campos obligatorios del registro hostelero";
+      return "Completa los campos obligatorios del registro hostelero";
     }
 
     if (form.password.length < 6) {
@@ -105,10 +103,10 @@ export function HostRegisterPage() {
         password: form.password,
         passwordConfirm: form.confirmPassword,
         businessName: form.businessName,
-        businessLogo: form.businessLogo,
+        businessLogo: form.businessLogo || undefined,
         phone: form.phone,
         cif: form.cif,
-        businessAddress: form.businessAddress,
+        businessAddress: form.businessAddress || undefined,
       });
 
       const role = response?.data?.role;
@@ -124,11 +122,11 @@ export function HostRegisterPage() {
     <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100" style={shellStyle}>
       <div className="mx-auto w-full max-w-[430px]">
         <Link
-          to="/host/login"
+          to="/login"
           className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline"
         >
           <ArrowLeft size={18} />
-          Volver al login hostelero
+          Volver al login
         </Link>
 
         <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">Registro hostelero</h1>
@@ -250,7 +248,7 @@ export function HostRegisterPage() {
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Imagen del local (logo)</span>
+            <span className="text-base font-semibold text-slate-300">Imagen del local (logo, opcional)</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -307,7 +305,7 @@ export function HostRegisterPage() {
           </div>
 
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Direccion</span>
+            <span className="text-base font-semibold text-slate-300">Direccion (opcional)</span>
             <span
               className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
@@ -342,12 +340,11 @@ export function HostRegisterPage() {
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
           Ya tienes cuenta?{" "}
-          <Link to="/host/login" className="font-bold text-[#ff7a2f] no-underline">
-            Inicia sesion
+          <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
+            Inicia sesión
           </Link>
         </p>
       </div>
     </section>
   );
 }
-

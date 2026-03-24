@@ -4,7 +4,6 @@
 // Página que muestra todas las tapas disponibles, ordenadas por proximidad al usuario
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer } from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import { itemService } from "../services/itemService";
 import { useGeolocation } from "../hooks/useGeolocation.js";
@@ -156,7 +155,6 @@ export const AllTapas = () => {
                })}
             </div>
          </div>
-         <Footer />
       </div>
    );
 };
