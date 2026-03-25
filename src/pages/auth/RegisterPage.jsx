@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, UserRoundPlus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Eye, EyeOff, Lock, Mail, User, UserRoundPlus } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
 import { ImageDropInput } from "../../components/common/ImageDropInput";
@@ -12,7 +12,11 @@ const avatarOptions = [
   "/avatars/avatar-3.svg",
   "/avatars/avatar-4.svg",
   "/avatars/avatar-5.svg",
-  "/avatars/avatar-6.svg",
+  "/avatars/avatar-f.jpg",
+  "/avatars/avatar-g.jpg",
+  "/avatars/avatar-h.jpg",
+  "/avatars/avatar-i.jpg",
+  "/avatars/avatar-j.jpg",
 ];
 
 const inputWrapStyle = {
@@ -27,20 +31,176 @@ const primaryButtonStyle = {
 export function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const avatarScrollerRef = useRef(null);
+  const avatarScrollTrackRef = useRef(null);
+  const avatarScrollThumbRef = useRef(null);
+  const avatarThumbDragRef = useRef({
+    active: false,
+    startX: 0,
+    startScrollLeft: 0,
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [avatarScrollUi, setAvatarScrollUi] = useState({
+    canLeft: false,
+    canRight: false,
+    thumbLeft: 0,
+    thumbWidth: 100,
+  });
   const [form, setForm] = useState({
     name: "",
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    avatar: avatarOptions[0],
+    avatar: "",
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const selectedAvatar = useMemo(() => form.avatar, [form.avatar]);
+
+  const getAvatarScrollMetrics = useCallback(() => {
+    const scroller = avatarScrollerRef.current;
+    const track = avatarScrollTrackRef.current;
+    if (!scroller || !track) return null;
+
+    const maxScroll = Math.max(scroller.scrollWidth - scroller.clientWidth, 0);
+    const trackWidth = track.clientWidth;
+    const thumbWidthPx = maxScroll > 0
+      ? Math.max((scroller.clientWidth / scroller.scrollWidth) * trackWidth, trackWidth * 0.16)
+      : trackWidth;
+    const maxThumbTravel = Math.max(trackWidth - thumbWidthPx, 0);
+
+    return {
+      maxScroll,
+      trackWidth,
+      thumbWidthPx,
+      maxThumbTravel,
+    };
+  }, []);
+
+  const updateAvatarScrollUi = useCallback(() => {
+    const scroller = avatarScrollerRef.current;
+    if (!scroller) return;
+
+    const maxScroll = Math.max(scroller.scrollWidth - scroller.clientWidth, 0);
+    const canLeft = scroller.scrollLeft > 2;
+    const canRight = scroller.scrollLeft < maxScroll - 2;
+    const thumbWidth = maxScroll > 0
+      ? Math.max((scroller.clientWidth / scroller.scrollWidth) * 100, 16)
+      : 100;
+    const thumbLeft = maxScroll > 0
+      ? (scroller.scrollLeft / maxScroll) * (100 - thumbWidth)
+      : 0;
+
+    setAvatarScrollUi({
+      canLeft,
+      canRight,
+      thumbLeft,
+      thumbWidth,
+    });
+  }, []);
+
+  useEffect(() => {
+    const scroller = avatarScrollerRef.current;
+    if (!scroller) return undefined;
+
+    updateAvatarScrollUi();
+
+    const handleScroll = () => updateAvatarScrollUi();
+    scroller.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateAvatarScrollUi);
+
+    return () => {
+      scroller.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateAvatarScrollUi);
+    };
+  }, [updateAvatarScrollUi]);
+
+  useEffect(() => {
+    const stopDrag = () => {
+      if (!avatarThumbDragRef.current.active) return;
+      avatarThumbDragRef.current.active = false;
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+    };
+
+    const handlePointerMove = (event) => {
+      const drag = avatarThumbDragRef.current;
+      if (!drag.active) return;
+
+      const scroller = avatarScrollerRef.current;
+      const metrics = getAvatarScrollMetrics();
+      if (!scroller || !metrics || metrics.maxScroll <= 0 || metrics.maxThumbTravel <= 0) return;
+
+      const deltaX = event.clientX - drag.startX;
+      const nextScroll = drag.startScrollLeft + (deltaX * metrics.maxScroll) / metrics.maxThumbTravel;
+      scroller.scrollLeft = Math.max(0, Math.min(nextScroll, metrics.maxScroll));
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", stopDrag);
+    window.addEventListener("pointercancel", stopDrag);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", stopDrag);
+      window.removeEventListener("pointercancel", stopDrag);
+      stopDrag();
+    };
+  }, [getAvatarScrollMetrics]);
+
+  const scrollAvatarStrip = (direction) => {
+    const scroller = avatarScrollerRef.current;
+    if (!scroller) return;
+
+    const step = Math.max(scroller.clientWidth * 0.65, 130);
+    scroller.scrollBy({
+      left: direction * step,
+      behavior: "smooth",
+    });
+  };
+
+  const handleTrackPointerDown = (event) => {
+    if (event.button !== 0) return;
+    if (event.target === avatarScrollThumbRef.current) return;
+
+    const scroller = avatarScrollerRef.current;
+    const track = avatarScrollTrackRef.current;
+    const metrics = getAvatarScrollMetrics();
+    if (!scroller || !track || !metrics || metrics.maxScroll <= 0 || metrics.maxThumbTravel <= 0) return;
+
+    const rect = track.getBoundingClientRect();
+    const clickX = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+    const desiredThumbLeft = Math.max(0, Math.min(clickX - metrics.thumbWidthPx / 2, metrics.maxThumbTravel));
+    const nextScroll = (desiredThumbLeft / metrics.maxThumbTravel) * metrics.maxScroll;
+
+    scroller.scrollTo({
+      left: nextScroll,
+      behavior: "smooth",
+    });
+  };
+
+  const handleThumbPointerDown = (event) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+
+    const scroller = avatarScrollerRef.current;
+    const metrics = getAvatarScrollMetrics();
+    if (!scroller || !metrics || metrics.maxScroll <= 0) return;
+
+    avatarThumbDragRef.current.active = true;
+    avatarThumbDragRef.current.startX = event.clientX;
+    avatarThumbDragRef.current.startScrollLeft = scroller.scrollLeft;
+
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "grabbing";
+
+    if (event.currentTarget.setPointerCapture) {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -83,7 +243,7 @@ export function RegisterPage() {
         email: form.email,
         password: form.password,
         passwordConfirm: form.confirmPassword,
-        avatar: form.avatar,
+        avatar: form.avatar || undefined,
       });
 
       const role = response?.data?.role;
@@ -124,7 +284,7 @@ export function RegisterPage() {
                 value={form.name}
                 onChange={handleChange}
                 autoComplete="name"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -143,7 +303,7 @@ export function RegisterPage() {
                 value={form.username}
                 onChange={handleChange}
                 autoComplete="nickname"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -162,7 +322,7 @@ export function RegisterPage() {
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -181,7 +341,7 @@ export function RegisterPage() {
                 value={form.password}
                 onChange={handleChange}
                 autoComplete="new-password"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
               <button
                 type="button"
@@ -208,7 +368,7 @@ export function RegisterPage() {
                 value={form.confirmPassword}
                 onChange={handleChange}
                 autoComplete="new-password"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
               <button
                 type="button"
@@ -235,7 +395,10 @@ export function RegisterPage() {
               uploadFolder="nextapa/avatars"
               helperText="Puedes subir una foto propia o elegir uno de los avatares."
             />
-            <div className="flex gap-2.5 overflow-x-auto pb-1.5">
+            <div
+              ref={avatarScrollerRef}
+              className="avatar-scroll-strip flex gap-2.5 overflow-x-auto pb-1.5"
+            >
               {avatarOptions.map((avatarPath) => (
                 <button
                   type="button"
@@ -245,17 +408,57 @@ export function RegisterPage() {
                       ? "border-[#f77827] ring-2 ring-[#f77827]/20"
                       : "border-transparent"
                   }`}
-                  onClick={() =>
+                  onClick={(event) => {
                     setForm((prev) => ({
                       ...prev,
                       avatar: avatarPath,
-                    }))
-                  }
+                    }));
+                    event.currentTarget.scrollIntoView({
+                      behavior: "smooth",
+                      block: "nearest",
+                      inline: "center",
+                    });
+                  }}
                   aria-label={`Seleccionar avatar ${avatarPath}`}
                 >
                   <img src={avatarPath} alt="Avatar opcion" className="h-full w-full rounded-full object-cover" />
                 </button>
               ))}
+            </div>
+            <div className="flex items-center gap-2 px-0.5">
+              <button
+                type="button"
+                onClick={() => scrollAvatarStrip(-1)}
+                disabled={!avatarScrollUi.canLeft}
+                className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[#5c341e] bg-[#22110a]/85 text-[#d07a47] transition hover:border-[#ff7a2f] hover:text-[#ff9958] disabled:cursor-default disabled:opacity-35"
+                aria-label="Desplazar avatares a la izquierda"
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <div
+                ref={avatarScrollTrackRef}
+                onPointerDown={handleTrackPointerDown}
+                className="relative h-2 flex-1 overflow-hidden rounded-full bg-[#2f160d]/90 cursor-pointer"
+              >
+                <span
+                  ref={avatarScrollThumbRef}
+                  onPointerDown={handleThumbPointerDown}
+                  className="absolute top-0 h-full rounded-full bg-gradient-to-r from-[#ff9a52] to-[#ff6f2b] shadow-[0_0_14px_rgba(255,122,47,0.5)] transition-all duration-200 cursor-grab active:cursor-grabbing"
+                  style={{
+                    width: `${avatarScrollUi.thumbWidth}%`,
+                    left: `${avatarScrollUi.thumbLeft}%`,
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => scrollAvatarStrip(1)}
+                disabled={!avatarScrollUi.canRight}
+                className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[#5c341e] bg-[#22110a]/85 text-[#d07a47] transition hover:border-[#ff7a2f] hover:text-[#ff9958] disabled:cursor-default disabled:opacity-35"
+                aria-label="Desplazar avatares a la derecha"
+              >
+                <ChevronRight size={15} />
+              </button>
             </div>
           </div>
 
@@ -273,14 +476,14 @@ export function RegisterPage() {
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          Ya tienes cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
             Inicia sesión
           </Link>
         </p>
 
         <p className="mb-0 mt-3 text-center text-lg text-slate-400">
-          Eres hostelero?{" "}
+          ¿Eres hostelero?{" "}
           <Link to="/host/register" className="font-bold text-[#ff7a2f] no-underline">
             Regístrate como hostelero
           </Link>
