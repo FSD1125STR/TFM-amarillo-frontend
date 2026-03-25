@@ -21,11 +21,7 @@ import { useAuth } from "../../context/AuthContext";
 import { establishmentService } from "../../services/establishmentService";
 import { reservationService } from "../../services/reservationService";
 import { useWebSocket } from "../../hooks/useWebSocket";
-
-const shellStyle = {
-  background:
-    "radial-gradient(900px 500px at 90% -10%, rgba(255, 116, 43, 0.16), transparent 58%), linear-gradient(180deg, #150b07, #0f0805 65%)",
-};
+import { toastService } from "../../services/toastService";
 
 const formatLocation = (address) => {
   if (!address) return "Pendiente de completar";
@@ -398,8 +394,10 @@ export function HostDashboard() {
             : r,
         ),
       );
+      toastService.success("Reserva confirmada correctamente");
     } catch (err) {
       console.error("Error al confirmar reserva:", err);
+      toastService.error("No se pudo confirmar la reserva");
     }
   };
 
@@ -418,8 +416,10 @@ export function HostDashboard() {
             : r,
         ),
       );
+      toastService.success("Reserva rechazada correctamente");
     } catch (err) {
       console.error("Error al rechazar reserva:", err);
+      toastService.error("No se pudo rechazar la reserva");
     }
   };
 
@@ -433,8 +433,10 @@ export function HostDashboard() {
             : r,
         ),
       );
+      toastService.success("Reserva completada correctamente");
     } catch (err) {
       console.error("Error al completar reserva:", err);
+      toastService.error("No se pudo completar la reserva");
     }
   };
 
@@ -453,10 +455,7 @@ export function HostDashboard() {
   const isComplete = Boolean(establishment);
 
   return (
-    <section
-      className="min-h-screen px-4 pb-10 pt-8 text-slate-100"
-      style={shellStyle}
-    >
+    <section className="min-h-screen px-4 pb-10 pt-8 text-slate-100">
       <div className="mx-auto w-full max-w-4xl">
         <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>

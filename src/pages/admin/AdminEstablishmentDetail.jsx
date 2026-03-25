@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { establishmentService } from '../../services/establishmentService';
+import { toastService } from '../../services/toastService';
 import './styles/admin.css';
 
 // Componentes
@@ -116,14 +117,17 @@ export const AdminEstablishmentDetail = () => {
       try {
          if (isNew) {
             const res = await establishmentService.create(form);
+            toastService.success("Establecimiento creado correctamente");
             navigate(`/admin/establishments/${res.data._id}`);
          } else {
             await establishmentService.update(id, form);
             setSuccessMsg("Guardado correctamente");
+            toastService.success("Cambios guardados correctamente");
             setTimeout(() => setSuccessMsg(null), 3000);
          }
       } catch (err) {
          setError("Error al guardar");
+         toastService.error("Error al guardar el establecimiento");
       } finally {
          setSaving(false);
       }

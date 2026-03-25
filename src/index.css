@@ -1,6 +1,18 @@
 @import "tailwindcss";
 
+:root {
+  --public-shell-gradient:
+    radial-gradient(1200px 700px at 80% -10%, rgba(255, 115, 38, 0.18), transparent 55%),
+    radial-gradient(800px 500px at -10% 120%, rgba(255, 77, 0, 0.14), transparent 65%),
+    linear-gradient(180deg, #1d0e08 0%, #110906 100%);
+}
+
 body {
   background-color: #0a0a0a;
   color: white;
+}
+
+.public-shell-gradient {
+  background: var(--public-shell-gradient);
+  background-attachment: fixed;
 }

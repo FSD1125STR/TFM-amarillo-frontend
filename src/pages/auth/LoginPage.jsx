@@ -3,11 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
-
-const shellStyle = {
-  background:
-    "radial-gradient(1200px 700px at 80% -10%, rgba(255,115,38,.18), transparent 55%), radial-gradient(800px 500px at -10% 120%, rgba(255,77,0,.14), transparent 65%), linear-gradient(180deg, #1d0e08 0%, #110906 100%)",
-};
+import { toastService } from "../../services/toastService";
 
 const inputWrapStyle = {
   background: "linear-gradient(180deg, #181c28, #141924)",
@@ -36,7 +32,9 @@ export function LoginPage() {
     setError("");
 
     if (!form.email || !form.password) {
-      setError("Completa correo electrónico y contraseña");
+      const message = "Completa correo electrónico y contraseña";
+      setError(message);
+      toastService.error(message);
       return;
     }
 
@@ -48,19 +46,19 @@ export function LoginPage() {
       });
 
       const role = response?.data?.role;
+      toastService.success("Sesión iniciada correctamente");
       navigate(getDefaultRouteByRole(role), { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "No se pudo iniciar sesión");
+      const message = err?.response?.data?.message || "No se pudo iniciar sesión";
+      setError(message);
+      toastService.error(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section
-      className="min-h-screen px-4 pb-9 pt-7 text-slate-100"
-      style={shellStyle}
-    >
+    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-[490px]">
         <div className="mb-6 text-center">
           <div
@@ -79,8 +77,7 @@ export function LoginPage() {
           </p>
         </div>
 
-        <h2 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">Bienvenido de nuevo</h2>
-        <p className="mb-6 mt-2 text-lg text-slate-400">Ingresa tus credenciales para continuar</p>
+        <h2 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl">Bienvenido de nuevo</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-2">
@@ -149,7 +146,7 @@ export function LoginPage() {
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
           ¿No tienes cuenta?{" "}
           <Link to="/register" className="font-bold text-[#ff7a2f] no-underline">
-            Registrate
+            Regístrate
           </Link>
         </p>
 
@@ -187,7 +184,7 @@ export function LoginPage() {
             Privacidad
           </a>
           <a href="#" className="text-xs text-slate-400 no-underline">
-            Terminos
+            Términos
           </a>
           <a href="#" className="text-xs text-slate-400 no-underline">
             Soporte

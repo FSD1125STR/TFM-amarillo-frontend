@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import {
   AtSign,
-  Camera,
   Mail,
   Phone,
   Save,
@@ -15,19 +14,12 @@ import {
   Trash2,
 } from "lucide-react";
 import Header from "../../components/layout/Header";
+import { ImageDropInput } from "../../components/common/ImageDropInput";
 import { useAuth } from "../../context/AuthContext";
 import { userService } from "../../services/userService";
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
-
-// ─────────────────────────────────────────────
-//  Estilos compartidos
-// ─────────────────────────────────────────────
-
-const shellStyle = {
-  background:
-    "radial-gradient(900px 500px at 85% -10%, rgba(249, 115, 22, 0.12), transparent 60%), linear-gradient(180deg, #0f0f10 0%, #0a0a0b 100%)",
-};
+import { toastService } from "../../services/toastService";
 
 const inputClassName =
   "w-full rounded-xl border border-neutral-700 bg-neutral-900 px-3 py-3 text-sm text-white outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-500/25";
@@ -288,7 +280,12 @@ export function ProfilePage() {
     setError("");
 
     const userId = user?.id || user?._id;
-    if (!userId) { setError("No se pudo identificar el usuario actual."); return; }
+    if (!userId) {
+      const message = "No se pudo identificar el usuario actual.";
+      setError(message);
+      toastService.error(message);
+      return;
+    }
 
     const payload = {
       name:     form.name.trim(),
@@ -297,20 +294,27 @@ export function ProfilePage() {
       avatar:   form.avatar.trim() || null,
     };
 
-    if (!payload.name) { setError("El nombre es obligatorio."); return; }
+    if (!payload.name) {
+      const message = "El nombre es obligatorio.";
+      setError(message);
+      toastService.error(message);
+      return;
+    }
 
     try {
       setSubmitting(true);
       await userService.updateUser(userId, payload);
       await refreshUser();
       setSuccess("Perfil actualizado correctamente.");
+      toastService.success("Perfil actualizado correctamente");
     } catch (err) {
       const validationErrors = err?.response?.data?.errors;
-      setError(
+      const message =
         Array.isArray(validationErrors) && validationErrors.length > 0
           ? validationErrors[0]
-          : err?.response?.data?.message || "No se pudo actualizar el perfil."
-      );
+          : err?.response?.data?.message || "No se pudo actualizar el perfil.";
+      setError(message);
+      toastService.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -332,7 +336,7 @@ export function ProfilePage() {
   const pendingCoupons = coupons.filter((c) => c.status === "pending_admin");
 
   return (
-    <div className="min-h-screen text-white" style={shellStyle}>
+    <div className="min-h-screen text-white">
       <Header />
 
       <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-5">
@@ -395,14 +399,18 @@ export function ProfilePage() {
               </div>
             </label>
 
-            <label className="flex flex-col gap-2">
-              <span className="text-sm font-semibold text-neutral-200">Avatar (URL)</span>
-              <div className="relative">
-                <Camera className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-                <input type="url" name="avatar" value={form.avatar} onChange={handleChange}
-                  placeholder="https://..." className={`${inputClassName} pl-10`} />
-              </div>
-            </label>
+            <ImageDropInput
+              label="Avatar"
+              value={form.avatar}
+              onChange={(nextValue) =>
+                setForm((prev) => ({
+                  ...prev,
+                  avatar: nextValue,
+                }))
+              }
+              uploadFolder="nextapa/avatars"
+              helperText="Sube o arrastra una imagen para tu perfil."
+            />
 
             <label className="flex flex-col gap-2">
               <span className="text-sm font-semibold text-neutral-200">Correo electrónico</span>

@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, UserRoundPlus } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
+import { ImageDropInput } from "../../components/common/ImageDropInput";
+import { toastService } from "../../services/toastService";
 
 const avatarOptions = [
   "/avatars/avatar-1.svg",
@@ -12,11 +14,6 @@ const avatarOptions = [
   "/avatars/avatar-5.svg",
   "/avatars/avatar-6.svg",
 ];
-
-const shellStyle = {
-  background:
-    "radial-gradient(1200px 700px at 80% -10%, rgba(255,115,38,.18), transparent 55%), radial-gradient(800px 500px at -10% 120%, rgba(255,77,0,.14), transparent 65%), linear-gradient(180deg, #1d0e08 0%, #110906 100%)",
-};
 
 const inputWrapStyle = {
   background: "linear-gradient(180deg, #181c28, #141924)",
@@ -73,6 +70,7 @@ export function RegisterPage() {
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
+      toastService.error(validationError);
       return;
     }
 
@@ -89,16 +87,19 @@ export function RegisterPage() {
       });
 
       const role = response?.data?.role;
+      toastService.success("Registro completado correctamente");
       navigate(getDefaultRouteByRole(role), { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "No se pudo completar el registro");
+      const message = err?.response?.data?.message || "No se pudo completar el registro";
+      setError(message);
+      toastService.error(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100" style={shellStyle}>
+    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-[430px]">
         <Link to="/login" className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline">
           <ArrowLeft size={18} />
@@ -106,7 +107,7 @@ export function RegisterPage() {
         </Link>
 
         <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">Crea tu cuenta</h1>
-        <p className="mb-6 mt-2 text-lg text-slate-400">Únete a la comunidad foodie de nexTapa</p>
+        <p className="mb-6 mt-2 text-lg text-slate-400">Unete a la comunidad foodie de nexTapa</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-2">
@@ -222,6 +223,18 @@ export function RegisterPage() {
 
           <div className="flex flex-col gap-2">
             <span className="text-base font-semibold text-slate-300">Selecciona tu avatar</span>
+            <ImageDropInput
+              label=""
+              value={form.avatar}
+              onChange={(nextValue) =>
+                setForm((prev) => ({
+                  ...prev,
+                  avatar: nextValue,
+                }))
+              }
+              uploadFolder="nextapa/avatars"
+              helperText="Puedes subir una foto propia o elegir uno de los avatares."
+            />
             <div className="flex gap-2.5 overflow-x-auto pb-1.5">
               {avatarOptions.map((avatarPath) => (
                 <button
@@ -260,14 +273,14 @@ export function RegisterPage() {
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          ¿Ya tienes cuenta?{" "}
+          Ya tienes cuenta?{" "}
           <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
             Inicia sesión
           </Link>
         </p>
 
         <p className="mb-0 mt-3 text-center text-lg text-slate-400">
-          ¿Eres hostelero?{" "}
+          Eres hostelero?{" "}
           <Link to="/host/register" className="font-bold text-[#ff7a2f] no-underline">
             Regístrate como hostelero
           </Link>

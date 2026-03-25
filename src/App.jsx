@@ -25,9 +25,12 @@ import { Footer } from "./components/layout/Footer";
 function AppLayout() {
    const location = useLocation();
    const hideFooter = location.pathname.startsWith("/admin");
+   const shellClassName = hideFooter
+      ? "min-h-screen"
+      : "min-h-screen public-shell-gradient";
 
    return (
-      <>
+      <div className={shellClassName}>
          <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Home />} />
@@ -76,14 +79,10 @@ function AppLayout() {
             <Route path="/403" element={<ForbiddenPage />} />
 
             {/* Admin — protegido por AdminRoute */}
-            <Route
-               path="/admin"
-               element={
-                  <AdminRoute>
-                     <AdminPanel />
-                  </AdminRoute>
-               }
-            >
+            <Route path="/admin" element={
+               <AdminRoute>
+                  <AdminPanel />
+               </AdminRoute>}            >
                <Route index element={<Dashboard />} />
                <Route path="establishments" element={<AdminEstablishments />} />
                <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
@@ -92,7 +91,7 @@ function AppLayout() {
          </Routes>
 
          {!hideFooter && <Footer />}
-      </>
+      </div>
    );
 }
 

@@ -10,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getAccountRouteByRole } from "../../utils/authRedirect";
 import { SearchDropdown } from "../search/SearchDropdown";
+import { toastService } from "../../services/toastService";
 
 export default function Header() {
    const navigate = useNavigate();
@@ -36,11 +37,12 @@ export default function Header() {
    const handleLogout = () => {
       logout();
       setMenuOpen(false);
+      toastService.success("Sesión cerrada correctamente");
       navigate("/");
    };
 
    return (
-      <header className="bg-neutral-950 border-b border-neutral-800/60 px-4 pt-5 pb-4 max-w-3xl mx-auto">
+      <header className="bg-transparent border-b border-neutral-800/60 px-4 pt-5 pb-4 max-w-3xl mx-auto">
          <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-1.5">
                <Circle className="text-orange-500 text-2xl leading-none" />

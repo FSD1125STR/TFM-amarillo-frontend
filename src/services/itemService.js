@@ -86,7 +86,9 @@ export const itemService = {
 
    create: async (itemData) => {
       try {
-         const response = await api.post('/items', itemData);
+         const response = await api.post('/items', itemData, {
+            skipGlobalErrorToast: true,
+         });
          return response.data;
       } catch (error) {
          console.error('Error al crear item:', error);
@@ -95,7 +97,9 @@ export const itemService = {
    },
    update: async (itemId, itemData) => {
       try {
-         const response = await api.put(`/items/${itemId}`, itemData);
+         const response = await api.put(`/items/${itemId}`, itemData, {
+            skipGlobalErrorToast: true,
+         });
          return response.data;
       } catch (error) {
          console.error('Error al actualizar item:', error);

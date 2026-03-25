@@ -122,7 +122,7 @@ export const AllEstablishment = () => {
 
    if (geoLoading || loading) {
       return (
-         <div className="bg-neutral-950 min-h-screen text-white">
+         <div className="bg-transparent min-h-screen text-white">
             <Header />
             <Container>
                <div className="space-y-4 py-8">
@@ -136,7 +136,7 @@ export const AllEstablishment = () => {
    }
 
    return (
-      <div className="bg-neutral-950 min-h-screen text-white">
+      <div className="bg-transparent min-h-screen text-white">
          <Header />
 
          <Container>

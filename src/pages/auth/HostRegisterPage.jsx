@@ -5,7 +5,6 @@ import {
   Eye,
   EyeOff,
   IdCard,
-  Image,
   Lock,
   Mail,
   MapPin,
@@ -15,11 +14,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
-
-const shellStyle = {
-  background:
-    "radial-gradient(1200px 700px at 80% -10%, rgba(255,115,38,.18), transparent 55%), radial-gradient(800px 500px at -10% 120%, rgba(255,77,0,.14), transparent 65%), linear-gradient(180deg, #1d0e08 0%, #110906 100%)",
-};
+import { ImageDropInput } from "../../components/common/ImageDropInput";
+import { toastService } from "../../services/toastService";
 
 const inputWrapStyle = {
   background: "linear-gradient(180deg, #181c28, #141924)",
@@ -91,6 +87,7 @@ export function HostRegisterPage() {
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
+      toastService.error(validationError);
       return;
     }
 
@@ -110,16 +107,19 @@ export function HostRegisterPage() {
       });
 
       const role = response?.data?.role;
+      toastService.success("Registro de hostelero completado");
       navigate(getDefaultRouteByRole(role), { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "No se pudo completar el registro");
+      const message = err?.response?.data?.message || "No se pudo completar el registro";
+      setError(message);
+      toastService.error(message);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100" style={shellStyle}>
+    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-[430px]">
         <Link
           to="/login"
@@ -247,23 +247,18 @@ export function HostRegisterPage() {
             </span>
           </label>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Imagen del local (logo, opcional)</span>
-            <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-              style={inputWrapStyle}
-            >
-              <Image size={20} className="shrink-0 text-[#7787ab]" />
-              <input
-                type="text"
-                name="businessLogo"
-                placeholder="/logos/mi-local.svg o https://..."
-                value={form.businessLogo}
-                onChange={handleChange}
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
-              />
-            </span>
-          </label>
+          <ImageDropInput
+            label="Imagen del local (logo, opcional)"
+            value={form.businessLogo}
+            onChange={(nextValue) =>
+              setForm((prev) => ({
+                ...prev,
+                businessLogo: nextValue,
+              }))
+            }
+            uploadFolder="nextapa/host-register/logo"
+            helperText="Sube o arrastra una imagen para el logo del local."
+          />
 
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
             <label className="flex flex-col gap-2">
@@ -334,12 +329,12 @@ export function HostRegisterPage() {
             className="inline-flex min-h-16 items-center justify-center gap-2 rounded-2xl border-0 text-2xl font-bold tracking-tight text-white transition active:translate-y-[2px] disabled:cursor-not-allowed disabled:opacity-75 sm:text-3xl"
             style={primaryButtonStyle}
           >
-            {submitting ? "Creando cuenta..." : "Crear cuenta hostelero"}
+            {submitting ? "Creando cuenta..." : "Crear cuenta"}
           </button>
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          Ya tienes cuenta?{" "}
+          ¿Ya tienes cuenta?{" "}
           <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
             Inicia sesión
           </Link>

@@ -2,12 +2,16 @@ import { api } from "./api";
 
 const authService = {
   async register(userData) {
-    const response = await api.post("/auth/register", userData);
+    const response = await api.post("/auth/register", userData, {
+      skipGlobalErrorToast: true,
+    });
     return response.data;
   },
 
   async login(credentials) {
-    const response = await api.post("/auth/login", credentials);
+    const response = await api.post("/auth/login", credentials, {
+      skipGlobalErrorToast: true,
+    });
     return response.data;
   },
 

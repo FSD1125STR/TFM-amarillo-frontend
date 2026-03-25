@@ -198,7 +198,7 @@ export const Establishment = () => {
    }
 
    return (
-      <div className="bg-neutral-950 min-h-screen text-white">
+      <div className="bg-transparent min-h-screen text-white">
          {lightboxOpen && allLightboxImages.length > 0 && (
             <Lightbox
                images={allLightboxImages}

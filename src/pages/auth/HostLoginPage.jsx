@@ -4,11 +4,6 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
 
-const shellStyle = {
-  background:
-    "radial-gradient(1200px 700px at 80% -10%, rgba(255,115,38,.18), transparent 55%), radial-gradient(800px 500px at -10% 120%, rgba(255,77,0,.14), transparent 65%), linear-gradient(180deg, #1d0e08 0%, #110906 100%)",
-};
-
 const inputWrapStyle = {
   background: "linear-gradient(180deg, #181c28, #141924)",
 };
@@ -58,7 +53,7 @@ export function HostLoginPage() {
   };
 
   return (
-    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100" style={shellStyle}>
+    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-[430px]">
         <Link to="/login" className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline">
           <ArrowLeft size={18} />
@@ -141,7 +136,7 @@ export function HostLoginPage() {
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          Aun no tienes cuenta de hostelero?{" "}
+          ¿Aún no tienes cuenta de hostelero?{" "}
           <Link to="/host/register" className="font-bold text-[#ff7a2f] no-underline">
             Crear cuenta hostelero
           </Link>
