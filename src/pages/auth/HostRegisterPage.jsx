@@ -149,7 +149,7 @@ export function HostRegisterPage() {
                 value={form.name}
                 onChange={handleChange}
                 autoComplete="name"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -168,7 +168,7 @@ export function HostRegisterPage() {
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -188,7 +188,7 @@ export function HostRegisterPage() {
                   value={form.password}
                   onChange={handleChange}
                   autoComplete="new-password"
-                  className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
                 />
                 <button
                   type="button"
@@ -215,7 +215,7 @@ export function HostRegisterPage() {
                   value={form.confirmPassword}
                   onChange={handleChange}
                   autoComplete="new-password"
-                  className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
                 />
                 <button
                   type="button"
@@ -242,7 +242,7 @@ export function HostRegisterPage() {
                 placeholder="Ej. Taberna La Plaza"
                 value={form.businessName}
                 onChange={handleChange}
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -275,7 +275,7 @@ export function HostRegisterPage() {
                   value={form.phone}
                   onChange={handleChange}
                   autoComplete="tel"
-                  className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
                 />
               </span>
             </label>
@@ -293,7 +293,7 @@ export function HostRegisterPage() {
                   placeholder="B12345678"
                   value={form.cif}
                   onChange={handleChange}
-                  className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
                 />
               </span>
             </label>
@@ -312,7 +312,7 @@ export function HostRegisterPage() {
                 placeholder="Calle, numero, ciudad"
                 value={form.businessAddress}
                 onChange={handleChange}
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>

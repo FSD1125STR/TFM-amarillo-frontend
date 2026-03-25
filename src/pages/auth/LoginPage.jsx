@@ -61,13 +61,12 @@ export function LoginPage() {
     <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-[490px]">
         <div className="mb-6 text-center">
-          <div
-            className="mx-auto mb-3.5 grid h-[74px] w-[74px] place-items-center overflow-hidden rounded-[20px] border border-[#f77827]/45 bg-white/95"
-            style={{
-              boxShadow: "0 14px 28px rgba(247, 105, 34, 0.35)",
-            }}
-          >
-            <img src="/Logo.png" alt="Logo nexTapa" className="h-[80px] w-[80px] object-contain" />
+          <div className="mx-auto mb-3.5 grid place-items-center">
+            <img
+              src="/Logo.png"
+              alt="Logo nexTapa"
+              className="h-[86px] w-[86px] object-contain drop-shadow-[0_12px_24px_rgba(247,105,34,0.35)]"
+            />
           </div>
           <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">
             nex<span className="text-orange-500">Tapa</span>
@@ -94,7 +93,7 @@ export function LoginPage() {
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -118,7 +117,7 @@ export function LoginPage() {
                 value={form.password}
                 onChange={handleChange}
                 autoComplete="current-password"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
               <button
                 type="button"
