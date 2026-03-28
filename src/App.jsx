@@ -9,6 +9,7 @@ import { Dashboard } from "./pages/admin/Dashboard";
 import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
 import { ItemAdmin } from "./pages/admin/ItemAdmin";
+import { HostItemEditor } from "./pages/host/HostItemEditor";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { HostRegisterPage } from "./pages/auth/HostRegisterPage";
@@ -66,6 +67,11 @@ function AppLayout() {
             <Route path="/host/dashboard" element={
                <HostRoute>
                   <HostDashboard />
+               </HostRoute>
+            } />
+            <Route path="/host/items/:id" element={
+               <HostRoute>
+                  <HostItemEditor />
                </HostRoute>
             } />
 

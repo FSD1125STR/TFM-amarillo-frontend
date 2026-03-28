@@ -22,6 +22,7 @@ import { establishmentService } from "../../services/establishmentService";
 import { reservationService } from "../../services/reservationService";
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { toastService } from "../../services/toastService";
+import { HostEstablishmentSettings } from "./HostEstablishmentSettings";
 
 const formatLocation = (address) => {
   if (!address) return "Pendiente de completar";
@@ -649,6 +650,11 @@ export function HostDashboard() {
                 </div>
               )}
             </section>
+
+            <HostEstablishmentSettings
+              establishment={establishment}
+              onEstablishmentUpdated={setEstablishment}
+            />
           </div>
         )}
       </div>

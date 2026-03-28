@@ -27,7 +27,12 @@ const TimeRange = ({ openVal, closeVal, onChangeOpen, onChangeClose, disabled })
    </div>
 );
 
-export const ScheduleAdmin = memo(({ schedule, onChange, saving }) => {
+export const ScheduleAdmin = memo(({
+   schedule,
+   onChange,
+   saving,
+   showSaveButton = true,
+}) => {
    return (
       <section className="admin-section">
          <h2 className="admin-section-title">Horarios</h2>
@@ -96,7 +101,7 @@ export const ScheduleAdmin = memo(({ schedule, onChange, saving }) => {
                );
             })}
          </div>
-         <SaveButton saving={saving} />
+         {showSaveButton && <SaveButton saving={saving} />}
       </section>
    );
 });

@@ -31,6 +31,9 @@ export const ItemAdmin = () => {
    const [success, setSuccess] = useState(false);
    const location = useLocation();
    const establishmentIdFromState = location.state?.establishmentId;
+   const itemEditorBasePath = location.pathname.startsWith('/host/items')
+      ? '/host/items'
+      : '/admin/items';
 
    const { coords } = useGeolocation();
 
@@ -102,7 +105,7 @@ export const ItemAdmin = () => {
             const res = await itemService.create(payload);
             const newId = res.data._id;
             toastService.success("Tapa creada correctamente");
-            navigate(`/admin/items/${newId}`, {
+            navigate(`${itemEditorBasePath}/${newId}`, {
                replace: true,
                state: { establishmentId: establishmentIdFromState }
             });

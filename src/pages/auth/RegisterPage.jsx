@@ -403,11 +403,10 @@ export function RegisterPage() {
                 <button
                   type="button"
                   key={avatarPath}
-                  className={`h-[68px] w-[68px] shrink-0 rounded-full border-2 bg-transparent p-1 mt-1 transition hover:-translate-y-0.5 ${
-                    selectedAvatar === avatarPath
+                  className={`h-[68px] w-[68px] shrink-0 rounded-full border-2 bg-transparent p-1 mt-1 transition hover:-translate-y-0.5 ${selectedAvatar === avatarPath
                       ? "border-[#f77827] ring-2 ring-[#f77827]/20"
                       : "border-transparent"
-                  }`}
+                    }`}
                   onClick={(event) => {
                     setForm((prev) => ({
                       ...prev,
