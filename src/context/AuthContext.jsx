@@ -1,99 +1,126 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import authService from "../services/authService";
 import { setAuthToken } from "../services/api";
+import { useLocation } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-   const [token, setToken] = useState(() => localStorage.getItem("token"));
-   const [user, setUser] = useState(null);
-   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
-   const fetchMe = async (currentToken) => {
-      if (!currentToken) {return null;}
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // 🔒 Rutas públicas donde NO queremos forzar auth
+  const isPublicRoute =
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/auth/verify" ||
+    location.pathname.startsWith("/auth/reset-password") ||
+    location.pathname === "/forgot-password";
+
+  const fetchMe = async (currentToken) => {
+    if (!currentToken) return null;
+
+    try {
       setAuthToken(currentToken);
+
       const response = await authService.getMe();
       const userData = response?.data || response;
+
       setUser(userData);
       return userData;
-   };
 
-   const login = async ({ email, password }) => {
-      const response = await authService.login({ email, password });
-      const newToken = response.token;
+    } catch (error) {
+      // ❗ No forzamos logout en rutas públicas
+      if (error?.response?.status === 401) {
+        setUser(null);
+        return null;
+      }
 
-      localStorage.setItem("token", newToken);
-      setToken(newToken);
-      setAuthToken(newToken);
+      throw error;
+    }
+  };
 
-      await fetchMe(newToken);
-      return response;
-   };
+  const login = async ({ email, password }) => {
+    const response = await authService.login({ email, password });
+    const newToken = response.token;
 
-   const register = async (payload) => {
-      const response = await authService.register(payload);
-      const newToken = response.token;
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setAuthToken(newToken);
 
-      localStorage.setItem("token", newToken);
-      setToken(newToken);
-      setAuthToken(newToken);
+    await fetchMe(newToken);
+    return response;
+  };
 
-      await fetchMe(newToken);
-      return response;
-   };
+  const register = async (payload) => {
+    const response = await authService.register(payload);
+    const newToken = response.token;
 
-   const logout = () => {
-      localStorage.removeItem("token");
-      setToken(null);
-      setUser(null);
-      setAuthToken(null);
-   };
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setAuthToken(newToken);
 
-   const refreshUser = async () => {
-      if (!token) {return null;}
-      return fetchMe(token);
-   };
+    await fetchMe(newToken);
+    return response;
+  };
 
-   useEffect(() => {
-      const initAuth = async () => {
-         try {
-            if (token) {
-               await fetchMe(token);
-            }
-         } catch (error) {
-            logout();
-         } finally {
-            setLoading(false);
-         }
-      };
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setUser(null);
+    setAuthToken(null);
+  };
 
-      initAuth();
-   }, []);
+  const refreshUser = async () => {
+    if (!token) return null;
+    return fetchMe(token);
+  };
 
-   const value = useMemo(
-      () => ({
-         user,
-         token,
-         loading,
-         isAuthenticated: !!user,
-         login,
-         register,
-         logout,
-         refreshUser,
-      }),
-      [user, token, loading]
-   );
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (token) {
+          await fetchMe(token);
+        }
+      } catch (error) {
+        // Solo logout si no estamos en rutas públicas
+        if (!isPublicRoute) {
+          logout();
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    initAuth();
+  }, [token, isPublicRoute]);
+
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      loading,
+      isAuthenticated: !!user,
+      login,
+      register,
+      logout,
+      refreshUser,
+    }),
+    [user, token, loading]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-   const context = useContext(AuthContext);
+  const context = useContext(AuthContext);
 
-   if (!context) {
-      throw new Error("useAuth debe usarse dentro de AuthProvider");
-   }
+  if (!context) {
+    throw new Error("useAuth debe usarse dentro de AuthProvider");
+  }
 
-   return context;
+  return context;
 }

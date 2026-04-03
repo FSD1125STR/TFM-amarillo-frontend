@@ -25,6 +25,10 @@ export function VerifyEmailPage() {
   const hasVerified = useRef(false);
 
   useEffect(() => {
+    // ✅ DEBUG LOGS
+    console.log("VerifyEmailPage mounted");
+    console.log("Token:", token);
+
     if (!token) {
       setStatus("error");
       setMessage("Enlace de verificación inválido.");

@@ -74,7 +74,9 @@ function AppLayout() {
           </PublicOnlyRoute>
         } />
 
-        <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/auth/verify" element={
+          <VerifyEmailPage />
+        } />
 
         <Route path="/forgot-password" element={
           <PublicOnlyRoute>
@@ -116,6 +118,8 @@ function AppLayout() {
             <AdminPanel />
           </AdminRoute>
         }>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
           <Route index element={<Dashboard />} />
           <Route path="establishments" element={<AdminEstablishments />} />
           <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />

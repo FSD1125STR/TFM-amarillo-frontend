@@ -123,78 +123,157 @@ export function RegisterPage() {
 
   return (
     <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
-      <div className="mx-auto w-full max-w-107.5">
+      <div className="mx-auto w-full max-w-122.5">
 
+        {/* Back */}
         <Link to="/login" className="mb-4 flex items-center gap-2 text-slate-300">
           <ArrowLeft size={18} /> Volver
         </Link>
 
-        <h1 className="text-4xl font-bold">Crea tu cuenta</h1>
+        {/* Logo */}
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3.5 grid place-items-center">
+            <img
+              src="/Logo.png"
+              alt="Logo nexTapa"
+              className="h-21.5 w-21.5 object-contain drop-shadow-[0_12px_24px_rgba(247,105,34,0.35)]"
+            />
+          </div>
+
+          <h1 className="text-4xl font-bold sm:text-5xl">
+            nex<span className="text-orange-500">Tapa</span>
+          </h1>
+
+          <p className="text-orange-400">
+            Tus tapas favoritas a un click
+          </p>
+        </div>
+
+        {/* Title */}
+        <h2 className="mb-6 text-4xl font-bold">
+          Crea tu cuenta
+        </h2>
+
         <p className="mb-6 text-slate-400">
           Únete a la comunidad foodie de nexTapa
         </p>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Nombre */}
-          <input
-            type="text"
-            name="name"
-            placeholder="Nombre completo"
-            value={form.name}
-            onChange={handleChange}
-            className="auth-input"
-          />
+          {/* Name */}
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold text-slate-300">
+              Nombre completo
+            </span>
+            <span
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5"
+              style={inputWrapStyle}
+            >
+              <UserRoundPlus size={22} />
+              <input
+                type="text"
+                name="name"
+                placeholder="Tu nombre"
+                value={form.name}
+                onChange={handleChange}
+                className="auth-input w-full bg-transparent outline-none"
+              />
+            </span>
+          </label>
 
           {/* Username */}
-          <input
-            type="text"
-            name="username"
-            placeholder="@usuario (opcional)"
-            value={form.username}
-            onChange={handleChange}
-            className="auth-input"
-          />
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold text-slate-300">
+              Usuario
+            </span>
+            <span
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5"
+              style={inputWrapStyle}
+            >
+              <User size={22} />
+              <input
+                type="text"
+                name="username"
+                placeholder="@usuario (opcional)"
+                value={form.username}
+                onChange={handleChange}
+                className="auth-input w-full bg-transparent outline-none"
+              />
+            </span>
+          </label>
 
           {/* Email */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="auth-input"
-          />
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold text-slate-300">
+              Correo electrónico
+            </span>
+            <span
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5"
+              style={inputWrapStyle}
+            >
+              <Mail size={22} />
+              <input
+                type="email"
+                name="email"
+                placeholder="tu@email.com"
+                value={form.email}
+                onChange={handleChange}
+                className="auth-input w-full bg-transparent outline-none"
+              />
+            </span>
+          </label>
 
           {/* Password */}
-          <div className="flex gap-2">
-            <input
-              type={showPassword ? "text" : "password"}
-              name="password"
-              placeholder="Contraseña"
-              value={form.password}
-              onChange={handleChange}
-              className="auth-input w-full"
-            />
-            <button type="button" onClick={() => setShowPassword((p) => !p)}>
-              {showPassword ? <EyeOff /> : <Eye />}
-            </button>
-          </div>
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold text-slate-300">
+              Contraseña
+            </span>
+            <span
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5"
+              style={inputWrapStyle}
+            >
+              <Lock size={22} />
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="********"
+                value={form.password}
+                onChange={handleChange}
+                className="auth-input w-full bg-transparent outline-none"
+              />
+              <button type="button" onClick={() => setShowPassword((p) => !p)}>
+                {showPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </span>
+          </label>
 
-          {/* Confirm */}
-          <div className="flex gap-2">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              name="confirmPassword"
-              placeholder="Confirmar contraseña"
-              value={form.confirmPassword}
-              onChange={handleChange}
-              className="auth-input w-full"
-            />
-            <button type="button" onClick={() => setShowConfirmPassword((p) => !p)}>
-              {showConfirmPassword ? <EyeOff /> : <Eye />}
-            </button>
-          </div>
+          {/* Confirm Password */}
+          <label className="flex flex-col gap-2">
+            <span className="font-semibold text-slate-300">
+              Confirmar contraseña
+            </span>
+            <span
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5"
+              style={inputWrapStyle}
+            >
+              <Lock size={22} />
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="********"
+                value={form.confirmPassword}
+                onChange={handleChange}
+                className="auth-input w-full bg-transparent outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((p) => !p)}
+              >
+                {showConfirmPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </span>
+          </label>
 
           {/* Avatar */}
           <ImageDropInput
@@ -222,7 +301,7 @@ export function RegisterPage() {
             type="submit"
             disabled={submitting}
             style={primaryButtonStyle}
-            className="rounded-2xl py-4 font-bold"
+            className="rounded-2xl py-4 text-xl font-bold"
           >
             {submitting ? "Creando..." : "Crear cuenta"}
           </button>
@@ -230,14 +309,14 @@ export function RegisterPage() {
 
         <p className="mt-5 text-center text-slate-400">
           ¿Ya tienes cuenta?{" "}
-          <Link to="/login" className="text-orange-500 font-bold">
+          <Link to="/login" className="text-[#ff7a2f] font-bold">
             Inicia sesión
           </Link>
         </p>
 
         <p className="mt-3 text-center text-slate-400">
           ¿Eres hostelero?{" "}
-          <Link to="/host/register" className="text-orange-500 font-bold">
+          <Link to="/host/register" className="text-[#ff7a2f] font-bold">
             Regístrate como hostelero
           </Link>
         </p>
