@@ -133,9 +133,5 @@ function AppLayout() {
 }
 
 export function App() {
-  return (
-    <BrowserRouter>
-      <AppLayout />
-    </BrowserRouter>
-  );
+  return <AppLayout />;
 }
