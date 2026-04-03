@@ -62,30 +62,42 @@ export function LoginPage() {
       className="min-h-screen px-4 pb-9 pt-7 text-slate-100"
       style={shellStyle}
     >
-      <div className="mx-auto w-full max-w-[490px]">
+      <div className="mx-auto w-full max-w-122.5">
         <div className="mb-6 text-center">
           <div
-            className="mx-auto mb-3.5 grid h-[74px] w-[74px] place-items-center overflow-hidden rounded-[20px] border border-[#f77827]/45 bg-white/95"
+            className="mx-auto mb-3.5 grid h-18.5 w-18.5 place-items-center overflow-hidden rounded-[20px] border border-[#f77827]/45 bg-white/95"
             style={{
               boxShadow: "0 14px 28px rgba(247, 105, 34, 0.35)",
             }}
           >
-            <img src="/Logo.png" alt="Logo nexTapa" className="h-[80px] w-[80px] object-contain" />
+            <img
+              src="/Logo.png"
+              alt="Logo nexTapa"
+              className="h-20 w-20 object-contain"
+            />
           </div>
-          <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">nex<span className="text-orange-500">Tapa</span></h1>
+          <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">
+            nex<span className="text-orange-500">Tapa</span>
+          </h1>
           <p className="mt-1.5 text-base text-orange-400 sm:text-lg">
             Tus tapas favoritas a un click
           </p>
         </div>
 
-        <h2 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">Bienvenido de nuevo</h2>
-        <p className="mb-6 mt-2 text-lg text-slate-400">Ingresa tus credenciales para continuar</p>
+        <h2 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">
+          Bienvenido de nuevo
+        </h2>
+        <p className="mb-6 mt-2 text-lg text-slate-400">
+          Ingresa tus credenciales para continuar
+        </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Correo electrónico</span>
+            <span className="text-base font-semibold text-slate-300">
+              Correo electrónico
+            </span>
             <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
             >
               <Mail size={22} className="shrink-0 text-[#7787ab]" />
@@ -103,13 +115,18 @@ export function LoginPage() {
 
           <label className="flex flex-col gap-2">
             <span className="flex items-baseline justify-between gap-3">
-              <span className="text-base font-semibold text-slate-300">Contraseña</span>
-              <a href="#" className="text-sm font-semibold text-[#f77827] no-underline">
+              <span className="text-base font-semibold text-slate-300">
+                Contraseña
+              </span>
+              <Link
+                to="/forgot-password"
+                className="text-sm font-semibold text-[#f77827] no-underline"
+              >
                 ¿Olvidaste tu contraseña?
-              </a>
+              </Link>
             </span>
             <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
+              className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
               style={inputWrapStyle}
             >
               <Lock size={22} className="shrink-0 text-[#7787ab]" />
@@ -126,7 +143,9 @@ export function LoginPage() {
                 type="button"
                 className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
               >
                 {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
               </button>
@@ -138,7 +157,7 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex min-h-16 items-center justify-center gap-2 rounded-2xl border-0 text-2xl font-bold tracking-tight text-white transition active:translate-y-[2px] disabled:cursor-not-allowed disabled:opacity-75 sm:text-3xl"
+            className="inline-flex min-h-16 items-center justify-center gap-2 rounded-2xl border-0 text-2xl font-bold tracking-tight text-white transition active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-75 sm:text-3xl"
             style={primaryButtonStyle}
           >
             {submitting ? "Entrando..." : "Iniciar sesión"}
@@ -147,15 +166,18 @@ export function LoginPage() {
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
           ¿No tienes cuenta?{" "}
-          <Link to="/register" className="font-bold text-[#ff7a2f] no-underline">
+          <Link
+            to="/register"
+            className="font-bold text-[#ff7a2f] no-underline"
+          >
             Regístrate
           </Link>
         </p>
 
         <div className="my-5 flex items-center gap-3 text-center text-xs uppercase tracking-[0.2em] text-slate-400">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+          <span className="h-px flex-1 bg-linear-to-r from-transparent via-slate-700 to-transparent" />
           <span>o continúa con</span>
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent via-slate-700 to-transparent" />
+          <span className="h-px flex-1 bg-linear-to-r from-transparent via-slate-700 to-transparent" />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -164,7 +186,7 @@ export function LoginPage() {
             className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl border border-[#263859] bg-[#131824]/65 text-lg font-semibold text-slate-200 opacity-80"
             disabled
           >
-            <span className="grid h-[26px] w-[26px] place-items-center rounded-full bg-white text-xs font-bold text-slate-900">
+            <span className="grid h-6.5 w-6.5 place-items-center rounded-full bg-white text-xs font-bold text-slate-900">
               G
             </span>
             Google
@@ -174,7 +196,7 @@ export function LoginPage() {
             className="inline-flex min-h-14 items-center justify-center gap-2 rounded-xl border border-[#263859] bg-[#131824]/65 text-lg font-semibold text-slate-200 opacity-80"
             disabled
           >
-            <span className="grid h-[26px] w-[26px] place-items-center rounded-full bg-blue-600 text-xs font-bold text-white">
+            <span className="grid h-6.5 w-6.5 place-items-center rounded-full bg-blue-600 text-xs font-bold text-white">
               f
             </span>
             Facebook
@@ -186,12 +208,14 @@ export function LoginPage() {
           className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-[#f77827]/45 bg-[#722d12]/50 p-3.5 text-inherit no-underline"
         >
           <span className="flex items-center gap-3">
-            <span className="grid h-[46px] w-[46px] place-items-center rounded-xl bg-[#f77827]/20 text-[#ff893f]">
+            <span className="grid h-11.5 w-11.5 place-items-center rounded-xl bg-[#f77827]/20 text-[#ff893f]">
               <Store size={22} />
             </span>
             <span>
               <p className="m-0 text-2xl font-bold">¿Eres hostelero?</p>
-              <p className="mt-0.5 text-sm text-slate-400">Gestiona tu local y tus tapas</p>
+              <p className="mt-0.5 text-sm text-slate-400">
+                Gestiona tu local y tus tapas
+              </p>
             </span>
           </span>
           <span className="text-2xl text-[#f77827]">›</span>
