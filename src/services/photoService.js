@@ -5,6 +5,25 @@
 import { api } from './api';
 
 export const photoService = {
+   uploadTemporary: async (file, options = {}) => {
+      try {
+         const { folder = "nextapa/temp" } = options;
+
+         const formData = new FormData();
+         formData.append("photo", file);
+         formData.append("folder", folder);
+
+         const res = await api.post("/photos/temp", formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+            skipGlobalErrorToast: true,
+         });
+
+         return res.data;
+      } catch (error) {
+         console.error("Error al subir imagen temporal:", error);
+         throw error;
+      }
+   },
 
    getByEstablishment: async (establishmentId, options = {}) => {
       try {

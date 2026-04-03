@@ -4,7 +4,6 @@
 // Página que muestra todas las tapas disponibles, ordenadas por proximidad al usuario
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Footer } from "../components/layout/Footer";
 import Header from "../components/layout/Header";
 import { itemService } from "../services/itemService";
 import { useGeolocation } from "../hooks/useGeolocation.js";
@@ -36,7 +35,7 @@ export const AllTapas = () => {
 
    if (loading && items.length === 0) {
       return (
-         <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white">
+         <div className="min-h-screen bg-transparent flex flex-col items-center justify-center text-white">
             <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4" />
             <p className="text-neutral-400 italic">
                {geoLoading ? "Obteniendo tu ubicación..." : "Buscando las mejores tapas cerca de ti..."}
@@ -46,7 +45,7 @@ export const AllTapas = () => {
    }
 
    return (
-      <div className="min-h-screen bg-neutral-950 text-white">
+      <div className="min-h-screen bg-transparent text-white">
          <Header />
 
          <div className="max-w-3xl mx-auto px-4 pb-24 mt-4">
@@ -156,7 +155,6 @@ export const AllTapas = () => {
                })}
             </div>
          </div>
-         <Footer />
       </div>
    );
 };

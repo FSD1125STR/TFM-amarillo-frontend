@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useSearch } from '../hooks/useSearch';
-import { Footer } from '../components/layout/Footer.jsx';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -255,10 +254,10 @@ export const SearchPage = () => {
             }
          `}</style>
 
-         <div className="min-h-screen bg-neutral-950 max-w-3xl mx-auto">
+         <div className="min-h-screen bg-transparent max-w-3xl mx-auto">
 
             {/* ── Barra superior sticky ── */}
-            <div className="sticky top-0 z-40 bg-neutral-950/95 backdrop-blur-md border-b border-neutral-800/50 px-4 py-3">
+            <div className="sticky top-0 z-40 bg-black/45 backdrop-blur-md border-b border-neutral-800/50 px-4 py-3">
                <div ref={wrapperRef} className="relative">
                   <div className="flex items-center gap-3 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-2.5 focus-within:border-orange-500/40 focus-within:ring-1 focus-within:ring-orange-500/10 transition-all">
                      {loading
@@ -365,7 +364,6 @@ export const SearchPage = () => {
                   </>
                )}
             </div>
-            <Footer />
          </div>
       </>
    );

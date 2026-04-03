@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
-   
+
    CircleUserRound,
-   Circle,
    ChevronDown,
    LogOut,
 } from "lucide-react";
@@ -10,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getAccountRouteByRole } from "../../utils/authRedirect";
 import { SearchDropdown } from "../search/SearchDropdown";
+import { toastService } from "../../services/toastService";
 
 export default function Header() {
    const navigate = useNavigate();
@@ -36,16 +36,17 @@ export default function Header() {
    const handleLogout = () => {
       logout();
       setMenuOpen(false);
+      toastService.success("Sesión cerrada correctamente");
       navigate("/");
    };
 
    return (
-      <header className="bg-neutral-950 border-b border-neutral-800/60 px-4 pt-5 pb-4 max-w-3xl mx-auto">
+      <header className="bg-transparent border-b border-neutral-800/60 px-4 pt-5 pb-4 max-w-3xl mx-auto">
          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-1.5">
-               <Circle className="text-orange-500 text-2xl leading-none" />
-               <h1 className="text-2xl font-black tracking-tight text-white">
-            nex<span className="text-orange-500">Tapa</span>
+            <div className="flex items-center gap-2.5">
+               <img src="/Logo.png" alt="Logo de nexTapa" className="h-20 w-20 object-contain drop-shadow-[0_0_20px_rgba(255,105,0,0.6)]" />
+               <h1 className="text-3xl font-black tracking-tight leading-none text-white">
+                  nex<span className="text-[#ff6900]">Tapa</span>
                </h1>
             </div>
 
@@ -76,7 +77,7 @@ export default function Header() {
                   {menuOpen && (
                      <div className="absolute right-0 top-[calc(100%+10px)] z-50 w-56 overflow-hidden rounded-xl border border-neutral-700 bg-neutral-900 shadow-2xl">
                         <div className="border-b border-neutral-800 px-4 py-3">
-                           <p className="m-0 text-xs text-neutral-400">Sesion iniciada como</p>
+                           <p className="m-0 text-xs text-neutral-400">Sesión iniciada como</p>
                            <p className="m-0 truncate text-sm font-semibold text-white">
                               {user?.email || "usuario"}
                            </p>
@@ -97,7 +98,7 @@ export default function Header() {
                            className="flex w-full items-center gap-2 border-t border-neutral-800 px-4 py-3 text-left text-sm text-rose-300 transition-colors hover:bg-neutral-800"
                         >
                            <LogOut className="h-4 w-4" />
-                           Cerrar sesion
+                           Cerrar sesión
                         </button>
                      </div>
                   )}

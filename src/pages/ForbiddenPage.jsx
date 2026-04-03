@@ -1,10 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 
-const shellStyle = {
-  background:
-    "radial-gradient(760px 420px at 80% -10%, rgba(249, 115, 22, 0.15), transparent 56%), linear-gradient(180deg, #140b08, #0b0706)",
-};
-
 const primaryButtonStyle = {
   background: "linear-gradient(180deg, #ff7a2f, #f76922)",
 };
@@ -16,7 +11,6 @@ export function ForbiddenPage() {
   return (
     <section
       className="grid min-h-screen place-items-center px-5 text-slate-100"
-      style={shellStyle}
     >
       <div className="w-full max-w-130 rounded-2xl border border-[#2f3c55] bg-[#121824]/80 p-6">
         <p className="m-0 text-5xl font-extrabold text-orange-500 sm:text-6xl">403</p>
@@ -34,10 +28,10 @@ export function ForbiddenPage() {
             Ir al inicio
           </Link>
           <Link
-            to="/host/login"
+            to="/login"
             className="inline-flex min-h-10 items-center justify-center rounded-[11px] border border-[#36455f] bg-[#181e2d] px-3.5 font-semibold text-slate-200 no-underline"
           >
-            Login hostelero
+            Iniciar sesión
           </Link>
         </div>
       </div>

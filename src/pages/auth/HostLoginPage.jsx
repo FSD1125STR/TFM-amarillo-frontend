@@ -4,11 +4,6 @@ import { ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
 
-const shellStyle = {
-  background:
-    "radial-gradient(1200px 700px at 80% -10%, rgba(255,115,38,.18), transparent 55%), radial-gradient(800px 500px at -10% 120%, rgba(255,77,0,.14), transparent 65%), linear-gradient(180deg, #1d0e08 0%, #110906 100%)",
-};
-
 const inputWrapStyle = {
   background: "linear-gradient(180deg, #181c28, #141924)",
 };
@@ -51,14 +46,14 @@ export function HostLoginPage() {
       const role = response?.data?.role;
       navigate(getDefaultRouteByRole(role), { replace: true });
     } catch (err) {
-      setError(err?.response?.data?.message || "No se pudo iniciar sesion");
+      setError(err?.response?.data?.message || "No se pudo iniciar sesión");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100" style={shellStyle}>
+    <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-[430px]">
         <Link to="/login" className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline">
           <ArrowLeft size={18} />
@@ -66,13 +61,12 @@ export function HostLoginPage() {
         </Link>
 
         <div className="mb-6 text-center">
-          <div
-            className="mx-auto mb-3.5 grid h-[74px] w-[74px] place-items-center overflow-hidden rounded-[20px] border border-[#f77827]/45 bg-white/95"
-            style={{
-              boxShadow: "0 14px 28px rgba(247, 105, 34, 0.35)",
-            }}
-          >
-            <img src="/Logo.png" alt="Logo nexTapa" className="h-[80px] w-[80px] object-contain" />
+          <div className="mx-auto mb-3.5 grid place-items-center">
+            <img
+              src="/Logo.png"
+              alt="Logo nexTapa"
+              className="h-[86px] w-[86px] object-contain drop-shadow-[0_12px_24px_rgba(247,105,34,0.35)]"
+            />
           </div>
           <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">nexTapa Host</h1>
           <p className="mt-1.5 text-base text-orange-400 sm:text-lg">Gestiona tu local y tus tapas</p>
@@ -96,7 +90,7 @@ export function HostLoginPage() {
                 value={form.email}
                 onChange={handleChange}
                 autoComplete="email"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
             </span>
           </label>
@@ -115,7 +109,7 @@ export function HostLoginPage() {
                 value={form.password}
                 onChange={handleChange}
                 autoComplete="current-password"
-                className="w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
               />
               <button
                 type="button"
@@ -141,7 +135,7 @@ export function HostLoginPage() {
         </form>
 
         <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          Aun no tienes cuenta de hostelero?{" "}
+          ¿Aún no tienes cuenta de hostelero?{" "}
           <Link to="/host/register" className="font-bold text-[#ff7a2f] no-underline">
             Crear cuenta hostelero
           </Link>
@@ -150,7 +144,7 @@ export function HostLoginPage() {
         <p className="mb-0 mt-3 text-center text-lg text-slate-400">
           Prefieres entrar como cliente?{" "}
           <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
-            Inicia sesion de cliente
+            Inicia sesión de cliente
           </Link>
         </p>
       </div>

@@ -3,7 +3,6 @@
 // AdminPanel.jsx
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAdminSidebar } from '../../hooks/useAdminSidebar.js';
-import { Footer } from '../../components/layout/Footer.jsx';
 import './styles/admin.css';
 
 export const AdminPanel = () => {
@@ -56,7 +55,6 @@ export const AdminPanel = () => {
          {/* ── Main ── */}
          <main className="admin-main">
             <Outlet />
-            <Footer />
          </main>
 
       </div>

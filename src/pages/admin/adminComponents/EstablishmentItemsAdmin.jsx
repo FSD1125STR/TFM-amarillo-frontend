@@ -130,8 +130,14 @@ const SortableRow = ({ item, onToggleAvailable, onToggleFeatured, onDelete, onEd
 };
 
 // ── Componente principal ───────────────────────────────────────────────────
-export const EstablishmentItems = ({ establishmentId }) => {
+export const EstablishmentItems = ({
+   establishmentId,
+   itemEditorBasePath = '/admin/items'
+}) => {
    const navigate = useNavigate();
+   const itemEditorPrefix = itemEditorBasePath.endsWith('/')
+      ? itemEditorBasePath.slice(0, -1)
+      : itemEditorBasePath;
 
    const [items, setItems] = useState([]);
    const [loading, setLoading] = useState(true);
@@ -283,7 +289,9 @@ export const EstablishmentItems = ({ establishmentId }) => {
                )}
                <button
                   className="admin-btn admin-btn-primary admin-btn-sm"
-                  onClick={() => navigate('/admin/items/new', { state: { establishmentId } })}
+                  onClick={() =>
+                     navigate(`${itemEditorPrefix}/new`, { state: { establishmentId } })
+                  }
                >
                   + Añadir tapa
                </button>
@@ -327,7 +335,7 @@ export const EstablishmentItems = ({ establishmentId }) => {
                                  onToggleAvailable={handleToggleAvailable}
                                  onToggleFeatured={handleToggleFeatured}
                                  onDelete={handleDeleteRequest}
-                                 onEdit={(id) => navigate(`/admin/items/${id}`)}
+                                 onEdit={(id) => navigate(`${itemEditorPrefix}/${id}`)}
                               />
                            ))}
                         </SortableContext>

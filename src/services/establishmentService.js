@@ -64,7 +64,9 @@ export const establishmentService = {
 
    create: async (establishmentData) => {
       try {
-         const response = await api.post('/establishment', establishmentData);
+         const response = await api.post('/establishment', establishmentData, {
+            skipGlobalErrorToast: true,
+         });
          return response.data;
       } catch (error) {
          console.error('Error al crear establecimiento:', error);
@@ -74,7 +76,9 @@ export const establishmentService = {
 
    update: async (id, establishmentData) => {
       try {
-         const response = await api.patch(`/establishment/${id}`, establishmentData);
+         const response = await api.patch(`/establishment/${id}`, establishmentData, {
+            skipGlobalErrorToast: true,
+         });
          return response.data;
       } catch (error) {
          console.error('Error al actualizar establecimiento:', error);

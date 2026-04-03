@@ -14,6 +14,7 @@ import { DietaryOptions } from './itemsComponents/DietaryOptions';
 import { ItemPhotoSection } from './itemsComponents/ItemPhotoSection';
 import { ViewItemInAppButton } from './itemsComponents/ViewItemInApp';
 import { useGeolocation } from '../../hooks/useGeolocation.js';
+import { toastService } from '../../services/toastService';
 
 import './styles/admin.css';
 import './styles/itemAdmin.css';
@@ -30,6 +31,9 @@ export const ItemAdmin = () => {
    const [success, setSuccess] = useState(false);
    const location = useLocation();
    const establishmentIdFromState = location.state?.establishmentId;
+   const itemEditorBasePath = location.pathname.startsWith('/host/items')
+      ? '/host/items'
+      : '/admin/items';
 
    const { coords } = useGeolocation();
 
@@ -100,17 +104,20 @@ export const ItemAdmin = () => {
          if (isNew) {
             const res = await itemService.create(payload);
             const newId = res.data._id;
-            navigate(`/admin/items/${newId}`, {
+            toastService.success("Tapa creada correctamente");
+            navigate(`${itemEditorBasePath}/${newId}`, {
                replace: true,
                state: { establishmentId: establishmentIdFromState }
             });
          } else {
             await itemService.update(id, payload);
             setSuccess(true);
+            toastService.success("Tapa guardada correctamente");
             setTimeout(() => setSuccess(false), 3000);
          }
       } catch (err) {
          setError('Error al guardar la tapa', err);
+         toastService.error("Error al guardar la tapa");
       } finally {
          setSaving(false);
       }

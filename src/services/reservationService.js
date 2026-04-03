@@ -15,6 +15,8 @@ export const reservationService = {
         time,
         guests: Number(guests),
         notes: notes?.trim() || "",
+      }, {
+        skipGlobalErrorToast: true,
       });
       return response.data;
     } catch (error) {
@@ -39,7 +41,9 @@ export const reservationService = {
   // PATCH /api/reservations/:id/cancel
   cancel: async (id) => {
     try {
-      const response = await api.patch(`/reservations/${id}/cancel`);
+      const response = await api.patch(`/reservations/${id}/cancel`, {}, {
+        skipGlobalErrorToast: true,
+      });
       return response.data;
     } catch (error) {
       console.error("Error al cancelar reserva:", error);
@@ -65,7 +69,9 @@ export const reservationService = {
   // PATCH /api/reservations/:id/confirm
   confirm: async (id) => {
     try {
-      const response = await api.patch(`/reservations/${id}/confirm`);
+      const response = await api.patch(`/reservations/${id}/confirm`, {}, {
+        skipGlobalErrorToast: true,
+      });
       return response.data;
     } catch (error) {
       console.error("Error al confirmar reserva:", error);
@@ -77,7 +83,9 @@ export const reservationService = {
   // PATCH /api/reservations/:id/reject
   reject: async (id, rejectionReason = "") => {
     try {
-      const response = await api.patch(`/reservations/${id}/reject`, { rejectionReason });
+      const response = await api.patch(`/reservations/${id}/reject`, { rejectionReason }, {
+        skipGlobalErrorToast: true,
+      });
       return response.data;
     } catch (error) {
       console.error("Error al rechazar reserva:", error);
@@ -91,6 +99,8 @@ export const reservationService = {
     try {
       const response = await api.patch(`/reservations/${id}/complete`, {
         totalAmount: Number(totalAmount),
+      }, {
+        skipGlobalErrorToast: true,
       });
       return response.data;
     } catch (error) {

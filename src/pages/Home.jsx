@@ -3,7 +3,6 @@
 
 import Header from "../components/layout/Header";
 import Container from "../components/layout/Container";
-import { Footer } from "../components/layout/Footer";
 
 import NearbySection from "../components/home/NearbySection";
 import { FeaturedSection } from "../components/home/FeaturedSection";
@@ -18,7 +17,6 @@ export const Home = () => {
             <FeaturedSection />
             <TopCities />
          </Container>
-         <Footer />
       </>
    );
 };

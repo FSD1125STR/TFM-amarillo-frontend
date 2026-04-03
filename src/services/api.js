@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toastService } from "./toastService";
 
 // const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const API_URL = "http://localhost:4000/api";
@@ -25,9 +26,16 @@ api.interceptors.response.use(
     const message =
       error.response?.data?.message ||
       error.message ||
-      "Error en la petición";
+      "Error en la peticion";
+    const hasResponse = Boolean(error.response);
+    const skipGlobalToast = Boolean(error.config?.skipGlobalErrorToast);
 
-    console.error("❌ Error en API:", {
+    // Caso 15: fallback global para errores no gestionados
+    if (!skipGlobalToast && !hasResponse) {
+      toastService.error(message || "Error inesperado de servidor");
+    }
+
+    console.error("Error en API:", {
       status: error.response?.status,
       message,
       url: error.config?.url,
