@@ -10,101 +10,128 @@ import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
 import { ItemAdmin } from "./pages/admin/ItemAdmin";
 import { HostItemEditor } from "./pages/host/HostItemEditor";
+
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
 import { HostRegisterPage } from "./pages/auth/HostRegisterPage";
 import { HostDashboard } from "./pages/host/HostDashboard";
 import { ProfilePage } from "./pages/profile/ProfilePage";
 import { ForbiddenPage } from "./pages/ForbiddenPage";
+import { SearchPage } from "./pages/SearchPage";
+
 import { PublicOnlyRoute } from "./components/routes/PublicOnlyRoute";
 import { AdminRoute } from "./components/routes/AdminRoute";
-import { SearchPage } from "./pages/SearchPage";
 import { HostRoute } from "./components/routes/HostRoute";
 import { PrivateRoute } from "./components/routes/ClientRoute";
+
+import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
+import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
+
 import { Footer } from "./components/layout/Footer";
 
 function AppLayout() {
-   const location = useLocation();
-   const hideFooter = location.pathname.startsWith("/admin");
-   const shellClassName = hideFooter
-      ? "min-h-screen"
-      : "min-h-screen public-shell-gradient";
+  const location = useLocation();
 
-   return (
-      <div className={shellClassName}>
-         <Routes>
-            {/* Rutas públicas */}
-            <Route path="/" element={<Home />} />
-            <Route path="/establishments" element={<AllEstablishment />} />
-            <Route path="/establishment/:slug" element={<Establishment />} />
-            <Route path="/items" element={<AllTapas />} />
-            <Route path="/items/:slug" element={<Tapas />} />
-            <Route path="/search" element={<SearchPage />} />
+  const hideFooter = location.pathname.startsWith("/admin");
+  const shellClassName = hideFooter
+    ? "min-h-screen"
+    : "min-h-screen public-shell-gradient";
 
-            {/* Auth: solo accesibles si NO estás logueado */}
-            <Route path="/login" element={
-               <PublicOnlyRoute>
-                  <LoginPage />
-               </PublicOnlyRoute>
-            } />
-            <Route path="/register" element={
-               <PublicOnlyRoute>
-                  <RegisterPage />
-               </PublicOnlyRoute>
-            } />
-            <Route path="/host/login" element={
-               <PublicOnlyRoute>
-                  <Navigate to="/login" replace />
-               </PublicOnlyRoute>
-            } />
-            <Route path="/host/register" element={
-               <PublicOnlyRoute>
-                  <HostRegisterPage />
-               </PublicOnlyRoute>
-            } />
+  return (
+    <div className={shellClassName}>
+      <Routes>
+        {/* Públicas */}
+        <Route path="/" element={<Home />} />
+        <Route path="/establishments" element={<AllEstablishment />} />
+        <Route path="/establishment/:slug" element={<Establishment />} />
+        <Route path="/items" element={<AllTapas />} />
+        <Route path="/items/:slug" element={<Tapas />} />
+        <Route path="/search" element={<SearchPage />} />
 
-            {/* Host */}
-            <Route path="/host/dashboard" element={
-               <HostRoute>
-                  <HostDashboard />
-               </HostRoute>
-            } />
-            <Route path="/host/items/:id" element={
-               <HostRoute>
-                  <HostItemEditor />
-               </HostRoute>
-            } />
+        {/* Auth */}
+        <Route path="/login" element={
+          <PublicOnlyRoute>
+            <LoginPage />
+          </PublicOnlyRoute>
+        } />
 
-            {/* Perfil — accesible para cualquier rol autenticado (PrivateRoute) */}
-            <Route path="/profile" element={
-               <PrivateRoute>
-                  <ProfilePage />
-               </PrivateRoute>
-            } />
+        <Route path="/register" element={
+          <PublicOnlyRoute>
+            <RegisterPage />
+          </PublicOnlyRoute>
+        } />
 
-            <Route path="/403" element={<ForbiddenPage />} />
+        <Route path="/host/login" element={
+          <PublicOnlyRoute>
+            <Navigate to="/login" replace />
+          </PublicOnlyRoute>
+        } />
 
-            {/* Admin — protegido por AdminRoute */}
-            <Route path="/admin" element={
-               <AdminRoute>
-                  <AdminPanel />
-               </AdminRoute>}            >
-               <Route index element={<Dashboard />} />
-               <Route path="establishments" element={<AdminEstablishments />} />
-               <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
-               <Route path="items/:id" element={<ItemAdmin />} />
-            </Route>
-         </Routes>
+        <Route path="/host/register" element={
+          <PublicOnlyRoute>
+            <HostRegisterPage />
+          </PublicOnlyRoute>
+        } />
 
-         {!hideFooter && <Footer />}
-      </div>
-   );
+        <Route path="/auth/verify" element={
+          <VerifyEmailPage />
+        } />
+
+        <Route path="/forgot-password" element={
+          <PublicOnlyRoute>
+            <ForgotPasswordPage />
+          </PublicOnlyRoute>
+        } />
+
+        <Route path="/auth/reset-password" element={
+          <PublicOnlyRoute>
+            <ResetPasswordPage />
+          </PublicOnlyRoute>
+        } />
+
+        {/* Host */}
+        <Route path="/host/dashboard" element={
+          <HostRoute>
+            <HostDashboard />
+          </HostRoute>
+        } />
+
+        <Route path="/host/items/:id" element={
+          <HostRoute>
+            <HostItemEditor />
+          </HostRoute>
+        } />
+
+        {/* Perfil */}
+        <Route path="/profile" element={
+          <PrivateRoute>
+            <ProfilePage />
+          </PrivateRoute>
+        } />
+
+        <Route path="/403" element={<ForbiddenPage />} />
+
+        {/* Admin */}
+        <Route path="/admin" element={
+          <AdminRoute>
+            <AdminPanel />
+          </AdminRoute>
+        }>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route index element={<Dashboard />} />
+          <Route path="establishments" element={<AdminEstablishments />} />
+          <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
+          <Route path="items/:id" element={<ItemAdmin />} />
+        </Route>
+      </Routes>
+
+      {!hideFooter && <Footer />}
+    </div>
+  );
 }
 
 export function App() {
-   return (
-      <BrowserRouter>
-         <AppLayout />
-      </BrowserRouter>
-   );
+  return <AppLayout />;
 }

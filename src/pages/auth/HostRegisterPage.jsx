@@ -1,3 +1,4 @@
+// src/pages/auth/HostRegisterPage.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -27,10 +28,12 @@ const primaryButtonStyle = {
 };
 
 export function HostRegisterPage() {
-  const navigate = useNavigate();
   const { register } = useAuth();
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -42,11 +45,12 @@ export function HostRegisterPage() {
     cif: "",
     businessAddress: "",
   });
+
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -80,11 +84,12 @@ export function HostRegisterPage() {
     return "";
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError("");
 
     const validationError = validateForm();
+
     if (validationError) {
       setError(validationError);
       toastService.error(validationError);
@@ -93,6 +98,7 @@ export function HostRegisterPage() {
 
     try {
       setSubmitting(true);
+
       const response = await register({
         role: "hostelero",
         name: form.name,
@@ -107,12 +113,18 @@ export function HostRegisterPage() {
       });
 
       const role = response?.data?.role;
+
       toastService.success("Registro de hostelero completado");
       navigate(getDefaultRouteByRole(role), { replace: true });
+
     } catch (err) {
-      const message = err?.response?.data?.message || "No se pudo completar el registro";
+      const message =
+        err?.response?.data?.message ||
+        "No se pudo completar el registro";
+
       setError(message);
       toastService.error(message);
+
     } finally {
       setSubmitting(false);
     }
@@ -120,7 +132,8 @@ export function HostRegisterPage() {
 
   return (
     <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
-      <div className="mx-auto w-full max-w-[430px]">
+      <div className="mx-auto w-full max-w-107.5">
+
         <Link
           to="/login"
           className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline"
@@ -129,216 +142,162 @@ export function HostRegisterPage() {
           Volver al login
         </Link>
 
-        <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">Registro hostelero</h1>
+        <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">
+          Registro hostelero
+        </h1>
+
         <p className="mb-6 mt-2 text-lg text-slate-400">
           Crea tu cuenta y prepara tu local para publicarlo
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+          {/* Nombre */}
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Nombre del responsable</span>
-            <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-              style={inputWrapStyle}
-            >
-              <User size={20} className="shrink-0 text-[#7787ab]" />
+            <span className="text-base font-semibold text-slate-300">
+              Nombre del responsable
+            </span>
+            <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25" style={inputWrapStyle}>
+              <User size={20} className="text-[#7787ab]" />
               <input
                 type="text"
                 name="name"
                 placeholder="Ej. Marta Ruiz"
                 value={form.name}
                 onChange={handleChange}
-                autoComplete="name"
-                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full bg-transparent text-lg text-slate-200 outline-none"
               />
             </span>
           </label>
 
+          {/* Email */}
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Email</span>
-            <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-              style={inputWrapStyle}
-            >
-              <Mail size={20} className="shrink-0 text-[#7787ab]" />
+            <span className="text-base font-semibold text-slate-300">
+              Email
+            </span>
+            <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5" style={inputWrapStyle}>
+              <Mail size={20} className="text-[#7787ab]" />
               <input
                 type="email"
                 name="email"
                 placeholder="responsable@local.com"
                 value={form.email}
                 onChange={handleChange}
-                autoComplete="email"
-                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full bg-transparent text-lg text-slate-200 outline-none"
               />
             </span>
           </label>
 
+          {/* Passwords */}
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+
             <label className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-slate-300">Contraseña</span>
-              <span
-                className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-                style={inputWrapStyle}
-              >
-                <Lock size={20} className="shrink-0 text-[#7787ab]" />
+              <span className="text-base font-semibold text-slate-300">
+                Contraseña
+              </span>
+              <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5" style={inputWrapStyle}>
+                <Lock size={20} />
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  placeholder="********"
                   value={form.password}
                   onChange={handleChange}
-                  autoComplete="new-password"
-                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                  className="auth-input w-full bg-transparent text-lg outline-none"
                 />
-                <button
-                  type="button"
-                  className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                >
+                <button type="button" onClick={() => setShowPassword((p) => !p)}>
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </span>
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-slate-300">Confirmar contraseña</span>
-              <span
-                className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-                style={inputWrapStyle}
-              >
-                <Lock size={20} className="shrink-0 text-[#7787ab]" />
+              <span className="text-base font-semibold text-slate-300">
+                Confirmar contraseña
+              </span>
+              <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5" style={inputWrapStyle}>
+                <Lock size={20} />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
-                  placeholder="********"
                   value={form.confirmPassword}
                   onChange={handleChange}
-                  autoComplete="new-password"
-                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                  className="auth-input w-full bg-transparent text-lg outline-none"
                 />
-                <button
-                  type="button"
-                  className="grid cursor-pointer place-items-center bg-transparent p-0 text-[#7a8cae]"
-                  onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                >
+                <button type="button" onClick={() => setShowConfirmPassword((p) => !p)}>
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </span>
             </label>
+
           </div>
 
+          {/* Negocio */}
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Nombre del local</span>
-            <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-              style={inputWrapStyle}
-            >
-              <Store size={20} className="shrink-0 text-[#7787ab]" />
+            <span className="text-base font-semibold text-slate-300">
+              Nombre del local
+            </span>
+            <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border px-3.5" style={inputWrapStyle}>
+              <Store size={20} />
               <input
                 type="text"
                 name="businessName"
-                placeholder="Ej. Taberna La Plaza"
                 value={form.businessName}
                 onChange={handleChange}
-                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
+                className="auth-input w-full bg-transparent text-lg outline-none"
               />
             </span>
           </label>
 
           <ImageDropInput
-            label="Imagen del local (logo, opcional)"
+            label="Logo (opcional)"
             value={form.businessLogo}
-            onChange={(nextValue) =>
-              setForm((prev) => ({
-                ...prev,
-                businessLogo: nextValue,
-              }))
-            }
-            uploadFolder="nextapa/host-register/logo"
-            helperText="Sube o arrastra una imagen para el logo del local."
+            onChange={(val) => setForm((p) => ({ ...p, businessLogo: val }))}
           />
 
+          {/* Teléfono + CIF */}
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-            <label className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-slate-300">Telefono</span>
-              <span
-                className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-                style={inputWrapStyle}
-              >
-                <Phone size={20} className="shrink-0 text-[#7787ab]" />
-                <input
-                  type="text"
-                  name="phone"
-                  placeholder="699123123"
-                  value={form.phone}
-                  onChange={handleChange}
-                  autoComplete="tel"
-                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
-                />
-              </span>
-            </label>
 
-            <label className="flex flex-col gap-2">
-              <span className="text-base font-semibold text-slate-300">CIF</span>
-              <span
-                className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-                style={inputWrapStyle}
-              >
-                <IdCard size={20} className="shrink-0 text-[#7787ab]" />
-                <input
-                  type="text"
-                  name="cif"
-                  placeholder="B12345678"
-                  value={form.cif}
-                  onChange={handleChange}
-                  className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
-                />
-              </span>
-            </label>
+            <input
+              type="text"
+              name="phone"
+              placeholder="Teléfono"
+              value={form.phone}
+              onChange={handleChange}
+              className="auth-input"
+            />
+
+            <input
+              type="text"
+              name="cif"
+              placeholder="CIF"
+              value={form.cif}
+              onChange={handleChange}
+              className="auth-input"
+            />
+
           </div>
 
-          <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">Direccion (opcional)</span>
-            <span
-              className="flex min-h-[60px] items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25"
-              style={inputWrapStyle}
-            >
-              <MapPin size={20} className="shrink-0 text-[#7787ab]" />
-              <input
-                type="text"
-                name="businessAddress"
-                placeholder="Calle, numero, ciudad"
-                value={form.businessAddress}
-                onChange={handleChange}
-                className="auth-input w-full border-0 bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]"
-              />
-            </span>
-          </label>
+          {/* Dirección */}
+          <input
+            type="text"
+            name="businessAddress"
+            placeholder="Dirección (opcional)"
+            value={form.businessAddress}
+            onChange={handleChange}
+            className="auth-input"
+          />
 
-          <p className="m-0 text-sm text-slate-400">
-            Tras registrarte, te llevamos al dashboard de hostelero para completar el local.
-          </p>
-
-          {error && <p className="m-0 text-sm text-rose-300">{error}</p>}
+          {error && <p className="text-rose-300">{error}</p>}
 
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex min-h-16 items-center justify-center gap-2 rounded-2xl border-0 text-2xl font-bold tracking-tight text-white transition active:translate-y-[2px] disabled:cursor-not-allowed disabled:opacity-75 sm:text-3xl"
             style={primaryButtonStyle}
+            className="rounded-2xl py-4 text-xl font-bold"
           >
-            {submitting ? "Creando cuenta..." : "Crear cuenta"}
+            {submitting ? "Creando..." : "Crear cuenta"}
           </button>
         </form>
-
-        <p className="mb-0 mt-5 text-center text-lg text-slate-400">
-          ¿Ya tienes cuenta?{" "}
-          <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
-            Inicia sesión
-          </Link>
-        </p>
       </div>
     </section>
   );
