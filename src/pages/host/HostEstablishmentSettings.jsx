@@ -43,6 +43,15 @@ import {
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 mapboxgl.accessToken = MAPBOX_TOKEN;
+const mapboxEventsDescriptor = mapboxgl.config
+  ? Object.getOwnPropertyDescriptor(mapboxgl.config, "EVENTS_URL")
+  : null;
+if (mapboxEventsDescriptor?.configurable) {
+  Object.defineProperty(mapboxgl.config, "EVENTS_URL", {
+    value: null,
+    configurable: true,
+  });
+}
 
 const ESTABLISHMENT_TYPES = [
   "bar",
@@ -358,6 +367,7 @@ function HostMapPickerSection({ coordinates, onChange, onAddressChange }) {
       style: "mapbox://styles/mapbox/streets-v12",
       center: [lng, lat],
       zoom: 17,
+      performanceMetricsCollection: false,
     });
 
     markerRef.current = new mapboxgl.Marker({ draggable: true, color: "#f77827" })
@@ -1065,29 +1075,28 @@ function HostItemsSection({ establishmentId, itemEditorBasePath = "/host/items" 
           No hay tapas registradas para este establecimiento.
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[#243247] bg-[#0b121a]">
-          <table className="min-w-[720px] w-full border-collapse text-sm">
-            <thead className="border-b border-[#243247] bg-[#131d2a]">
-              <tr>
-                <th className="w-8 px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400" />
-                <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Nombre</th>
-                <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Opciones</th>
-                <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Disponible</th>
-                <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Destacada</th>
-                <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Acciones</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={items.map((item) => item._id)}
-                  strategy={verticalListSortingStrategy}
-                >
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={items.map((item) => item._id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="overflow-x-auto rounded-xl border border-[#243247] bg-[#0b121a]">
+              <table className="min-w-[720px] w-full border-collapse text-sm">
+                <thead className="border-b border-[#243247] bg-[#131d2a]">
+                  <tr>
+                    <th className="w-8 px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400" />
+                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Nombre</th>
+                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Opciones</th>
+                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Disponible</th>
+                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Destacada</th>
+                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
                   {items.map((item) => (
                     <HostSortableItemRow
                       key={item._id}
@@ -1098,11 +1107,11 @@ function HostItemsSection({ establishmentId, itemEditorBasePath = "/host/items" 
                       onEdit={(id) => navigate(`${itemEditorPrefix}/${id}`)}
                     />
                   ))}
-                </SortableContext>
-              </DndContext>
-            </tbody>
-          </table>
-        </div>
+                </tbody>
+              </table>
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </HostCard>
   );
