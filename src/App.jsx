@@ -27,6 +27,7 @@ import { PrivateRoute } from "./components/routes/ClientRoute";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
+import { AboutPage } from "./pages/AboutPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 
 import { Footer } from "./components/layout/Footer";
@@ -49,6 +50,7 @@ function AppLayout() {
         <Route path="/items" element={<AllTapas />} />
         <Route path="/items/:slug" element={<Tapas />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/nosotros" element={<AboutPage />} />
 
         {/* Auth */}
         <Route path="/login" element={
