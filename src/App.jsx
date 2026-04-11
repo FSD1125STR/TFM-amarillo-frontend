@@ -27,6 +27,7 @@ import { PrivateRoute } from "./components/routes/ClientRoute";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 import { Footer } from "./components/layout/Footer";
 
@@ -125,6 +126,8 @@ function AppLayout() {
           <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
           <Route path="items/:id" element={<ItemAdmin />} />
         </Route>
+
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {!hideFooter && <Footer />}
