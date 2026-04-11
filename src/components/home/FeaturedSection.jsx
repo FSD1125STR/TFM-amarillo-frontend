@@ -5,15 +5,22 @@ import { itemService } from "../../services/itemService";
 import { cloudinaryPresets } from "../../utils/cloudinaryHelpers.js";
 
 const DEFAULT_IMAGE = "/Logo.png";
+const SCROLL_STEP = 220;
+const CONTINUOUS_SCROLL_PX_PER_SECOND = 28;
 
-export const FeaturedSection = () => {
+export const FeaturedSection = ({ className = "" }) => {
    const [featuredItems, setFeaturedItems] = useState([]);
    const [loading, setLoading] = useState(true);
    const [error, setError] = useState(null);
    const [canLeft, setCanLeft] = useState(false);
    const [canRight, setCanRight] = useState(true);
+   const [isAutoplayPaused, setIsAutoplayPaused] = useState(false);
+   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
    const scrollRef = useRef(null);
+   const animationFrameRef = useRef(null);
+   const lastTimestampRef = useRef(0);
+   const scrollCarryRef = useRef(0);
    const navigate = useNavigate();
 
    useEffect(() => {
@@ -60,12 +67,70 @@ export const FeaturedSection = () => {
    }, [featuredItems]);
 
    const scroll = (direction) => {
-      scrollRef.current?.scrollBy({ left: direction * 220, behavior: "smooth" });
+      scrollRef.current?.scrollBy({ left: direction * SCROLL_STEP, behavior: "smooth" });
    };
+
+   useEffect(() => {
+      const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const syncPreference = () => {
+         setPrefersReducedMotion(mediaQuery.matches);
+      };
+
+      syncPreference();
+      mediaQuery.addEventListener("change", syncPreference);
+
+      return () => {
+         mediaQuery.removeEventListener("change", syncPreference);
+      };
+   }, []);
+
+   useEffect(() => {
+      const el = scrollRef.current;
+      if (!el || featuredItems.length <= 1 || isAutoplayPaused || prefersReducedMotion) {
+         return;
+      }
+
+      const loopPoint = el.scrollWidth / 2;
+
+      const animate = (timestamp) => {
+         if (!lastTimestampRef.current) {
+            lastTimestampRef.current = timestamp;
+         }
+
+         const elapsedMs = timestamp - lastTimestampRef.current;
+         lastTimestampRef.current = timestamp;
+
+         const nextOffset = (CONTINUOUS_SCROLL_PX_PER_SECOND * elapsedMs) / 1000;
+         const totalOffset = nextOffset + scrollCarryRef.current;
+         const appliedOffset = Math.floor(totalOffset);
+         scrollCarryRef.current = totalOffset - appliedOffset;
+
+         if (appliedOffset > 0) {
+            el.scrollLeft += appliedOffset;
+         }
+
+         if (el.scrollLeft >= loopPoint) {
+            el.scrollLeft -= loopPoint;
+         }
+
+         animationFrameRef.current = window.requestAnimationFrame(animate);
+      };
+
+      animationFrameRef.current = window.requestAnimationFrame(animate);
+
+      return () => {
+         if (animationFrameRef.current) {
+            window.cancelAnimationFrame(animationFrameRef.current);
+         }
+         animationFrameRef.current = null;
+         lastTimestampRef.current = 0;
+         scrollCarryRef.current = 0;
+      };
+   }, [featuredItems.length, isAutoplayPaused, prefersReducedMotion]);
 
    if (loading) {
       return (
-         <section id="home-featured" className="mt-8 px-4">
+         <section id="home-featured" className={`mt-8 px-4 ${className}`}>
             <div className="mb-3 flex items-center justify-between">
                <h2 className="text-lg font-semibold">Tapas mejor valoradas</h2>
             </div>
@@ -80,7 +145,7 @@ export const FeaturedSection = () => {
 
    if (error) {
       return (
-         <section id="home-featured" className="mt-8 px-4">
+         <section id="home-featured" className={`mt-8 px-4 ${className}`}>
             <p className="text-center text-sm text-red-400">{error}</p>
          </section>
       );
@@ -91,7 +156,7 @@ export const FeaturedSection = () => {
    }
 
    return (
-      <section id="home-featured" className="mt-8 px-4">
+      <section id="home-featured" className={`mt-8 px-4 ${className}`}>
          <div className="mb-3 flex items-center justify-between">
             <div>
                <h2 className="text-lg font-semibold text-white">Tapas mejor valoradas</h2>
@@ -107,7 +172,13 @@ export const FeaturedSection = () => {
             </button>
          </div>
 
-         <div className="group relative">
+         <div
+            className="group relative"
+            onMouseEnter={() => setIsAutoplayPaused(true)}
+            onMouseLeave={() => setIsAutoplayPaused(false)}
+            onTouchStart={() => setIsAutoplayPaused(true)}
+            onTouchEnd={() => setIsAutoplayPaused(false)}
+         >
             {canLeft && (
                <button
                   type="button"
@@ -132,9 +203,9 @@ export const FeaturedSection = () => {
 
             <div
                ref={scrollRef}
-               className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+               className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             >
-               {featuredItems.map((item, index) => {
+               {[...featuredItems, ...featuredItems].map((item, index) => {
                   const unavailable =
                      item.available === false ||
                      item.servedToday === false ||
@@ -149,10 +220,10 @@ export const FeaturedSection = () => {
 
                   return (
                      <button
-                        key={item._id || index}
+                        key={`${item._id || index}-${index}`}
                         type="button"
                         onClick={() => navigate(`/items/${item.slug}`)}
-                        className="group/card w-40 flex-none snap-start overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900 text-left transition-all duration-200 hover:border-orange-500/40"
+                        className="group/card w-40 flex-none overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/75 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/40 hover:shadow-[0_14px_28px_rgba(0,0,0,0.34)]"
                      >
                         <div className="relative overflow-hidden">
                            <img

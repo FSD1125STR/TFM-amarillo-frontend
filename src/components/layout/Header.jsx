@@ -40,7 +40,7 @@ export default function Header({ showSearch = true }) {
    };
 
    return (
-      <header className="mx-auto max-w-3xl bg-transparent px-4 pb-3 pt-4">
+      <header className="mx-auto max-w-5xl bg-transparent px-4 pb-3 pt-4">
          <div className={`flex items-center justify-between ${showSearch ? "mb-3" : "mb-0"}`}>
             <Link to="/" className="flex items-center gap-2.5 no-underline">
                <img

@@ -1,12 +1,12 @@
 import { ArrowRight, Store } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-export default function HostCTA() {
+export default function HostCTA({ className = "" }) {
    const navigate = useNavigate();
 
    return (
-      <section className="mt-8 px-4 pb-6" aria-labelledby="home-host-cta">
-         <div className="relative overflow-hidden rounded-3xl border border-orange-500/25 bg-linear-to-br from-[#25140b] via-[#1b120d] to-[#0f0f0f] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.4)]">
+      <section className={`mt-8 px-4 pb-6 ${className}`} aria-labelledby="home-host-cta">
+         <div className="relative overflow-hidden rounded-3xl border border-orange-500/25 bg-linear-to-br from-[#25140b] via-[#1b120d] to-[#0f0f0f] p-5 shadow-[0_18px_40px_rgba(0,0,0,0.35)] transition-all duration-200 hover:border-orange-500/45">
             <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-orange-500/15 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-14 left-8 h-24 w-24 rounded-full bg-orange-400/10 blur-2xl" />
 
@@ -26,7 +26,7 @@ export default function HostCTA() {
                <button
                   type="button"
                   onClick={() => navigate("/host/register")}
-                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+                  className="mt-5 inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-orange-600 hover:shadow-[0_12px_26px_rgba(249,115,22,0.28)]"
                >
                   Crear mi establecimiento
                   <ArrowRight size={16} />

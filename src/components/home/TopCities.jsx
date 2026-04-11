@@ -1,40 +1,59 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const CITIES = [
    {
       name: "Madrid",
-      img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=700&q=80",
+      img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=900&q=80",
       subtitle: "Mucho tapeo"
    },
    {
       name: "Barcelona",
-      img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=700&q=80",
+      img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=900&q=80",
       subtitle: "Plan urbano"
    },
    {
       name: "Sevilla",
-      img: "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?w=700&q=80",
+      img: "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?w=900&q=80",
       subtitle: "Centro histórico"
    },
    {
       name: "Valencia",
-      img: "https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=700&q=80",
+      img: "https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=900&q=80",
       subtitle: "Sabor mediterráneo"
    },
    {
       name: "Granada",
-      img: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=700&q=80",
+      img: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=900&q=80",
       subtitle: "Tapas con encanto"
    },
    {
       name: "Málaga",
-      img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=700&q=80",
+      img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=900&q=80",
       subtitle: "Sol y barra"
    }
 ];
 
-export default function TopCities({ onCitySelect }) {
+const CityCard = ({ city, onClick, className = "", titleClassName = "text-base" }) => (
+   <button
+      type="button"
+      onClick={onClick}
+      className={`group/card relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/65 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-500/40 hover:shadow-[0_14px_28px_rgba(0,0,0,0.34)] ${className}`}
+   >
+      <img
+         src={city.img}
+         alt={city.name}
+         className="h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105"
+      />
+      <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent" />
+      <div className="absolute bottom-3 left-3 right-3">
+         <p className={`font-bold text-white ${titleClassName}`}>{city.name}</p>
+         <p className="text-xs text-neutral-300">{city.subtitle}</p>
+      </div>
+   </button>
+);
+
+export default function TopCities({ onCitySelect, className = "" }) {
    const scrollRef = useRef(null);
    const [canLeft, setCanLeft] = useState(false);
    const [canRight, setCanRight] = useState(true);
@@ -70,7 +89,7 @@ export default function TopCities({ onCitySelect }) {
    };
 
    return (
-      <section id="home-cities" className="mt-8 px-4">
+      <section id="home-cities" className={`mt-8 px-4 ${className}`}>
          <div className="mb-3 flex items-center justify-between">
             <div>
                <h2 className="text-lg font-semibold text-white">Explora ciudades</h2>
@@ -78,7 +97,19 @@ export default function TopCities({ onCitySelect }) {
             </div>
          </div>
 
-         <div className="group relative">
+         <div className="hidden auto-rows-[104px] grid-cols-3 gap-3 lg:grid">
+            {CITIES.map((city, index) => (
+               <CityCard
+                  key={city.name}
+                  city={city}
+                  onClick={() => onCitySelect?.(city.name)}
+                  className={index === 0 ? "col-span-2 row-span-2" : ""}
+                  titleClassName={index === 0 ? "text-2xl" : "text-lg"}
+               />
+            ))}
+         </div>
+
+         <div className="group relative lg:hidden">
             {canLeft && (
                <button
                   type="button"
@@ -106,23 +137,12 @@ export default function TopCities({ onCitySelect }) {
                className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             >
                {CITIES.map((city) => (
-                  <button
+                  <CityCard
                      key={city.name}
-                     type="button"
+                     city={city}
                      onClick={() => onCitySelect?.(city.name)}
-                     className="group/card relative h-28 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border border-neutral-800 text-left"
-                  >
-                     <img
-                        src={city.img}
-                        alt={city.name}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover/card:scale-105"
-                     />
-                     <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/25 to-transparent" />
-                     <div className="absolute bottom-3 left-3 right-3">
-                        <p className="text-base font-bold text-white">{city.name}</p>
-                        <p className="text-xs text-neutral-300">{city.subtitle}</p>
-                     </div>
-                  </button>
+                     className="h-28 w-48 shrink-0 snap-start"
+                  />
                ))}
             </div>
          </div>

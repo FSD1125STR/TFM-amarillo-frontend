@@ -106,7 +106,7 @@ export function LoginPage() {
               <input
                 type="email"
                 name="email"
-                placeholder="tu@email.com"
+                placeholder= "Ingresa tu correo electrónico"
                 value={form.email}
                 onChange={handleChange}
                 className="auth-input w-full bg-transparent outline-none"
@@ -130,6 +130,7 @@ export function LoginPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
+                placeholder="Ingresa tu contraseña"
                 value={form.password}
                 onChange={handleChange}
                 className="auth-input w-full bg-transparent outline-none"
