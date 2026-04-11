@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-
    CircleUserRound,
    ChevronDown,
    LogOut,
@@ -11,7 +10,7 @@ import { getAccountRouteByRole } from "../../utils/authRedirect";
 import { SearchDropdown } from "../search/SearchDropdown";
 import { toastService } from "../../services/toastService";
 
-export default function Header() {
+export default function Header({ showSearch = true }) {
    const navigate = useNavigate();
    const { isAuthenticated, user, logout } = useAuth();
    const [menuOpen, setMenuOpen] = useState(false);
@@ -41,21 +40,25 @@ export default function Header() {
    };
 
    return (
-      <header className="bg-transparent border-b border-neutral-800/60 px-4 pt-5 pb-4 max-w-3xl mx-auto">
-         <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2.5">
-               <img src="/Logo.png" alt="Logo de nexTapa" className="h-20 w-20 object-contain drop-shadow-[0_0_20px_rgba(255,105,0,0.6)]" />
-               <h1 className="text-3xl font-black tracking-tight leading-none text-white">
+      <header className="mx-auto max-w-3xl bg-transparent px-4 pb-3 pt-4">
+         <div className={`flex items-center justify-between ${showSearch ? "mb-3" : "mb-0"}`}>
+            <Link to="/" className="flex items-center gap-2.5 no-underline">
+               <img
+                  src="/Logo.png"
+                  alt="Logo de nexTapa"
+                  className="h-12 w-12 object-contain drop-shadow-[0_0_16px_rgba(255,105,0,0.5)]"
+               />
+               <h1 className="text-2xl font-black tracking-tight leading-none text-white">
                   nex<span className="text-[#ff6900]">Tapa</span>
                </h1>
-            </div>
+            </Link>
 
             {!isAuthenticated ? (
                <Link
                   to="/login"
-                  className="flex items-center gap-2 px-5 py-2 rounded-full bg-orange-500 hover:bg-orange-600 transition-colors text-sm font-semibold text-white no-underline"
+                  className="flex items-center gap-1.5 rounded-full border border-orange-400/30 bg-orange-500/85 px-4 py-2 text-xs font-semibold text-white no-underline transition-colors hover:bg-orange-600"
                >
-                  <CircleUserRound className="w-4 h-4" />
+                  <CircleUserRound className="h-4 w-4" />
                   Login
                </Link>
             ) : (
@@ -63,15 +66,11 @@ export default function Header() {
                   <button
                      type="button"
                      onClick={() => setMenuOpen((prev) => !prev)}
-                     className="flex items-center gap-2 rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-600"
+                     className="flex items-center gap-2 rounded-full border border-orange-400/20 bg-orange-500 px-3.5 py-2 text-xs font-semibold text-white transition-colors hover:bg-orange-600"
                   >
                      <CircleUserRound className="h-4 w-4" />
-                     <span className="max-w-27.5 truncate">
-                        {user?.name || "Cuenta"}
-                     </span>
-                     <ChevronDown
-                        className={`h-4 w-4 transition-transform ${menuOpen ? "rotate-180" : ""}`}
-                     />
+                     <span className="max-w-24 truncate">{user?.name || "Cuenta"}</span>
+                     <ChevronDown className={`h-4 w-4 transition-transform ${menuOpen ? "rotate-180" : ""}`} />
                   </button>
 
                   {menuOpen && (
@@ -106,7 +105,7 @@ export default function Header() {
             )}
          </div>
 
-         <SearchDropdown placeholder="Tu próxima tapa aquí..." />
+         {showSearch && <SearchDropdown placeholder="Tu próxima tapa aquí..." />}
       </header>
    );
 }

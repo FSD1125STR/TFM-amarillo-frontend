@@ -1,17 +1,25 @@
-
-
-// src/components/home/NearbySection.jsx
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight, MapPinOff, Navigation } from "lucide-react";
 import Badge from "../common/Badge";
 import { establishmentService } from "../../services/establishmentService";
 import { useGeolocation } from "../../hooks/useGeolocation";
 import { cloudinaryPresets } from "../../utils/cloudinaryHelpers.js";
-import { CircleChevronLeft, CircleChevronRight, MapPinOff } from "lucide-react";
+
+const formatDistance = (distance) => {
+   if (typeof distance !== "number") {
+      return null;
+   }
+
+   return distance < 1000
+      ? `${Math.round(distance)} m`
+      : `${(distance / 1000).toFixed(1)} km`;
+};
 
 export default function NearbySection() {
    const navigate = useNavigate();
    const { coords, loading: geoLoading, error: geoError, clearCache } = useGeolocation();
+
    const [establishments, setEstablishments] = useState([]);
    const [currentIndex, setCurrentIndex] = useState(0);
    const [loading, setLoading] = useState(false);
@@ -20,7 +28,11 @@ export default function NearbySection() {
    const loadNearby = useCallback(async (location) => {
       setLoading(true);
       try {
-         const response = await establishmentService.getNearby({ lat: location.lat, lng: location.lng });
+         const response = await establishmentService.getNearby({
+            lat: location.lat,
+            lng: location.lng,
+            limit: 10
+         });
          setEstablishments(response.data || []);
          setUsingFallback(false);
       } catch (error) {
@@ -44,30 +56,67 @@ export default function NearbySection() {
    }, []);
 
    useEffect(() => {
-      if (geoLoading) {return;}
-      if (coords) {loadNearby(coords);}
-      else {loadFallback();}
+      if (geoLoading) {
+         return;
+      }
+
+      if (coords) {
+         loadNearby(coords);
+      } else {
+         loadFallback();
+      }
    }, [coords, geoLoading, loadNearby, loadFallback]);
 
-   const nextSlide = () => setCurrentIndex((prev) => prev === establishments.length - 1 ? 0 : prev + 1);
-   const prevSlide = () => setCurrentIndex((prev) => prev === 0 ? establishments.length - 1 : prev - 1);
+   useEffect(() => {
+      if (currentIndex > establishments.length - 1) {
+         setCurrentIndex(0);
+      }
+   }, [currentIndex, establishments.length]);
+
+   const nextSlide = () => {
+      setCurrentIndex((prev) => {
+         if (prev === establishments.length - 1) {
+            return 0;
+         }
+         return prev + 1;
+      });
+   };
+
+   const prevSlide = () => {
+      setCurrentIndex((prev) => {
+         if (prev === 0) {
+            return establishments.length - 1;
+         }
+         return prev - 1;
+      });
+   };
+
+   const mainEstablishment = establishments[currentIndex];
+
+   const secondaryCards = useMemo(
+      () => establishments
+         .map((establishment, index) => ({ establishment, index }))
+         .filter(({ index }) => index !== currentIndex)
+         .slice(0, 2),
+      [currentIndex, establishments]
+   );
 
    if (geoLoading || (loading && establishments.length === 0)) {
       return (
-         <section className="px-4 mt-8">
-            <h2 className="text-lg font-semibold mb-4">Establecimientos cercanos</h2>
-            <div className="bg-neutral-900 rounded-2xl h-72 animate-pulse flex items-center justify-center">
-               <span className="text-neutral-500 text-sm">Buscando locales cerca de ti...</span>
+         <section id="home-nearby" className="mt-8 px-4">
+            <div className="mb-4 flex items-center justify-between">
+               <h2 className="text-lg font-semibold">Cerca de ti</h2>
             </div>
+            <div className="h-64 animate-pulse rounded-3xl border border-neutral-800 bg-neutral-900" />
          </section>
       );
    }
 
    if (!loading && establishments.length === 0) {
       return (
-         <section className="px-4 mt-8">
-            <h2 className="text-lg font-semibold mb-4">Establecimientos cercanos</h2>
-            <div className="bg-neutral-900 rounded-2xl p-8 text-center border border-neutral-800">
+         <section id="home-nearby" className="mt-8 px-4">
+            <h2 className="mb-4 text-lg font-semibold">Cerca de ti</h2>
+            <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-6 text-center">
                <p className="text-sm text-neutral-400">No hemos encontrado establecimientos disponibles.</p>
             </div>
          </section>
@@ -75,123 +124,158 @@ export default function NearbySection() {
    }
 
    return (
-      <section className="px-4 mt-8">
-         <div className="flex justify-between items-center mb-4">
+      <section id="home-nearby" className="mt-8 px-4">
+         <div className="mb-4 flex items-start justify-between gap-3">
             <div>
-               <h2 className="text-lg font-semibold">
-                  {usingFallback ? "Establecimientos destacados" : "Establecimientos cercanos"}
+               <h2 className="text-lg font-semibold text-white">
+                  {usingFallback ? "Establecimientos destacados" : "Cerca de ti"}
                </h2>
                {usingFallback && geoError && (
-                  <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="mt-1 flex items-center gap-1.5">
                      <MapPinOff size={11} className="text-neutral-500" />
                      <span className="text-[11px] text-neutral-500">Ubicación no disponible</span>
                      <button
-                        onClick={() => { clearCache(); window.location.reload(); }}
-                        className="text-[11px] text-orange-500 hover:text-orange-400 underline transition-colors"
+                        type="button"
+                        onClick={() => {
+                           clearCache();
+                           window.location.reload();
+                        }}
+                        className="text-[11px] text-orange-500 underline transition-colors hover:text-orange-400"
                      >
                         Activar
                      </button>
                   </div>
                )}
             </div>
+
             <button
+               type="button"
                onClick={() => navigate("/establishments")}
-               className="text-orange-400 text-sm font-medium hover:text-orange-500 transition-colors"
+               className="text-sm font-semibold text-orange-400 transition-colors hover:text-orange-300"
             >
                Ver todos
             </button>
          </div>
 
-         <div className="relative w-full overflow-hidden group">
-            <div
-               className="flex transition-transform duration-500 ease-out"
-               style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
-               {establishments.map((establishment) => {
-                  const isOpen = establishment.isOpen === true;
+         {mainEstablishment && (
+            <div className="relative overflow-hidden rounded-3xl border border-neutral-800 bg-neutral-900 shadow-[0_16px_38px_rgba(0,0,0,0.35)]">
+               <button
+                  type="button"
+                  onClick={() => navigate(`/establishment/${mainEstablishment.slug}`, {
+                     state: { distance: mainEstablishment.distance }
+                  })}
+                  className={`relative block w-full text-left ${mainEstablishment.isOpen ? "" : "opacity-75"}`}
+               >
+                  {!mainEstablishment.isOpen && (
+                     <span className="absolute left-3 top-3 z-20 rounded-full border border-neutral-600 bg-black/70 px-3 py-1 text-xs font-bold text-white">
+                        Cerrado
+                     </span>
+                  )}
 
-                  return (
-                     <div key={establishment._id} className="w-full shrink-0">
-                        <div
-                           onClick={() => navigate(`/establishment/${establishment.slug}`, {
-                              state: { distance: establishment.distance }
-                           })}
-                           className={`bg-neutral-900 rounded-2xl overflow-hidden cursor-pointer hover:ring-1 ring-orange-500/50 transition-all duration-300 shadow-xl relative ${
-                              !isOpen ? "opacity-60" : ""
-                           }`}
-                        >
-                           {!isOpen && (
-                              <div className="absolute top-3 left-3 z-10">
-                                 <span className="bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full border border-neutral-600 backdrop-blur-sm">
-                                    Cerrado
-                                 </span>
-                              </div>
-                           )}
+                  <img
+                     src={cloudinaryPresets.card(mainEstablishment.mainImage || "/Logo.png")}
+                     alt={mainEstablishment.name}
+                     className="h-60 w-full object-cover"
+                     onError={(event) => {
+                        event.target.onerror = null;
+                        event.target.src = "/Logo.png";
+                     }}
+                  />
 
-                           {/* IMAGEN — card: 600×400 fill — slider ocupa ancho completo pero h-56, no necesita más */}
-                           <div className="relative">
-                              <img
-                                 src={cloudinaryPresets.card(establishment.mainImage || "/Logo.png")}
-                                 alt={establishment.name}
-                                 className="h-56 w-full object-cover"
-                                 onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }}
-                              />
-                              <div className="absolute top-3 right-3">
-                                 <Badge className="bg-black/60 backdrop-blur-md border-none">
-                                    {Number(establishment.averageRating || 0).toFixed(1)}
-                                 </Badge>
-                              </div>
-                           </div>
+                  <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-transparent" />
+                  <div className="absolute right-3 top-3">
+                     <Badge className="border-none bg-black/60 backdrop-blur-sm">
+                        {Number(mainEstablishment.averageRating || 0).toFixed(1)}
+                     </Badge>
+                  </div>
 
-                           <div className="p-4 space-y-1">
-                              <h3 className="font-bold text-lg truncate text-white">{establishment.name}</h3>
-                              <div className="flex justify-between items-center">
-                                 <p className="text-sm text-neutral-400">
-                                    {establishment.cuisineType?.[0] || "Restaurante"}
-                                 </p>
-                                 {typeof establishment.distance === "number" && (
-                                    <p className="text-sm font-semibold text-orange-400 bg-orange-400/10 px-2 py-0.5 rounded-lg">
-                                       {establishment.distance < 1000
-                                          ? `${Math.round(establishment.distance)} m`
-                                          : `${(establishment.distance / 1000).toFixed(1)} km`}
-                                    </p>
-                                 )}
-                              </div>
-                           </div>
-                        </div>
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                     <h3 className="text-xl font-bold text-white">{mainEstablishment.name}</h3>
+                     <div className="mt-2 flex items-center justify-between gap-2">
+                        <p className="text-sm text-neutral-200">
+                           {mainEstablishment.cuisineType?.[0] || "Restaurante"}
+                        </p>
+                        {formatDistance(mainEstablishment.distance) && (
+                           <span className="rounded-lg bg-orange-500/20 px-2 py-1 text-xs font-semibold text-orange-300">
+                              {formatDistance(mainEstablishment.distance)}
+                           </span>
+                        )}
                      </div>
-                  );
-               })}
-            </div>
+                  </div>
+               </button>
 
-            {establishments.length > 1 && (
-               <>
-                  <button
-                     onClick={prevSlide}
-                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 backdrop-blur-sm hover:bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                  >
-                     <CircleChevronLeft size={24} />
-                  </button>
-                  <button
-                     onClick={nextSlide}
-                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 backdrop-blur-sm hover:bg-orange-500 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
-                  >
-                     <CircleChevronRight size={24} />
-                  </button>
-               </>
-            )}
-         </div>
+               {establishments.length > 1 && (
+                  <>
+                     <button
+                        type="button"
+                        onClick={prevSlide}
+                        className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-neutral-700 bg-neutral-800 p-1.5 text-neutral-300 transition-all duration-200 hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+                        aria-label="Anterior"
+                     >
+                        <ChevronLeft size={16} />
+                     </button>
+                     <button
+                        type="button"
+                        onClick={nextSlide}
+                        className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full border border-neutral-700 bg-neutral-800 p-1.5 text-neutral-300 transition-all duration-200 hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+                        aria-label="Siguiente"
+                     >
+                        <ChevronRight size={16} />
+                     </button>
+                  </>
+               )}
+            </div>
+         )}
 
          {establishments.length > 1 && (
-            <div className="flex justify-center mt-4 gap-1.5">
-               {establishments.map((_, index) => (
-                  <div
-                     key={index}
+            <div className="mt-4 flex justify-center gap-1.5">
+               {establishments.map((establishment, index) => (
+                  <button
+                     key={`${establishment._id}-${index}`}
+                     type="button"
                      onClick={() => setCurrentIndex(index)}
-                     className={`h-1.5 rounded-full cursor-pointer transition-all duration-300 ${
-                        index === currentIndex ? "bg-orange-500 w-6" : "bg-neutral-700 w-1.5"
+                     className={`h-1.5 rounded-full transition-all duration-300 ${
+                        index === currentIndex ? "w-6 bg-orange-500" : "w-1.5 bg-neutral-700"
                      }`}
+                     aria-label={`Ir al establecimiento ${index + 1}`}
                   />
+               ))}
+            </div>
+         )}
+
+         {secondaryCards.length > 0 && (
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+               {secondaryCards.map(({ establishment, index }) => (
+                  <button
+                     key={establishment._id}
+                     type="button"
+                     onClick={() => setCurrentIndex(index)}
+                     className="flex items-center gap-3 rounded-2xl border border-neutral-800 bg-neutral-900/80 p-2.5 text-left transition-all duration-200 hover:border-orange-500/50"
+                  >
+                     <img
+                        src={cloudinaryPresets.tapaCard(establishment.mainImage || "/Logo.png")}
+                        alt={establishment.name}
+                        className="h-16 w-24 rounded-xl object-cover"
+                        onError={(event) => {
+                           event.target.onerror = null;
+                           event.target.src = "/Logo.png";
+                        }}
+                     />
+
+                     <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-white">{establishment.name}</p>
+                        <p className="mt-0.5 truncate text-xs text-neutral-400">
+                           {establishment.cuisineType?.[0] || "Restaurante"}
+                        </p>
+                        <div className="mt-2 flex items-center gap-2 text-[11px] text-neutral-500">
+                           <span className="inline-flex items-center gap-1 text-orange-300">
+                              <Navigation size={11} />
+                              {formatDistance(establishment.distance) || "Sin distancia"}
+                           </span>
+                           <span>{Number(establishment.averageRating || 0).toFixed(1)}</span>
+                        </div>
+                     </div>
+                  </button>
                ))}
             </div>
          )}

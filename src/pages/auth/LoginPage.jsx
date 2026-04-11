@@ -160,23 +160,6 @@ export function LoginPage() {
           </Link>
         </p>
 
-        {/* Hosteleros */}
-        <Link
-          to="/host/login"
-          className="mt-5 flex items-center justify-between rounded-2xl border border-[#f77827]/45 bg-[#722d12]/50 p-4"
-        >
-          <div className="flex items-center gap-3">
-            <Store size={22} className="text-[#f77827]" />
-            <div>
-              <p className="font-bold">¿Eres hostelero?</p>
-              <p className="text-sm text-slate-400">
-                Gestiona tu local
-              </p>
-            </div>
-          </div>
-          <span className="text-[#f77827]">›</span>
-        </Link>
-
       </div>
     </section>
   );
