@@ -1,25 +1,25 @@
 // src/pages/profile/ProfilePage.jsx
 import { useEffect, useState } from "react";
 import {
-  AtSign,
-  Mail,
-  Phone,
-  Save,
-  UserRound,
-  Ticket,
-  CheckCircle2,
-  Clock3,
-  XCircle,
-  Sparkles,
+  AtSign, Camera, Mail, Phone, Save, UserRound,
+  Ticket, CheckCircle2, Clock3, XCircle, Sparkles,
   Trash2,
 } from "lucide-react";
 import Header from "../../components/layout/Header";
-import { ImageDropInput } from "../../components/common/ImageDropInput";
+import { Footer } from "../../components/layout/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { userService } from "../../services/userService";
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
-import { toastService } from "../../services/toastService";
+
+// ─────────────────────────────────────────────
+//  Estilos compartidos
+// ─────────────────────────────────────────────
+
+const shellStyle = {
+  background:
+    "radial-gradient(900px 500px at 85% -10%, rgba(249, 115, 22, 0.12), transparent 60%), linear-gradient(180deg, #0f0f10 0%, #0a0a0b 100%)",
+};
 
 const inputClassName =
   "w-full rounded-xl border border-neutral-700 bg-neutral-900 px-3 py-3 text-sm text-white outline-none transition focus:border-orange-500 focus:ring-2 focus:ring-orange-500/25";
@@ -79,11 +79,11 @@ function CouponCard({ coupon, isNew, onUse }) {
               {coupon.establishment?.name || "Establecimiento"}
             </p>
             <p className="mt-0.5 text-xs text-neutral-400">
-              Descuento de{" "}
+              Descuento del{" "}
               <span className="font-bold text-orange-400">
-                {coupon.discountAmount?.toFixed(2)} €
+                {coupon.discountPercent || 5}%
               </span>
-              {" "}({coupon.discountPercent || 5}% de {coupon.baseAmount?.toFixed(2)} €)
+              {" "}en tu próxima visita
             </p>
             {coupon.status === "active" && (
               <p className="mt-1 font-mono text-xs tracking-widest text-neutral-300">
@@ -147,7 +147,7 @@ function CouponToast({ notification, onClose }) {
         <Sparkles size={16} className="text-emerald-400" />
       </div>
       <div className="min-w-0">
-        <p className="text-sm font-bold text-white">¡Cupón activado!</p>
+        <p className="text-sm font-bold text-white">¡Cupón del {notification.discountPercent || 5}% activado!</p>
         <p className="mt-0.5 text-xs text-neutral-400">{notification.message}</p>
       </div>
       <button onClick={onClose} className="shrink-0 text-neutral-600 hover:text-neutral-400">
@@ -223,10 +223,8 @@ export function ProfilePage() {
           _id:             notif.couponId,
           code:            notif.code,
           status:          "active",
-          discountAmount:  notif.discountAmount,
-          discountPercent: 5,
+          discountPercent: notif.discountPercent || 5,
           expiresAt:       notif.expiresAt,
-          baseAmount:      notif.baseAmount,
           establishment:   { name: notif.establishmentName || "Establecimiento" },
         };
 
@@ -280,12 +278,7 @@ export function ProfilePage() {
     setError("");
 
     const userId = user?.id || user?._id;
-    if (!userId) {
-      const message = "No se pudo identificar el usuario actual.";
-      setError(message);
-      toastService.error(message);
-      return;
-    }
+    if (!userId) { setError("No se pudo identificar el usuario actual."); return; }
 
     const payload = {
       name:     form.name.trim(),
@@ -294,27 +287,20 @@ export function ProfilePage() {
       avatar:   form.avatar.trim() || null,
     };
 
-    if (!payload.name) {
-      const message = "El nombre es obligatorio.";
-      setError(message);
-      toastService.error(message);
-      return;
-    }
+    if (!payload.name) { setError("El nombre es obligatorio."); return; }
 
     try {
       setSubmitting(true);
       await userService.updateUser(userId, payload);
       await refreshUser();
       setSuccess("Perfil actualizado correctamente.");
-      toastService.success("Perfil actualizado correctamente");
     } catch (err) {
       const validationErrors = err?.response?.data?.errors;
-      const message =
+      setError(
         Array.isArray(validationErrors) && validationErrors.length > 0
           ? validationErrors[0]
-          : err?.response?.data?.message || "No se pudo actualizar el perfil.";
-      setError(message);
-      toastService.error(message);
+          : err?.response?.data?.message || "No se pudo actualizar el perfil."
+      );
     } finally {
       setSubmitting(false);
     }
@@ -336,7 +322,7 @@ export function ProfilePage() {
   const pendingCoupons = coupons.filter((c) => c.status === "pending_admin");
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen text-white" style={shellStyle}>
       <Header />
 
       <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-5">
@@ -399,18 +385,14 @@ export function ProfilePage() {
               </div>
             </label>
 
-            <ImageDropInput
-              label="Avatar"
-              value={form.avatar}
-              onChange={(nextValue) =>
-                setForm((prev) => ({
-                  ...prev,
-                  avatar: nextValue,
-                }))
-              }
-              uploadFolder="nextapa/avatars"
-              helperText="Sube o arrastra una imagen para tu perfil."
-            />
+            <label className="flex flex-col gap-2">
+              <span className="text-sm font-semibold text-neutral-200">Avatar (URL)</span>
+              <div className="relative">
+                <Camera className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+                <input type="url" name="avatar" value={form.avatar} onChange={handleChange}
+                  placeholder="https://..." className={`${inputClassName} pl-10`} />
+              </div>
+            </label>
 
             <label className="flex flex-col gap-2">
               <span className="text-sm font-semibold text-neutral-200">Correo electrónico</span>
@@ -519,6 +501,8 @@ export function ProfilePage() {
           )}
         </section>
       </main>
+
+      <Footer />
 
       {/* ── Toast de notificación WS ───────────────────────────────────── */}
       {activeToast && (

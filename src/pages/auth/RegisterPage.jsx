@@ -105,7 +105,7 @@ export function RegisterPage() {
 
       const role = response?.data?.role;
 
-      toastService.success("Registro completado correctamente");
+      toastService.success("Verifica tu correo para activar tu cuenta");
       navigate(getDefaultRouteByRole(role), { replace: true });
 
     } catch (err) {

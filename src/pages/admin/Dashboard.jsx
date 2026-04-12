@@ -1,4 +1,5 @@
 // src/pages/admin/Dashboard.jsx
+<<<<<<< HEAD
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,6 +15,10 @@ import {
   UserCheck,
   Building2,
 } from "lucide-react";
+=======
+import { useEffect, useState } from "react";
+import { Store, Ticket, Bell, Wifi, WifiOff } from "lucide-react";
+>>>>>>> main
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
 import { establishmentService } from "../../services/establishmentService";
@@ -226,6 +231,7 @@ export const Dashboard = () => {
     });
   }, [notifications, clearNotification]);
 
+<<<<<<< HEAD
   /* ── Acciones (Juande — intacto) ── */
   const handleVerifyEstablishment = async (notif) => {
     try {
@@ -233,8 +239,25 @@ export const Dashboard = () => {
         prev.filter((n) => n.establishmentId !== notif.establishmentId),
       );
       loadStats();
+=======
+  // ── Acciones ──────────────────────────────────────────────────────────────
+
+  const handleVerifyEstablishment = async (notif) => {
+    try {
+      await establishmentService.verify(notif.establishmentId);
+      setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
+>>>>>>> main
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleRejectEstablishment = async (notif) => {
+    try {
+      await establishmentService.reject(notif.establishmentId);
+      setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
+    } catch (err) {
+      console.error("Error al rechazar establecimiento:", err);
     }
   };
 
@@ -375,6 +398,7 @@ export const Dashboard = () => {
           </div>
         </div>
 
+<<<<<<< HEAD
         {/* ── Stats: Usuarios ── */}
         <div>
           <SectionHeader
@@ -483,6 +507,28 @@ export const Dashboard = () => {
                   </p>
                 )}
               </div>
+=======
+        {/* ── Establecimientos pendientes ─────────────────────────────────── */}
+        {establishments.length > 0 && (
+          <section className="mb-5">
+            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
+              <Store size={14} className="text-[#f77827]" />
+              Establecimientos pendientes
+              <span className="rounded-full bg-[#f77827] px-2 py-0.5 text-xs text-white">
+                {establishments.length}
+              </span>
+            </h2>
+            <div className="space-y-2.5">
+              {establishments.map((notif) => (
+                <AdminEstablishmentCard
+                  key={notif.establishmentId || notif.id}
+                  notif={notif}
+                  onVerify={handleVerifyEstablishment}
+                  onReject={handleRejectEstablishment}
+                  onDismiss={handleDismiss}
+                />
+              ))}
+>>>>>>> main
             </div>
           ) : (
             <div className="rounded-2xl border border-[#2a374f] bg-[#0a0f18] overflow-hidden">
