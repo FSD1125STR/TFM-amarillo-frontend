@@ -143,7 +143,6 @@ export const Tapas = () => {
       }
       const data = response.data;
       setTapa(data);
-
       const fotosData = await photoService.getByItem(data._id);
       const sorted = [...(fotosData || [])].sort((a, b) => a.order - b.order);
       setPhotos(sorted);
@@ -234,8 +233,6 @@ export const Tapas = () => {
             />
           </div>
         )}
-
-        {/* Top bar */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
           <button
             onClick={() => navigate(-1)}
@@ -248,8 +245,6 @@ export const Tapas = () => {
             <HeartHandshake />
           </button>
         </div>
-
-        {/* Indicador de galería */}
         {lightboxUrls.length > 1 && (
           <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
             1 / {lightboxUrls.length}
@@ -257,7 +252,7 @@ export const Tapas = () => {
         )}
       </div>
 
-      {/* ── Carrusel de thumbnails ── */}
+      {/* ── Carrusel thumbnails ── */}
       {photos.length > 1 && (
         <div className="max-w-3xl mx-auto mt-3 px-2">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
@@ -265,11 +260,7 @@ export const Tapas = () => {
               <button
                 key={photo._id || i}
                 onClick={() => openLightbox(i)}
-                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                  i === 0
-                    ? "border-orange-500 opacity-100"
-                    : "border-transparent opacity-60 hover:opacity-90"
-                }`}
+                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${i === 0 ? "border-orange-500 opacity-100" : "border-transparent opacity-60 hover:opacity-90"}`}
               >
                 <img
                   src={cloudinaryPresets.thumbnail(photo.url)}
@@ -287,7 +278,7 @@ export const Tapas = () => {
       )}
 
       {/* ── Modalidades + disponibilidad ── */}
-      <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row gap-3 p-4 items-center bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
+      <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row gap-3 p-4 items-center bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200">
         {tapa.modalities?.length > 0 && (
           <div className="flex flex-wrap gap-2 flex-1">
             {tapa.modalities.map((mod, i) => (
@@ -380,7 +371,7 @@ export const Tapas = () => {
       <Container>
         {/* ── Descripción ── */}
         {tapa.description && (
-          <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200 cursor-pointer">
+          <div className="mt-6 bg-neutral-900 rounded-2xl p-6 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
             <div className="mb-6 text-center">
               <h2 className="text-3xl font-bold text-white">{tapa.name}</h2>
               <div className="w-16 h-1 bg-orange-500 rounded-full mt-3 mx-auto" />
@@ -398,76 +389,85 @@ export const Tapas = () => {
           slug={tapa.establishment.slug}
         />
 
-        <Section title="Información adicional">
-          <div className="mt-6 flex flex-col md:flex-row gap-4">
-            <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-blue-500 text-center min-h-55 flex flex-col">
-              <div>
-                <Tags className="w-6 h-6 text-blue-400 mx-auto mb-2" />
-                <h3 className="text-white font-semibold text-lg mb-4">
-                  Categorías
-                </h3>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2 grow items-center">
-                {tapa.categories?.length > 0 ? (
-                  tapa.categories.map((cat, i) => (
-                    <span
-                      key={i}
-                      className="text-xs bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1 rounded-full"
-                    >
-                      {cat}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-neutral-500">—</span>
-                )}
-              </div>
+        {/* ── Información adicional — estilo unificado ── */}
+        {(tapa.categories?.length > 0 ||
+          tapa.allergens?.length > 0 ||
+          tapa.dietaryOptions?.length > 0) && (
+          <div className="mt-8">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-white">
+                Información adicional
+              </h2>
+              <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
             </div>
-
-            <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-red-500 text-center min-h-55 flex flex-col">
-              <div>
-                <AlertTriangle className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                <h3 className="text-white font-semibold text-lg mb-4">
-                  Alérgenos
-                </h3>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2 grow items-center">
-                {tapa.allergens?.length > 0 ? (
-                  tapa.allergens.map((allergen, i) => (
-                    <span
-                      key={i}
-                      className="text-xs bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1 rounded-full"
-                    >
-                      {allergen}
+            <div className="flex flex-col md:flex-row gap-3">
+              {tapa.categories?.length > 0 && (
+                <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
+                  <div className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 rounded-full px-3 py-1 mb-4">
+                    <Tags className="w-3.5 h-3.5 text-orange-400" />
+                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">
+                      Categorías
                     </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-neutral-500">—</span>
-                )}
-              </div>
-            </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {tapa.categories.map((cat, i) => (
+                      <span
+                        key={i}
+                        className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl"
+                      >
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            <div className="flex-1 bg-neutral-900 rounded-2xl p-6 border-2 border-green-500 text-center min-h-55 flex flex-col">
-              <div>
-                <Leaf className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                <h3 className="text-white font-semibold text-lg mb-4">Dieta</h3>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2 grow items-center">
-                {tapa.dietaryOptions?.length > 0 ? (
-                  tapa.dietaryOptions.map((diet, i) => (
-                    <span
-                      key={i}
-                      className="text-xs bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1 rounded-full"
-                    >
-                      {diet}
+              {tapa.allergens?.length > 0 && (
+                <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
+                  <div className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 rounded-full px-3 py-1 mb-4">
+                    <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />
+                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">
+                      Alérgenos
                     </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-neutral-500">—</span>
-                )}
-              </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {tapa.allergens.map((allergen, i) => (
+                      <span
+                        key={i}
+                        className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl"
+                      >
+                        {allergen}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {tapa.dietaryOptions?.length > 0 && (
+                <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
+                  <div className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 rounded-full px-3 py-1 mb-4">
+                    <Leaf className="w-3.5 h-3.5 text-orange-400" />
+                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">
+                      Dieta
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {tapa.dietaryOptions.map((diet, i) => (
+                      <span
+                        key={i}
+                        className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl"
+                      >
+                        {diet}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        </Section>
+        )}
+
+        {/* ── Valoración ── */}
         <Section title="Valoración">
           <ReviewWidget targetType="item" targetId={tapa._id} />
         </Section>

@@ -26,6 +26,19 @@ export const reviewService = {
     }
   },
 
+  // Admin — valoraciones de un usuario concreto
+  getByUser: async (userId) => {
+    try {
+      const response = await api.get("/admin/reviews", {
+        params: { userId },
+      });
+      return response.data?.reviews || [];
+    } catch (error) {
+      console.error("Error al obtener valoraciones del usuario:", error);
+      return [];
+    }
+  },
+
   // Crear valoración
   create: async ({ establishmentId, itemId, rating }) => {
     try {
@@ -71,10 +84,10 @@ export const reviewService = {
   },
 
   // Admin — todas las valoraciones
-  getAll: async ({ page = 1, limit = 20 } = {}) => {
+  getAll: async ({ page = 1, limit = 20, userId } = {}) => {
     try {
       const response = await api.get("/admin/reviews", {
-        params: { page, limit },
+        params: { page, limit, ...(userId && { userId }) },
       });
       return response.data;
     } catch (error) {

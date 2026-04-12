@@ -1,5 +1,4 @@
 // src/pages/admin/Dashboard.jsx
-<<<<<<< HEAD
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,14 +10,9 @@ import {
   ShieldCheck,
   Star,
   ChevronRight,
-  TrendingUp,
   UserCheck,
   Building2,
 } from "lucide-react";
-=======
-import { useEffect, useState } from "react";
-import { Store, Ticket, Bell, Wifi, WifiOff } from "lucide-react";
->>>>>>> main
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
 import { establishmentService } from "../../services/establishmentService";
@@ -27,13 +21,12 @@ import { AdminEstablishmentCard } from "./adminComponents/AdminEstablishmentCard
 import { AdminCouponCard } from "./adminComponents/AdminCouponCard";
 import { api } from "../../services/api";
 
-/* ── Fondo ── */
 const shellStyle = {
   background:
     "radial-gradient(900px 500px at 90% -10%, rgba(255,116,43,0.10), transparent 55%), linear-gradient(180deg,#0d1219,#080d13 80%)",
 };
 
-/* ── Stat Card ── */
+// ── StatCard ──────────────────────────────────────────────────────────────────
 const StatCard = ({
   icon: Icon,
   iconColor,
@@ -45,7 +38,7 @@ const StatCard = ({
   accent,
 }) => (
   <div
-    className="relative rounded-2xl border bg-[#0d1219]/90 p-5 overflow-hidden transition-all duration-200 hover:-translate-y-0.5"
+    className="relative rounded-2xl border bg-[#0d1219]/90 p-4 overflow-hidden transition-all duration-200 hover:-translate-y-0.5"
     style={{ borderColor: accent ? `${accent}30` : "#2a374f" }}
   >
     {accent && (
@@ -56,24 +49,22 @@ const StatCard = ({
         }}
       />
     )}
-    <div className="flex items-start justify-between gap-3">
-      <div className={`rounded-xl p-2.5 ${iconBg}`}>
-        <Icon size={16} className={iconColor} />
-      </div>
+    <div className={`rounded-xl p-2 w-fit ${iconBg}`}>
+      <Icon size={14} className={iconColor} />
     </div>
     {loading ? (
-      <div className="admin-stat-loading mt-3 w-16 h-7" />
+      <div className="admin-stat-loading mt-2 w-14 h-6" />
     ) : (
-      <p className="mt-3 text-3xl font-black text-white tracking-tight leading-none">
+      <p className="mt-2 text-2xl font-black text-white tracking-tight leading-none">
         {value ?? "—"}
       </p>
     )}
-    <p className="mt-1.5 text-sm font-semibold text-slate-300">{label}</p>
-    {sub && <p className="mt-0.5 text-xs text-slate-500">{sub}</p>}
+    <p className="mt-1 text-xs font-semibold text-slate-300">{label}</p>
+    {sub && <p className="mt-0.5 text-[10px] text-slate-500">{sub}</p>}
   </div>
 );
 
-/* ── Quick Action ── */
+// ── QuickAction ───────────────────────────────────────────────────────────────
 const QuickAction = ({
   icon: Icon,
   iconColor,
@@ -87,12 +78,12 @@ const QuickAction = ({
   <button
     onClick={onClick}
     disabled={disabled}
-    className="group relative flex items-center gap-3 rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 px-4 py-3.5 text-left w-full transition-all duration-200 hover:border-[#f77827]/40 hover:bg-[#0f1520] disabled:opacity-35 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#f77827]/20"
+    className="group flex items-center gap-3 rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 px-4 py-3 text-left w-full transition-all duration-200 hover:border-[#f77827]/40 hover:bg-[#0f1520] disabled:opacity-35 disabled:cursor-not-allowed"
   >
     <span
-      className={`rounded-xl p-2.5 flex-shrink-0 ${iconBg} transition-transform duration-200 group-hover:scale-110`}
+      className={`rounded-xl p-2 flex-shrink-0 ${iconBg} transition-transform duration-200 group-hover:scale-110`}
     >
-      <Icon size={16} className={iconColor} />
+      <Icon size={14} className={iconColor} />
     </span>
     <span className="min-w-0 flex-1">
       <span className="flex items-center gap-2">
@@ -107,7 +98,7 @@ const QuickAction = ({
     </span>
     {!disabled ? (
       <ChevronRight
-        size={14}
+        size={13}
         className="text-slate-600 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
       />
     ) : (
@@ -118,15 +109,15 @@ const QuickAction = ({
   </button>
 );
 
-/* ── Section Header ── */
+// ── SectionHeader ─────────────────────────────────────────────────────────────
 const SectionHeader = ({ icon: Icon, iconColor, title }) => (
-  <h2 className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.12em] text-slate-500 mb-3">
-    <Icon size={11} className={iconColor} />
+  <h2 className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.12em] text-slate-500 mb-3">
+    <Icon size={10} className={iconColor} />
     {title}
   </h2>
 );
 
-/* ══════════════════════════════════════════════════════════════════════════ */
+// ═════════════════════════════════════════════════════════════════════════════
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -141,7 +132,6 @@ export const Dashboard = () => {
     role: "admin",
   });
 
-  /* ── Stats ── */
   const loadStats = useCallback(async () => {
     try {
       setStatsLoading(true);
@@ -231,7 +221,6 @@ export const Dashboard = () => {
     });
   }, [notifications, clearNotification]);
 
-<<<<<<< HEAD
   /* ── Acciones (Juande — intacto) ── */
   const handleVerifyEstablishment = async (notif) => {
     try {
@@ -239,14 +228,6 @@ export const Dashboard = () => {
         prev.filter((n) => n.establishmentId !== notif.establishmentId),
       );
       loadStats();
-=======
-  // ── Acciones ──────────────────────────────────────────────────────────────
-
-  const handleVerifyEstablishment = async (notif) => {
-    try {
-      await establishmentService.verify(notif.establishmentId);
-      setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
->>>>>>> main
     } catch (err) {
       console.error(err);
     }
@@ -255,7 +236,9 @@ export const Dashboard = () => {
   const handleRejectEstablishment = async (notif) => {
     try {
       await establishmentService.reject(notif.establishmentId);
-      setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
+      setEstablishments((prev) =>
+        prev.filter((n) => n.establishmentId !== notif.establishmentId),
+      );
     } catch (err) {
       console.error("Error al rechazar establecimiento:", err);
     }
@@ -287,13 +270,12 @@ export const Dashboard = () => {
 
   const totalPending = establishments.length + coupons.length;
 
-  /* ── Render ── */
   return (
     <div
       className="min-h-screen px-4 pb-16 pt-6 text-slate-100"
       style={shellStyle}
     >
-      <div className="mx-auto w-full max-w-4xl space-y-8">
+      <div className="mx-auto w-full max-w-4xl space-y-6">
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
@@ -307,41 +289,26 @@ export const Dashboard = () => {
           <WsStatusBadge connected={connected} />
         </header>
 
-        {/* ── Stats: Establecimientos ── */}
+        {/* ── Stats en una sola grid 4 cols ── */}
         <div>
           <SectionHeader
             icon={Building2}
             iconColor="text-[#f77827]"
-            title="Establecimientos"
+            title="Resumen general"
           />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard
               icon={Store}
               iconColor="text-[#f77827]"
               iconBg="bg-[#f77827]/10"
               accent="#f77827"
-              label="Total"
+              label="Establecimientos"
               loading={statsLoading}
               value={stats?.establishments}
               sub={`${stats?.establishmentsActive ?? "—"} activos`}
             />
             <StatCard
               icon={ShieldCheck}
-              iconColor="text-emerald-400"
-              iconBg="bg-emerald-500/10"
-              accent="#10b981"
-              label="Verificados"
-              loading={statsLoading}
-              value={
-                stats != null
-                  ? (stats.establishments ?? 0) -
-                    (stats.establishmentsPending ?? 0)
-                  : null
-              }
-              sub="aprobados"
-            />
-            <StatCard
-              icon={Bell}
               iconColor="text-amber-400"
               iconBg="bg-amber-500/10"
               accent="#f59e0b"
@@ -350,40 +317,15 @@ export const Dashboard = () => {
               value={stats?.establishmentsPending}
               sub="esperan revisión"
             />
-          </div>
-        </div>
-
-        {/* ── Stats: Tapas ── */}
-        <div>
-          <SectionHeader
-            icon={UtensilsCrossed}
-            iconColor="text-rose-400"
-            title="Tapas"
-          />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <StatCard
               icon={UtensilsCrossed}
               iconColor="text-rose-400"
               iconBg="bg-rose-500/10"
               accent="#f43f5e"
-              label="Total tapas"
+              label="Tapas"
               loading={statsLoading}
               value={stats?.items}
               sub={`${stats?.itemsActive ?? "—"} activas`}
-            />
-            <StatCard
-              icon={TrendingUp}
-              iconColor="text-sky-400"
-              iconBg="bg-sky-500/10"
-              accent="#0ea5e9"
-              label="Tasa activas"
-              loading={statsLoading}
-              value={
-                stats?.items
-                  ? `${Math.round((stats.itemsActive / stats.items) * 100)}%`
-                  : null
-              }
-              sub="del total"
             />
             <StatCard
               icon={Star}
@@ -392,27 +334,26 @@ export const Dashboard = () => {
               accent="#f59e0b"
               label="Valoraciones"
               loading={statsLoading}
-              value={stats?.ratings ?? "—"}
-              sub="próximamente"
+              value={stats?.reviews}
+              sub="en total"
             />
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* ── Stats: Usuarios ── */}
+        {/* ── Stats usuarios en una fila ── */}
         <div>
           <SectionHeader
             icon={Users}
             iconColor="text-violet-400"
             title="Usuarios"
           />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-3 gap-3">
             <StatCard
               icon={Users}
               iconColor="text-violet-400"
               iconBg="bg-violet-500/10"
               accent="#8b5cf6"
-              label="Total usuarios"
+              label="Total"
               loading={statsLoading}
               value={stats?.users}
               sub="cuentas activas"
@@ -447,7 +388,7 @@ export const Dashboard = () => {
             iconColor="text-slate-500"
             title="Acciones rápidas"
           />
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <QuickAction
               icon={Building2}
               iconColor="text-[#f77827]"
@@ -458,6 +399,14 @@ export const Dashboard = () => {
               onClick={() => navigate("/admin/establishments")}
             />
             <QuickAction
+              icon={UtensilsCrossed}
+              iconColor="text-rose-400"
+              iconBg="bg-rose-500/10"
+              label="Tapas"
+              sub="Catálogo completo"
+              onClick={() => navigate("/admin/items")}
+            />
+            <QuickAction
               icon={Users}
               iconColor="text-violet-400"
               iconBg="bg-violet-500/10"
@@ -465,28 +414,10 @@ export const Dashboard = () => {
               sub="Clientes y hosteleros"
               onClick={() => navigate("/admin/users")}
             />
-            <QuickAction
-              icon={UtensilsCrossed}
-              iconColor="text-rose-400"
-              iconBg="bg-rose-500/10"
-              label="Tapas"
-              sub="Catálogo completo"
-              onClick={() => navigate("/admin/items")}
-              disabled
-            />
-            <QuickAction
-              icon={Star}
-              iconColor="text-amber-400"
-              iconBg="bg-amber-500/10"
-              label="Valoraciones"
-              sub="Moderación y estadísticas"
-              onClick={() => navigate("/admin/ratings")}
-              disabled
-            />
           </div>
         </div>
 
-        {/* ── Pendientes con tabs ── */}
+        {/* ── Pendientes ── */}
         <div>
           <SectionHeader
             icon={Bell}
@@ -495,55 +426,31 @@ export const Dashboard = () => {
           />
 
           {totalPending === 0 ? (
-            <div className="grid min-h-36 place-items-center rounded-2xl border border-dashed border-[#2a374f] text-center">
+            <div className="grid min-h-32 place-items-center rounded-2xl border border-dashed border-[#2a374f] text-center">
               <div>
-                <Bell size={26} className="mx-auto mb-2 text-slate-700" />
+                <Bell size={24} className="mx-auto mb-2 text-slate-700" />
                 <p className="text-sm text-slate-500">
                   Todo al día · No hay pendientes
                 </p>
                 {!connected && (
-                  <p className="mt-1.5 text-xs text-rose-400/60">
-                    Sin conexión — las notificaciones no llegarán en tiempo real
+                  <p className="mt-1 text-xs text-rose-400/60">
+                    Sin conexión — notificaciones no en tiempo real
                   </p>
                 )}
               </div>
-=======
-        {/* ── Establecimientos pendientes ─────────────────────────────────── */}
-        {establishments.length > 0 && (
-          <section className="mb-5">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-400">
-              <Store size={14} className="text-[#f77827]" />
-              Establecimientos pendientes
-              <span className="rounded-full bg-[#f77827] px-2 py-0.5 text-xs text-white">
-                {establishments.length}
-              </span>
-            </h2>
-            <div className="space-y-2.5">
-              {establishments.map((notif) => (
-                <AdminEstablishmentCard
-                  key={notif.establishmentId || notif.id}
-                  notif={notif}
-                  onVerify={handleVerifyEstablishment}
-                  onReject={handleRejectEstablishment}
-                  onDismiss={handleDismiss}
-                />
-              ))}
->>>>>>> main
             </div>
           ) : (
             <div className="rounded-2xl border border-[#2a374f] bg-[#0a0f18] overflow-hidden">
-              {/* Tabs */}
               <div className="flex border-b border-[#1e2d42]">
                 <button
                   onClick={() => setActiveTab("establishments")}
-                  className={`flex items-center gap-2 px-5 py-3.5 text-sm font-bold transition-all border-b-2 -mb-px ${
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all border-b-2 -mb-px ${
                     activeTab === "establishments"
                       ? "text-[#f77827] border-[#f77827]"
                       : "text-slate-500 border-transparent hover:text-slate-300"
                   }`}
                 >
-                  <Store size={14} />
-                  Establecimientos
+                  <Store size={13} /> Establecimientos
                   {establishments.length > 0 && (
                     <span
                       className={`rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
@@ -558,14 +465,13 @@ export const Dashboard = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("coupons")}
-                  className={`flex items-center gap-2 px-5 py-3.5 text-sm font-bold transition-all border-b-2 -mb-px ${
+                  className={`flex items-center gap-2 px-5 py-3 text-sm font-bold transition-all border-b-2 -mb-px ${
                     activeTab === "coupons"
                       ? "text-emerald-400 border-emerald-400"
                       : "text-slate-500 border-transparent hover:text-slate-300"
                   }`}
                 >
-                  <Ticket size={14} />
-                  Cupones
+                  <Ticket size={13} /> Cupones
                   {coupons.length > 0 && (
                     <span
                       className={`rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
@@ -579,8 +485,6 @@ export const Dashboard = () => {
                   )}
                 </button>
               </div>
-
-              {/* Contenido tab */}
               <div className="p-4 space-y-3">
                 {activeTab === "establishments" &&
                   (establishments.length === 0 ? (
