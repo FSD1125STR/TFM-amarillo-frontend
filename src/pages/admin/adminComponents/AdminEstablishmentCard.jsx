@@ -7,13 +7,20 @@ const formatTime = (ts) => {
   return new Date(ts).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
 };
 
-export function AdminEstablishmentCard({ notif, onVerify, onDismiss }) {
-  const [expanded, setExpanded] = useState(true);
-  const [loading, setLoading]   = useState(false);
+export function AdminEstablishmentCard({ notif, onVerify, onReject, onDismiss }) {
+  const [expanded, setExpanded]   = useState(true);
+  const [rejecting, setRejecting] = useState(false);
+  const [loading, setLoading]     = useState(false);
 
   const handleVerify = async () => {
     setLoading(true);
     await onVerify(notif);
+    setLoading(false);
+  };
+
+  const handleReject = async () => {
+    setLoading(true);
+    await onReject(notif);
     setLoading(false);
   };
 
@@ -59,24 +66,58 @@ export function AdminEstablishmentCard({ notif, onVerify, onDismiss }) {
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <button
-              onClick={() => onDismiss(notif.id)}
-              className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/20 transition-colors"
-            >
-              <X size={13} /> Descartar
-            </button>
-            <button
-              onClick={handleVerify}
-              disabled={loading}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#f77827] py-2 text-xs font-bold text-white hover:bg-[#e06a1e] disabled:opacity-60 transition-colors"
-            >
-              {loading
-                ? <><RefreshCw size={13} className="animate-spin" /> Verificando...</>
-                : <><CheckCheck size={13} /> Verificar establecimiento</>
-              }
-            </button>
-          </div>
+          {!rejecting ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setRejecting(true)}
+                disabled={loading}
+                className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/20 transition-colors disabled:opacity-60"
+              >
+                <X size={13} /> Rechazar alta
+              </button>
+              <button
+                onClick={handleVerify}
+                disabled={loading}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#f77827] py-2 text-xs font-bold text-white hover:bg-[#e06a1e] disabled:opacity-60 transition-colors"
+              >
+                {loading
+                  ? <><RefreshCw size={13} className="animate-spin" /> Verificando...</>
+                  : <><CheckCheck size={13} /> Verificar establecimiento</>
+                }
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-xs text-slate-400">
+                ¿Confirmar rechazo del alta de <span className="font-bold text-slate-200">{notif.name}</span>?
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setRejecting(false)}
+                  className="flex-1 rounded-xl border border-[#2a374f] py-2 text-xs text-slate-400 hover:bg-[#1a2235] transition-colors"
+                >
+                  Volver
+                </button>
+                <button
+                  onClick={handleReject}
+                  disabled={loading}
+                  className="flex-1 rounded-xl border border-rose-500/50 bg-rose-500/10 py-2 text-xs font-semibold text-rose-400 hover:bg-rose-500/20 disabled:opacity-60 transition-colors"
+                >
+                  {loading
+                    ? <><RefreshCw size={13} className="animate-spin" /> Rechazando...</>
+                    : "Confirmar rechazo"
+                  }
+                </button>
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={() => onDismiss(notif.id)}
+            className="w-full text-center text-xs text-slate-600 hover:text-slate-400 transition-colors pt-1"
+          >
+            Descartar notificación
+          </button>
         </div>
       )}
     </div>

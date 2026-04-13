@@ -1,4 +1,5 @@
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { AllEstablishment } from "./pages/AllEstablishment";
 import { Establishment } from "./pages/Establishment";
@@ -35,6 +36,10 @@ import { Footer } from "./components/layout/Footer";
 function AppLayout() {
   const location = useLocation();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const hideFooter = location.pathname.startsWith("/admin");
   const shellClassName = hideFooter
     ? "min-h-screen"
@@ -43,7 +48,8 @@ function AppLayout() {
   return (
     <div className={shellClassName}>
       <Routes>
-        {/* Públicas */}
+
+        {/* ── Públicas ─────────────────────────────────────────────────── */}
         <Route path="/" element={<Home />} />
         <Route path="/establishments" element={<AllEstablishment />} />
         <Route path="/establishment/:slug" element={<Establishment />} />
@@ -52,81 +58,58 @@ function AppLayout() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/nosotros" element={<AboutPage />} />
 
-        {/* Auth */}
+        {/* ── Auth ─────────────────────────────────────────────────────── */}
         <Route path="/login" element={
-          <PublicOnlyRoute>
-            <LoginPage />
-          </PublicOnlyRoute>
+          <PublicOnlyRoute><LoginPage /></PublicOnlyRoute>
         } />
 
         <Route path="/register" element={
-          <PublicOnlyRoute>
-            <RegisterPage />
-          </PublicOnlyRoute>
+          <PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>
         } />
 
         <Route path="/host/login" element={
-          <PublicOnlyRoute>
-            <Navigate to="/login" replace />
-          </PublicOnlyRoute>
+          <PublicOnlyRoute><Navigate to="/login" replace /></PublicOnlyRoute>
         } />
 
         <Route path="/host/register" element={
-          <PublicOnlyRoute>
-            <HostRegisterPage />
-          </PublicOnlyRoute>
-        } />
-
-        <Route path="/auth/verify" element={
-          <VerifyEmailPage />
+          <PublicOnlyRoute><HostRegisterPage /></PublicOnlyRoute>
         } />
 
         <Route path="/forgot-password" element={
-          <PublicOnlyRoute>
-            <ForgotPasswordPage />
-          </PublicOnlyRoute>
+          <PublicOnlyRoute><ForgotPasswordPage /></PublicOnlyRoute>
         } />
 
-        <Route path="/auth/reset-password" element={
-          <PublicOnlyRoute>
-            <ResetPasswordPage />
-          </PublicOnlyRoute>
-        } />
+        {/* Verificación y reset — sin PublicOnlyRoute, el usuario no está logueado */}
+        <Route path="/verify-email"    element={<VerifyEmailPage />} />
+        <Route path="/auth/verify"     element={<VerifyEmailPage />} />
+        <Route path="/reset-password"  element={<ResetPasswordPage />} />
+        <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
-        {/* Host */}
+        {/* ── Host ─────────────────────────────────────────────────────── */}
         <Route path="/host/dashboard" element={
-          <HostRoute>
-            <HostDashboard />
-          </HostRoute>
+          <HostRoute><HostDashboard /></HostRoute>
         } />
 
         <Route path="/host/items/:id" element={
-          <HostRoute>
-            <HostItemEditor />
-          </HostRoute>
+          <HostRoute><HostItemEditor /></HostRoute>
         } />
 
-        {/* Perfil */}
+        {/* ── Perfil ───────────────────────────────────────────────────── */}
         <Route path="/profile" element={
-          <PrivateRoute>
-            <ProfilePage />
-          </PrivateRoute>
+          <PrivateRoute><ProfilePage /></PrivateRoute>
         } />
 
         <Route path="/403" element={<ForbiddenPage />} />
 
-        {/* Admin */}
+        {/* ── Admin ────────────────────────────────────────────────────── */}
         <Route path="/admin" element={
-          <AdminRoute>
-            <AdminPanel />
-          </AdminRoute>
+          <AdminRoute><AdminPanel /></AdminRoute>
         }>
-
-          <Route path="*" element={<Navigate to="/" replace />} />
           <Route index element={<Dashboard />} />
           <Route path="establishments" element={<AdminEstablishments />} />
           <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
           <Route path="items/:id" element={<ItemAdmin />} />
+          <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />

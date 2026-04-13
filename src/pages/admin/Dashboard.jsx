@@ -1,6 +1,6 @@
 // src/pages/admin/Dashboard.jsx
 import { useEffect, useState } from "react";
-import { Store, Ticket, Bell } from "lucide-react";
+import { Store, Ticket, Bell, Wifi, WifiOff } from "lucide-react";
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
 import { establishmentService } from "../../services/establishmentService";
@@ -85,12 +85,22 @@ export const Dashboard = () => {
   }, [notifications, clearNotification]);
 
   // ── Acciones ──────────────────────────────────────────────────────────────
+
   const handleVerifyEstablishment = async (notif) => {
     try {
-      // await establishmentService.verify(notif.establishmentId);
+      await establishmentService.verify(notif.establishmentId);
       setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
     } catch (err) {
       console.error("Error al verificar establecimiento:", err);
+    }
+  };
+
+  const handleRejectEstablishment = async (notif) => {
+    try {
+      await establishmentService.reject(notif.establishmentId);
+      setEstablishments((prev) => prev.filter((n) => n.establishmentId !== notif.establishmentId));
+    } catch (err) {
+      console.error("Error al rechazar establecimiento:", err);
     }
   };
 
@@ -178,6 +188,7 @@ export const Dashboard = () => {
                   key={notif.establishmentId || notif.id}
                   notif={notif}
                   onVerify={handleVerifyEstablishment}
+                  onReject={handleRejectEstablishment}
                   onDismiss={handleDismiss}
                 />
               ))}

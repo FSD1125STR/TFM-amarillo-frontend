@@ -2,9 +2,9 @@
 
 :root {
   --public-shell-gradient:
-    radial-gradient(1200px 700px at 80% -10%, rgba(255, 115, 38, 0.18), transparent 55%),
-    radial-gradient(800px 500px at -10% 120%, rgba(255, 77, 0, 0.14), transparent 65%),
-    linear-gradient(180deg, #1d0e08 0%, #110906 100%);
+    radial-gradient(1000px 640px at 85% -12%, rgba(255, 126, 47, 0.16), transparent 58%),
+    radial-gradient(680px 420px at -8% 118%, rgba(255, 98, 0, 0.12), transparent 62%),
+    linear-gradient(180deg, #16100d 0%, #0d0c0b 100%);
 }
 
 body {

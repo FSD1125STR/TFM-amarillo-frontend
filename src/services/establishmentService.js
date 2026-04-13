@@ -137,4 +137,26 @@ export const establishmentService = {
       throw error;
     }
   },
+
+  // Verificar establecimiento (Admin)
+  verify: async (id) => {
+    try {
+      const response = await api.patch(`/establishment/${id}/verify`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al verificar establecimiento:', error);
+      throw error;
+    }
+  },
+
+  // Rechazar alta de establecimiento (Admin)
+  reject: async (id) => {
+    try {
+      const response = await api.patch(`/establishment/${id}/reject`);
+      return response.data;
+    } catch (error) {
+      console.error('Error al rechazar establecimiento:', error);
+      throw error;
+    }
+  },
 };

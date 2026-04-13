@@ -1085,7 +1085,7 @@ function HostItemsSection({ establishmentId, itemEditorBasePath = "/host/items" 
             strategy={verticalListSortingStrategy}
           >
             <div className="overflow-x-auto rounded-xl border border-[#243247] bg-[#0b121a]">
-              <table className="min-w-[720px] w-full border-collapse text-sm">
+              <table className="min-w-180 w-full border-collapse text-sm">
                 <thead className="border-b border-[#243247] bg-[#131d2a]">
                   <tr>
                     <th className="w-8 px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400" />

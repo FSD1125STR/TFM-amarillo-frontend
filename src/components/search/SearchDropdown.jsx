@@ -140,7 +140,7 @@ export const SearchDropdown = ({ placeholder = 'Tu próxima tapa aquí...' }) =>
    const showDropdown      = isOpen && query.length >= 2;
 
    return (
-      <div ref={wrapperRef} className="relative w-full">
+      <div ref={wrapperRef} className="relative z-50 w-full">
 
          {/* ── Input ── */}
          <div className="relative">
@@ -170,7 +170,7 @@ export const SearchDropdown = ({ placeholder = 'Tu próxima tapa aquí...' }) =>
 
          {/* ── Dropdown ── */}
          {showDropdown && (
-            <div className="absolute top-[calc(100%+6px)] left-0 right-0 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
+            <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-[80] overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900 shadow-2xl shadow-black/40">
 
                {/* Sin resultados */}
                {!loading && !hasResults && !error && (
