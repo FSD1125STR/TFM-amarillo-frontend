@@ -77,7 +77,7 @@ export function NotFoundPage() {
                {[
                   { to: "/establishments", label: "Locales", hint: "Descubre sitios" },
                   { to: "/items", label: "Tapas", hint: "Platos y ofertas" },
-                  { to: "/login", label: "Cuenta", hint: "Inicia sesión" },
+                  { to: "/profile", label: "Cuenta", hint: "Inicia sesión" },
                ].map((item) => (
                   <Link
                      key={item.to}
