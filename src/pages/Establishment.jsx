@@ -35,10 +35,7 @@ import { useAuth } from "../context/AuthContext";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
-// ─────────────────────────────────────────────
-//  Lightbox (sin cambios)
-// ─────────────────────────────────────────────
-
+// ── Lightbox ──────────────────────────────────────────────────────────────────
 function Lightbox({ images, startIndex, onClose }) {
   const [current, setCurrent] = useState(startIndex);
   const prev = useCallback(
@@ -120,10 +117,7 @@ function Lightbox({ images, startIndex, onClose }) {
   );
 }
 
-// ─────────────────────────────────────────────
-//  Página principal
-// ─────────────────────────────────────────────
-
+// ── Página principal ──────────────────────────────────────────────────────────
 export const Establishment = () => {
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -138,8 +132,6 @@ export const Establishment = () => {
   const [photos, setPhotos] = useState([]);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-
-  // Modal de reserva
   const [reservationOpen, setReservationOpen] = useState(false);
 
   const mapInstance = useRef(null);
@@ -149,15 +141,12 @@ export const Establishment = () => {
     try {
       setLoading(true);
       setError(null);
-
       const params =
         !preloadedDistance && coords?.lat
           ? { lat: coords.lat, lng: coords.lng }
           : {};
-
       const response = await establishmentService.getBySlug(slug, params);
       setEstablishment(response.data);
-
       const photosResponse = await photoService.getByEstablishment(
         response.data._id,
       );
@@ -234,7 +223,6 @@ export const Establishment = () => {
       : `${(dist / 1000).toFixed(1)} km`;
   };
 
-  // ── El cliente está logueado
   const isLoggedInClient = user && user.role === "cliente";
 
   if (loading && !establishment) {
@@ -260,6 +248,12 @@ export const Establishment = () => {
     );
   }
 
+  const hasContact =
+    establishment.phone || establishment.email || establishment.website;
+  const hasSocial = Object.values(establishment.socialLinks || {}).some((v) =>
+    v?.trim(),
+  );
+
   return (
     <div className="bg-transparent min-h-screen text-white">
       {lightboxOpen && allLightboxImages.length > 0 && (
@@ -270,17 +264,15 @@ export const Establishment = () => {
         />
       )}
 
-      {/* Modal de reserva — solo se monta si el cliente está logueado */}
       {reservationOpen && isLoggedInClient && (
         <ReservationModal
           establishment={establishment}
           onClose={() => setReservationOpen(false)}
-          onSuccess={() => {
-            // Aquí puedes añadir feedback adicional si lo necesitas
-          }}
+          onSuccess={() => {}}
         />
       )}
 
+      {/* ── Hero ── */}
       <div className="relative h-72 max-w-3xl mx-auto">
         <img
           src={heroUrl}
@@ -320,31 +312,26 @@ export const Establishment = () => {
       </div>
 
       <Container>
-        <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
-          {photos.length > 0
-            ? photos.map((photo, i) => (
-                <img
-                  key={photo._id}
-                  src={cloudinaryPresets.thumbnail(photo.url)}
-                  className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80"
-                  onClick={() => openLightbox(i)}
-                  alt="Foto del establecimiento"
-                />
-              ))
-            : rawPrimaryUrl && (
-                <img
-                  src={cloudinaryPresets.thumbnail(rawPrimaryUrl)}
-                  className="h-20 w-32 object-cover rounded-lg shrink-0 cursor-pointer"
-                  onClick={() => openLightbox(0)}
-                  alt="Foto del establecimiento"
-                />
-              )}
-        </div>
+        {/* ── Miniaturas ── */}
+        {photos.length > 0 && (
+          <div className="flex gap-2 mt-4 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {photos.map((photo, i) => (
+              <img
+                key={photo._id}
+                src={cloudinaryPresets.thumbnail(photo.url)}
+                className="h-16 w-24 object-cover rounded-lg shrink-0 cursor-pointer hover:opacity-80"
+                onClick={() => openLightbox(i)}
+                alt="Foto del establecimiento"
+              />
+            ))}
+          </div>
+        )}
 
-        <div className="mt-6 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 shadow-sm hover:border-orange-500/30 transition-colors duration-200">
+        {/* ── Descripción ── */}
+        <div className="mt-4 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-white">Descripcion</h2>
+              <h2 className="text-xl font-bold text-white">Descripción</h2>
               <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
             </div>
             {establishment.priceRange && (
@@ -372,6 +359,7 @@ export const Establishment = () => {
           )}
         </div>
 
+        {/* ── Tapas ── */}
         <Section>
           <ItemGallery
             establishmentId={establishment._id}
@@ -381,35 +369,50 @@ export const Establishment = () => {
           />
         </Section>
 
-        <ServiceKitchen
-          features={establishment.features || []}
-          cuisineType={establishment.cuisineType || []}
-        />
+        {/* ── Servicios & Cocina — solo si hay datos ── */}
+        {(establishment.features?.length > 0 ||
+          establishment.cuisineType?.length > 0) && (
+          <ServiceKitchen
+            features={establishment.features || []}
+            cuisineType={establishment.cuisineType || []}
+          />
+        )}
 
-        <div className="mt-8 grid grid-cols-2 gap-4">
-          <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-sm hover:border-orange-500/30 transition-colors duration-200">
-            <div className="mb-5">
-              <h3 className="text-xl font-bold text-white">Contacto</h3>
-              <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
-            </div>
-            <Contact
-              phone={establishment.phone}
-              email={establishment.email}
-              website={establishment.website}
-            />
+        {/* ── Contacto + Redes — apilados en móvil, lado a lado en desktop ── */}
+        {(hasContact || hasSocial) && (
+          <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            {hasContact && (
+              <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
+                <div className="mb-4">
+                  <h3 className="text-white font-semibold text-lg">Contacto</h3>
+                  <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
+                </div>
+                <Contact
+                  phone={establishment.phone}
+                  email={establishment.email}
+                  website={establishment.website}
+                />
+              </div>
+            )}
+            {hasSocial && (
+              <div className="flex-1">
+                <SocialLinks socialLinks={establishment.socialLinks || {}} />
+              </div>
+            )}
           </div>
-          <SocialLinks socialLinks={establishment.socialLinks || {}} />
-        </div>
+        )}
 
-        <div className="mt-4 rounded-2xl p-5 shadow-sm">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="rounded-2xl overflow-hidden border border-neutral-700/60 h-full min-h-96">
+        {/* ── Mapa + Dirección + Horario ── */}
+        <div className="mt-4 rounded-2xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="rounded-2xl overflow-hidden border border-neutral-700/60 h-64 lg:h-auto lg:min-h-80">
               <div ref={mapContainer} className="w-full h-full" />
             </div>
-            <div className="flex flex-col justify-between gap-6">
+            <div className="flex flex-col gap-4">
               <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
-                <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3">
-                  <MapPinHouse className="text-orange-500" /> Direccion
+                <h3 className="flex items-center gap-2 text-lg font-bold text-white mb-3">
+                  <MapPinHouse className="text-orange-500 shrink-0" size={20} />{" "}
+                  Dirección
                 </h3>
                 <p className="text-sm text-neutral-200">
                   {establishment.address?.street},{" "}
@@ -427,14 +430,15 @@ export const Establishment = () => {
                       "_blank",
                     );
                   }}
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all text-sm font-medium"
+                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-all text-sm font-medium"
                 >
-                  Como llegar
+                  Cómo llegar
                 </button>
               </div>
               <div className="bg-neutral-800/50 rounded-xl p-4 border border-neutral-700/40">
-                <h3 className="flex items-center gap-2 text-2xl font-bold text-white mb-3">
-                  <Clock className="text-orange-500" /> Horario
+                <h3 className="flex items-center gap-2 text-lg font-bold text-white mb-3">
+                  <Clock className="text-orange-500 shrink-0" size={20} />{" "}
+                  Horario
                 </h3>
                 <ScheduleDisplay
                   schedule={establishment.schedule}
@@ -445,6 +449,7 @@ export const Establishment = () => {
           </div>
         </div>
 
+        {/* ── Valoración ── */}
         <Section title="Valoración">
           <ReviewWidget
             targetType="establishment"
@@ -452,19 +457,16 @@ export const Establishment = () => {
           />
         </Section>
 
-        {/* ── CTA final — condicional según estado de login ────────────── */}
-        <div className="mt-8 mb-6">
+        {/* ── CTA final ── */}
+        <div className="mt-6 mb-6">
           {isLoggedInClient ? (
-            // Cliente logueado → botón de reservar
             <button
               onClick={() => setReservationOpen(true)}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-4 text-sm font-bold text-white transition hover:bg-orange-600 active:scale-[0.98]"
             >
-              <CalendarDays size={18} />
-              Reservar mesa
+              <CalendarDays size={18} /> Reservar mesa
             </button>
           ) : (
-            // No logueado → invitar a registrarse
             <button
               onClick={() => navigate("/register")}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-4 text-sm font-bold text-white transition hover:bg-orange-600 active:scale-[0.98]"

@@ -89,7 +89,17 @@ export const AdminUserDetail = () => {
           reviewService.getByUser(id),
         ]);
         setUser(userRes.data);
-        setReviews(reviewsRes || []);
+        const seen = new Set();
+        const deduped = (reviewsRes || []).filter((r) => {
+          const key =
+            r.establishment?._id || r.establishment || r.item?._id || r.item;
+          if (seen.has(key)) {
+            return false;
+          }
+          seen.add(key);
+          return true;
+        });
+        setReviews(deduped);
       } catch (err) {
         console.error(err);
         setError("Error al cargar el usuario");
@@ -348,8 +358,10 @@ export const AdminUserDetail = () => {
                       {r.establishment?.name || r.item?.name || "—"}
                     </p>
                     <p className="iph-meta">
-                      {r.establishment ? "Establecimiento" : "Tapa"} ·{" "}
-                      {formatDate(r.createdAt)}
+                      {r.establishment
+                        ? "Establecimiento"
+                        : `Tapa · ${r.item?.establishment?.name || ""}`}{" "}
+                      · {formatDate(r.createdAt)}
                     </p>
                   </div>
                   <StarDisplay rating={r.rating} />

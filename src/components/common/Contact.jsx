@@ -1,51 +1,51 @@
 import { Phone, Mail, Globe } from "lucide-react";
 
 export const Contact = ({ phone, email, website }) => {
+  if (!phone && !email && !website) {
+    return null;
+  }
+
   return (
-    <div className="p-4 text-center">
-
-      <div className="space-y-4 flex flex-col items-center">
-
-        {/* Teléfono */}
-        {phone && (
-          <button
-            onClick={() => (window.location.href = `tel:${phone}`)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
+    <div className="flex flex-col gap-3">
+      {phone && (
+        <a
+          href={`tel:${phone}`}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
             <Phone className="w-4 h-4 text-orange-500" />
-            <span className="text-white text-sm font-medium">{phone}</span>
-          </button>
-        )}
-
-        {/* Email */}
-        {email && (
-          <button
-            onClick={() => (window.location.href = `mailto:${email}`)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <Mail className="w-4 h-4 text-blue-500" />
-            <span className="text-white text-sm font-medium">{email}</span>
-          </button>
-        )}
-
-        {/* Website */}
-        {website && (
-          <button
-            onClick={() => window.open(website, "_blank")}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <Globe className="w-4 h-4 text-green-500" />
-            <span className="text-white text-sm font-medium truncate max-w-50">
-              {website}
-            </span>
-          </button>
-        )}
-
-        {!phone && !email && !website && (
-          <span className="text-neutral-600 text-sm">—</span>
-        )}
-
-      </div>
+          </div>
+          <span className="text-white text-sm font-medium">{phone}</span>
+        </a>
+      )}
+      {email && (
+        <a
+          href={`mailto:${email}`}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+            <Mail className="w-4 h-4 text-blue-400" />
+          </div>
+          <span className="text-white text-sm font-medium break-all">
+            {email}
+          </span>
+        </a>
+      )}
+      {website && (
+        <a
+          href={website}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
+        >
+          <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center shrink-0">
+            <Globe className="w-4 h-4 text-green-400" />
+          </div>
+          <span className="text-white text-sm font-medium break-all">
+            {website}
+          </span>
+        </a>
+      )}
     </div>
   );
 };

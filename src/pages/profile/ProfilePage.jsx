@@ -634,7 +634,10 @@ export function ProfilePage() {
                         {r.establishment?.name || r.item?.name || "—"}
                       </p>
                       <p className="text-xs text-neutral-500">
-                        {r.establishment ? "Establecimiento" : "Tapa"} ·{" "}
+                        {r.establishment
+                          ? "Establecimiento"
+                          : `Tapa · ${r.item?.establishment?.name || ""}`}{" "}
+                        ·{" "}
                         {new Date(r.createdAt).toLocaleDateString("es-ES", {
                           day: "numeric",
                           month: "short",
