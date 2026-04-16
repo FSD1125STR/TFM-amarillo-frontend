@@ -19,7 +19,6 @@ import {
   ChevronRight,
   CheckCircle,
   XCircle,
-  HeartHandshake,
   SquareArrowLeft,
   Tags,
   AlertTriangle,
@@ -36,67 +35,48 @@ const Lightbox = ({ images, startIndex, onClose }) => {
 
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-      if (e.key === "ArrowLeft") {
-        prev();
-      }
-      if (e.key === "ArrowRight") {
-        next();
-      }
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") prev();
+      if (e.key === "ArrowRight") next();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/95 flex flex-col"
-      onClick={onClose}
-    >
-      <div className="flex justify-end p-4">
-        <button
-          onClick={onClose}
-          className="text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
-        >
-          <X size={24} />
+    <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={onClose}>
+      {/* Botón cerrar */}
+      <div className="flex justify-end p-3 shrink-0">
+        <button onClick={onClose}
+          className="text-white bg-white/20 hover:bg-white/30 rounded-full p-2.5 transition-colors">
+          <X size={22} />
         </button>
       </div>
-      <div
-        className="flex-1 flex items-center justify-between px-4 gap-4"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={prev}
-          className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0"
-        >
-          <ChevronLeft size={28} />
-        </button>
+
+      {/* Imagen centrada */}
+      <div className="flex-1 flex items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
         <img
           src={images[current]}
           alt={`Foto ${current + 1}`}
-          className="max-h-full max-w-full object-contain rounded-xl flex-1"
-          style={{ maxHeight: "75vh" }}
+          className="max-w-full max-h-full object-contain sm:max-h-[80vh]"
         />
-        <button
-          onClick={next}
-          className="text-white bg-white/10 hover:bg-white/20 rounded-full p-3 transition-colors shrink-0"
-        >
-          <ChevronRight size={28} />
+        {/* Flechas superpuestas */}
+        <button onClick={prev}
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/70 rounded-full p-2.5 transition-colors">
+          <ChevronLeft size={24} />
+        </button>
+        <button onClick={next}
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/70 rounded-full p-2.5 transition-colors">
+          <ChevronRight size={24} />
         </button>
       </div>
-      <div className="flex justify-center pb-6 pt-3">
-        <div className="flex gap-1.5">
+
+      {/* Dots */}
+      <div className="flex justify-center pb-6 pt-3 shrink-0">
+        <div className="flex gap-2">
           {images.map((_, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrent(i);
-              }}
-              className={`w-1.5 h-1.5 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`}
-            />
+            <button key={i} onClick={(e) => { e.stopPropagation(); setCurrent(i); }}
+              className={`w-2 h-2 rounded-full transition-colors ${i === current ? "bg-orange-400" : "bg-white/30"}`} />
           ))}
         </div>
       </div>
@@ -124,23 +104,15 @@ export const Tapas = () => {
   const { coords, loading: geoLoading } = useGeolocation();
 
   useEffect(() => {
-    if (slug && !geoLoading) {
-      loadTapa();
-    }
+    if (slug && !geoLoading) loadTapa();
   }, [slug, geoLoading]);
 
   const loadTapa = async () => {
     try {
       setLoading(true);
-      const params =
-        !distanceFromState && coords
-          ? { lat: coords.lat, lng: coords.lng }
-          : {};
+      const params = !distanceFromState && coords ? { lat: coords.lat, lng: coords.lng } : {};
       const response = await itemService.getBySlug(slug, params);
-      if (!response || !response.data) {
-        setError("Tapa no encontrada");
-        return;
-      }
+      if (!response || !response.data) { setError("Tapa no encontrada"); return; }
       const data = response.data;
       setTapa(data);
       const fotosData = await photoService.getByItem(data._id);
@@ -154,22 +126,13 @@ export const Tapas = () => {
     }
   };
 
-  const openLightbox = (index = 0) => {
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
+  const openLightbox = (index = 0) => { setLightboxIndex(index); setLightboxOpen(true); };
 
-  const rawPrimaryUrl =
-    photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || null;
-  const heroUrl = rawPrimaryUrl
-    ? cloudinaryPresets.detail(rawPrimaryUrl)
-    : "/Logo.png";
-  const lightboxUrls =
-    photos.length > 0
-      ? photos.map((p) => cloudinaryPresets.detail(p.url))
-      : rawPrimaryUrl
-        ? [cloudinaryPresets.detail(rawPrimaryUrl)]
-        : [];
+  const rawPrimaryUrl = photos.find((p) => p.isPrimary)?.url || tapa?.mainImage || null;
+  const heroUrl = rawPrimaryUrl ? cloudinaryPresets.detail(rawPrimaryUrl) : "/Logo.png";
+  const lightboxUrls = photos.length > 0
+    ? photos.map((p) => cloudinaryPresets.detail(p.url))
+    : rawPrimaryUrl ? [cloudinaryPresets.detail(rawPrimaryUrl)] : [];
 
   const distance = distanceFromState ?? tapa?.establishment?.distance ?? null;
   const isAvailableToday = tapa?.available && (tapa?.servedToday ?? true);
@@ -188,9 +151,7 @@ export const Tapas = () => {
     return (
       <Container>
         <div className="flex flex-col items-center justify-center h-screen">
-          <p className="text-lg text-red-500 mb-4">
-            {error || "Tapa no encontrada"}
-          </p>
+          <p className="text-lg text-red-500 mb-4">{error || "Tapa no encontrada"}</p>
           <Button onClick={() => navigate("/")}>Volver al inicio</Button>
         </div>
       </Container>
@@ -201,50 +162,35 @@ export const Tapas = () => {
     <div>
       {/* ── Lightbox ── */}
       {lightboxOpen && lightboxUrls.length > 0 && (
-        <Lightbox
-          images={lightboxUrls}
-          startIndex={lightboxIndex}
-          onClose={() => setLightboxOpen(false)}
-        />
+        <Lightbox images={lightboxUrls} startIndex={lightboxIndex} onClose={() => setLightboxOpen(false)} />
       )}
 
       {/* ── Hero ── */}
       <div className="relative max-w-3xl mx-auto mt-4 h-96">
         {rawPrimaryUrl ? (
           <>
-            <img
-              src={heroUrl}
-              alt={tapa.name}
+            <img src={heroUrl} alt={tapa.name}
               className="w-full h-full object-cover rounded-xl shadow-md cursor-pointer"
               onClick={() => openLightbox(0)}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "/Logo.png";
-              }}
-            />
+              onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }} />
             <div className="absolute inset-0 bg-black/20 rounded-xl pointer-events-none" />
           </>
         ) : (
           <div className="w-full h-full rounded-xl bg-neutral-800 overflow-hidden">
-            <img
-              src="/Logo.png"
-              alt="nexTapa"
-              className="w-full h-full object-cover opacity-60"
-            />
+            <img src="/Logo.png" alt="nexTapa" className="w-full h-full object-cover opacity-60" />
           </div>
         )}
+
+        {/* Barra superior — sin corazón */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-          <button
-            onClick={() => navigate(-1)}
-            className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center"
-          >
+          <button onClick={() => navigate(-1)}
+            className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center">
             <SquareArrowLeft />
           </button>
           <span className="text-white font-semibold">nexTapa</span>
-          <button className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/80 transition-colors">
-            <HeartHandshake />
-          </button>
+          <div className="w-10" /> {/* spacer para centrar el título */}
         </div>
+
         {lightboxUrls.length > 1 && (
           <div className="absolute bottom-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
             1 / {lightboxUrls.length}
@@ -252,25 +198,18 @@ export const Tapas = () => {
         )}
       </div>
 
-      {/* ── Carrusel thumbnails ── */}
+      {/* ── Galería thumbnails cuadrada ── */}
       {photos.length > 1 && (
         <div className="max-w-3xl mx-auto mt-3 px-2">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {photos.map((photo, i) => (
-              <button
-                key={photo._id || i}
-                onClick={() => openLightbox(i)}
-                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${i === 0 ? "border-orange-500 opacity-100" : "border-transparent opacity-60 hover:opacity-90"}`}
-              >
-                <img
-                  src={cloudinaryPresets.thumbnail(photo.url)}
-                  alt={`Foto ${i + 1}`}
+              <button key={photo._id || i} onClick={() => openLightbox(i)}
+                className={`shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                  i === 0 ? "border-orange-500 opacity-100" : "border-transparent opacity-60 hover:opacity-90"
+                }`}>
+                <img src={cloudinaryPresets.thumbnail(photo.url)} alt={`Foto ${i + 1}`}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/Logo.png";
-                  }}
-                />
+                  onError={(e) => { e.target.onerror = null; e.target.src = "/Logo.png"; }} />
               </button>
             ))}
           </div>
@@ -282,34 +221,19 @@ export const Tapas = () => {
         {tapa.modalities?.length > 0 && (
           <div className="flex flex-wrap gap-2 flex-1">
             {tapa.modalities.map((mod, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-2 rounded-xl px-4 py-2.5 border ${
-                  !mod.available
-                    ? "bg-neutral-900 border-neutral-700 opacity-50"
-                    : mod.isFree
-                      ? "bg-green-500/10 border-green-500/30"
-                      : "bg-neutral-900 border-neutral-700"
-                }`}
-              >
-                <span className="text-sm text-neutral-200 font-medium">
-                  {mod.label}
-                </span>
+              <div key={i} className={`flex items-center gap-2 rounded-xl px-4 py-2.5 border ${
+                !mod.available ? "bg-neutral-900 border-neutral-700 opacity-50"
+                : mod.isFree ? "bg-green-500/10 border-green-500/30"
+                : "bg-neutral-900 border-neutral-700"
+              }`}>
+                <span className="text-sm text-neutral-200 font-medium">{mod.label}</span>
                 <span className="w-px h-3 bg-neutral-600" />
                 {mod.isFree ? (
-                  <span className="text-xs font-bold text-green-400 uppercase tracking-wide">
-                    Gratis
-                  </span>
+                  <span className="text-xs font-bold text-green-400 uppercase tracking-wide">Gratis</span>
                 ) : (
-                  <span className="text-sm font-bold text-orange-400">
-                    {mod.price}€
-                  </span>
+                  <span className="text-sm font-bold text-orange-400">{mod.price}€</span>
                 )}
-                {!mod.available && (
-                  <span className="text-[10px] text-neutral-500 italic">
-                    no disponible
-                  </span>
-                )}
+                {!mod.available && <span className="text-[10px] text-neutral-500 italic">no disponible</span>}
               </div>
             ))}
           </div>
@@ -318,46 +242,25 @@ export const Tapas = () => {
         <div className="flex flex-col gap-2 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-3 self-start">
           <div className="flex items-center gap-2.5">
             {isAvailableToday ? (
-              <>
-                <CheckCircle className="text-green-500 w-4 h-4 flex-shrink-0" />
-                <span className="text-sm text-green-400 font-medium">
-                  Tapa disponible
-                </span>
-              </>
+              <><CheckCircle className="text-green-500 w-4 h-4 shrink-0" />
+              <span className="text-sm text-green-400 font-medium">Tapa disponible</span></>
             ) : tapa.availableOnlyOn?.length > 0 ? (
-              <>
-                <XCircle className="text-red-400 w-4 h-4" />
-                <span className="text-sm text-red-400 font-medium">
-                  Disponible los:{" "}
-                  {tapa.availableOnlyOn
-                    .map((d) => d.charAt(0).toUpperCase() + d.slice(1))
-                    .join(", ")}
-                </span>
-              </>
+              <><XCircle className="text-red-400 w-4 h-4" />
+              <span className="text-sm text-red-400 font-medium">
+                Disponible los: {tapa.availableOnlyOn.map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(", ")}
+              </span></>
             ) : (
-              <>
-                <XCircle className="text-red-500 w-4 h-4 flex-shrink-0" />
-                <span className="text-sm text-red-400 font-medium">
-                  Tapa no disponible
-                </span>
-              </>
+              <><XCircle className="text-red-500 w-4 h-4 shrink-0" />
+              <span className="text-sm text-red-400 font-medium">Tapa no disponible</span></>
             )}
           </div>
           <div className="flex items-center gap-2.5">
             {tapa.establishment?.isOpen ? (
-              <>
-                <CheckCircle className="text-green-500 w-4 h-4 flex-shrink-0" />
-                <span className="text-sm text-green-400 font-medium">
-                  Local abierto ahora
-                </span>
-              </>
+              <><CheckCircle className="text-green-500 w-4 h-4 shrink-0" />
+              <span className="text-sm text-green-400 font-medium">Local abierto ahora</span></>
             ) : (
-              <>
-                <XCircle className="text-red-500 w-4 h-4 flex-shrink-0" />
-                <span className="text-sm text-red-400 font-medium">
-                  Local cerrado ahora
-                </span>
-              </>
+              <><XCircle className="text-red-500 w-4 h-4 shrink-0" />
+              <span className="text-sm text-red-400 font-medium">Local cerrado ahora</span></>
             )}
           </div>
           {isAvailableToday && !tapa.establishment?.isOpen && (
@@ -376,9 +279,7 @@ export const Tapas = () => {
               <h2 className="text-3xl font-bold text-white">{tapa.name}</h2>
               <div className="w-16 h-1 bg-orange-500 rounded-full mt-3 mx-auto" />
             </div>
-            <p className="text-sm text-white leading-relaxed text-center">
-              {tapa.description}
-            </p>
+            <p className="text-sm text-white leading-relaxed text-center">{tapa.description}</p>
           </div>
         )}
 
@@ -389,15 +290,11 @@ export const Tapas = () => {
           slug={tapa.establishment.slug}
         />
 
-        {/* ── Información adicional — estilo unificado ── */}
-        {(tapa.categories?.length > 0 ||
-          tapa.allergens?.length > 0 ||
-          tapa.dietaryOptions?.length > 0) && (
+        {/* ── Información adicional ── */}
+        {(tapa.categories?.length > 0 || tapa.allergens?.length > 0 || tapa.dietaryOptions?.length > 0) && (
           <div className="mt-8">
             <div className="mb-4">
-              <h2 className="text-xl font-bold text-white">
-                Información adicional
-              </h2>
+              <h2 className="text-xl font-bold text-white">Información adicional</h2>
               <div className="w-12 h-1 bg-orange-500 rounded-full mt-2" />
             </div>
             <div className="flex flex-col md:flex-row gap-3">
@@ -405,60 +302,37 @@ export const Tapas = () => {
                 <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
                   <div className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 rounded-full px-3 py-1 mb-4">
                     <Tags className="w-3.5 h-3.5 text-orange-400" />
-                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">
-                      Categorías
-                    </span>
+                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">Categorías</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {tapa.categories.map((cat, i) => (
-                      <span
-                        key={i}
-                        className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl"
-                      >
-                        {cat}
-                      </span>
+                      <span key={i} className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl">{cat}</span>
                     ))}
                   </div>
                 </div>
               )}
-
               {tapa.allergens?.length > 0 && (
                 <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
                   <div className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 rounded-full px-3 py-1 mb-4">
                     <AlertTriangle className="w-3.5 h-3.5 text-orange-400" />
-                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">
-                      Alérgenos
-                    </span>
+                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">Alérgenos</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {tapa.allergens.map((allergen, i) => (
-                      <span
-                        key={i}
-                        className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl"
-                      >
-                        {allergen}
-                      </span>
+                      <span key={i} className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl">{allergen}</span>
                     ))}
                   </div>
                 </div>
               )}
-
               {tapa.dietaryOptions?.length > 0 && (
                 <div className="flex-1 bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-orange-500/30 transition-colors duration-200">
                   <div className="inline-flex items-center gap-1.5 bg-neutral-800 border border-neutral-700 rounded-full px-3 py-1 mb-4">
                     <Leaf className="w-3.5 h-3.5 text-orange-400" />
-                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">
-                      Dieta
-                    </span>
+                    <span className="text-xs font-semibold text-orange-400 uppercase tracking-wide">Dieta</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {tapa.dietaryOptions.map((diet, i) => (
-                      <span
-                        key={i}
-                        className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl"
-                      >
-                        {diet}
-                      </span>
+                      <span key={i} className="text-sm text-neutral-200 bg-neutral-800 border border-neutral-700/60 px-3 py-1.5 rounded-xl">{diet}</span>
                     ))}
                   </div>
                 </div>
@@ -481,9 +355,7 @@ export const Tapas = () => {
 
         <div className="mt-8 mb-6">
           <Button
-            onClick={() =>
-              navigate(`/establishment/${tapa.establishment.slug}`)
-            }
+            onClick={() => navigate(`/establishment/${tapa.establishment.slug}`)}
             className="w-full bg-orange-500 py-4 rounded-xl text-white font-semibold hover:bg-orange-600"
           >
             Volver al establecimiento {tapa.establishment.name}
