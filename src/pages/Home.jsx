@@ -1,13 +1,14 @@
-﻿import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
 import Container from "../components/layout/Container";
 import { SearchDropdown } from "../components/search/SearchDropdown";
-import NearbySection from "./home/NearbySection";
-import { FeaturedSection } from "./home/FeaturedSection";
-import TopCities from "./home/TopCities";
-import QuickFilters from "./home/QuickFilters";
-import HowItWorks from "./home/HowItWorks";
-import HostCTA from "./home/HostCTA";
+import NearbySection from "../components/home/NearbySection";
+import { FeaturedSection } from "../components/home/FeaturedSection";
+import TopCities from "../components/home/TopCities";
+import QuickFilters from "../components/home/QuickFilters";
+import HowItWorks from "../components/home/HowItWorks";
+import HostCTA from "../components/home/HostCTA";
+import AboutTeaser from "../components/home/AboutTeaser";
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ export const Home = () => {
         <NearbySection />
         <FeaturedSection className="mt-10" />
         <TopCities className="mt-10" />
+        <AboutTeaser className="mt-10" />
 
         <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-5 xl:gap-8">
           <div className="xl:col-span-3">

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { AllEstablishment } from "./pages/AllEstablishment";
@@ -30,11 +31,17 @@ import { PrivateRoute } from "./components/routes/ClientRoute";
 import { ForgotPasswordPage } from "./pages/auth/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/auth/ResetPasswordPage";
 import { VerifyEmailPage } from "./pages/auth/VerifyEmailPage";
+import { AboutPage } from "./pages/AboutPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 import { Footer } from "./components/layout/Footer";
 
 function AppLayout() {
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const hideFooter = location.pathname.startsWith("/admin");
   const shellClassName = hideFooter
@@ -51,6 +58,7 @@ function AppLayout() {
         <Route path="/items" element={<AllTapas />} />
         <Route path="/items/:slug" element={<Tapas />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/nosotros" element={<AboutPage />} />
 
         {/* ── Auth ─────────────────────────────────────────────────────── */}
         <Route
@@ -157,8 +165,7 @@ function AppLayout() {
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
 
-        {/* ── Fallback global ──────────────────────────────────────────── */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
       {!hideFooter && <Footer />}
