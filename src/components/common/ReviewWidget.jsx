@@ -3,11 +3,12 @@ import { Star, LogIn } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { reviewService } from "../../services/reviewService";
 
-// ── Estrellas interactivas ────────────────────────────────────────────────────
-const StarRow = ({ value, onChange, readonly = false, size = 28 }) => {
+// ── StarRow interactiva ───────────────────────────────────────────────────────
+const StarRow = ({ value, onChange, readonly = false, size = 24 }) => {
   const [hovered, setHovered] = useState(0);
+
   return (
-    <div className="flex gap-0.5">
+    <div className="flex gap-1">
       {[1, 2, 3, 4, 5].map((n) => {
         const filled = n <= (hovered || value);
         return (
@@ -18,11 +19,18 @@ const StarRow = ({ value, onChange, readonly = false, size = 28 }) => {
             onClick={() => !readonly && onChange?.(n)}
             onMouseEnter={() => !readonly && setHovered(n)}
             onMouseLeave={() => !readonly && setHovered(0)}
-            className={`transition-transform duration-100 ${readonly ? "cursor-default" : "cursor-pointer hover:scale-110"}`}
+            className={`transition-transform duration-100 ${
+              readonly ? "cursor-default" : "cursor-pointer hover:scale-115"
+            }`}
+            aria-label={`${n} estrella${n > 1 ? "s" : ""}`}
           >
             <Star
               size={size}
-              className={`transition-colors duration-100 ${filled ? "fill-amber-400 text-amber-400" : "fill-transparent text-zinc-600"}`}
+              className={`transition-colors duration-100 ${
+                filled
+                  ? "fill-amber-400 text-amber-400"
+                  : "fill-transparent text-zinc-600"
+              }`}
             />
           </button>
         );
@@ -41,8 +49,8 @@ export const ReviewWidget = ({ targetType, targetId }) => {
   const [myReview, setMyReview] = useState(null);
   const [selected, setSelected] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
   const fetchReviews = useCallback(async () => {
     try {
@@ -52,7 +60,7 @@ export const ReviewWidget = ({ targetType, targetId }) => {
       if (user && data.reviews) {
         const userId = user._id || user.id;
         const mine = data.reviews.find(
-          (r) => (r.user?._id ?? r.user) === userId,
+          (r) => (r.user?._id ?? r.user?._id ?? r.user) === userId,
         );
         if (mine) {
           setMyReview(mine);
@@ -71,6 +79,7 @@ export const ReviewWidget = ({ targetType, targetId }) => {
     fetchReviews();
   }, [fetchReviews]);
 
+  // Al pulsar una estrella: crea o actualiza directamente
   const handleRate = async (rating) => {
     if (!canReview || loading) {
       return;
@@ -99,25 +108,66 @@ export const ReviewWidget = ({ targetType, targetId }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      {/* ── Una sola fila: media + estrellas ── */}
-      <div className="flex items-center gap-4">
-        {/* Número grande + contador */}
-        <div className="flex flex-col items-center leading-none shrink-0">
-          <span className="text-4xl font-black text-white">
-            {avg ? avg.toFixed(1) : "—"}
+    <div className="flex flex-col gap-3">
+      {/* ── Media ── */}
+      <div className="flex items-center gap-3">
+        {avg ? (
+          <>
+            <span className="text-4xl font-black text-white leading-none">
+              {avg.toFixed(1)}
+            </span>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex gap-0.5">
+                {[1, 2, 3, 4, 5].map((n) => {
+                  const fill = Math.min(Math.max(avg - (n - 1), 0), 1);
+                  return (
+                    <span key={n} className="relative inline-block">
+                      <Star size={14} className="fill-zinc-700 text-zinc-700" />
+                      <span
+                        className="absolute inset-0 overflow-hidden"
+                        style={{ width: `${fill * 100}%` }}
+                      >
+                        <Star
+                          size={14}
+                          className="fill-amber-400 text-amber-400"
+                        />
+                      </span>
+                    </span>
+                  );
+                })}
+              </div>
+              <span className="text-xs text-zinc-500">
+                {count} {count === 1 ? "valoración" : "valoraciones"}
+              </span>
+            </div>
+          </>
+        ) : (
+          <span className="text-xs text-zinc-500 italic">
+            Sin valoraciones aún
           </span>
-          <span className="text-xs text-zinc-500 mt-0.5">
-            {count} {count === 1 ? "valoración" : "valoraciones"}
-          </span>
+        )}
+      </div>
+
+      {/* ── Separador ── */}
+      <div className="h-px bg-zinc-800" />
+
+      {/* ── Sin sesión o admin ── */}
+      {(!user || !canReview) && (
+        <div className="flex items-center gap-2 text-zinc-500 text-xs">
+          <LogIn size={13} />
+          <span>Inicia sesión para valorar</span>
         </div>
+      )}
 
-        {/* Divisor */}
-        <div className="w-px h-10 bg-zinc-700 shrink-0" />
-
-        {/* Estrellas — votar o login */}
-        {canReview ? (
-          <div className="flex flex-col gap-1">
+      {/* ── Con sesión — widget de valoración ── */}
+      {canReview && (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-xs text-zinc-400">
+            {myReview
+              ? "Tu valoración — pulsa para cambiar"
+              : "Valora este contenido"}
+          </span>
+          <div className="flex items-center gap-3">
             <StarRow
               value={selected}
               onChange={handleRate}
@@ -130,15 +180,10 @@ export const ReviewWidget = ({ targetType, targetId }) => {
             {saved && (
               <span className="text-xs text-emerald-400">✓ Guardado</span>
             )}
-            {error && <span className="text-xs text-red-400">{error}</span>}
           </div>
-        ) : (
-          <div className="flex items-center gap-2 text-zinc-500 text-xs">
-            <LogIn size={13} />
-            <span>Inicia sesión para valorar</span>
-          </div>
-        )}
-      </div>
+          {error && <span className="text-xs text-red-400">{error}</span>}
+        </div>
+      )}
     </div>
   );
 };

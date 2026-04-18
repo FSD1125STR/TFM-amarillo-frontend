@@ -11,6 +11,9 @@ import { AdminEstablishments } from "./pages/admin/AdminEstablishments";
 import { AdminEstablishmentDetail } from "./pages/admin/AdminEstablishmentDetail";
 import { ItemAdmin } from "./pages/admin/ItemAdmin";
 import { HostItemEditor } from "./pages/host/HostItemEditor";
+import { AdminUsers } from "./pages/admin/AdminUsers";
+import { AdminUserDetail } from "./pages/admin/AdminUserDetail";
+import { AdminItems } from "./pages/admin/AdminItems";
 
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
@@ -48,7 +51,6 @@ function AppLayout() {
   return (
     <div className={shellClassName}>
       <Routes>
-
         {/* ── Públicas ─────────────────────────────────────────────────── */}
         <Route path="/" element={<Home />} />
         <Route path="/establishments" element={<AllEstablishment />} />
@@ -59,56 +61,107 @@ function AppLayout() {
         <Route path="/nosotros" element={<AboutPage />} />
 
         {/* ── Auth ─────────────────────────────────────────────────────── */}
-        <Route path="/login" element={
-          <PublicOnlyRoute><LoginPage /></PublicOnlyRoute>
-        } />
+        <Route
+          path="/login"
+          element={
+            <PublicOnlyRoute>
+              <LoginPage />
+            </PublicOnlyRoute>
+          }
+        />
 
-        <Route path="/register" element={
-          <PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>
-        } />
+        <Route
+          path="/register"
+          element={
+            <PublicOnlyRoute>
+              <RegisterPage />
+            </PublicOnlyRoute>
+          }
+        />
 
-        <Route path="/host/login" element={
-          <PublicOnlyRoute><Navigate to="/login" replace /></PublicOnlyRoute>
-        } />
+        <Route
+          path="/host/login"
+          element={
+            <PublicOnlyRoute>
+              <Navigate to="/login" replace />
+            </PublicOnlyRoute>
+          }
+        />
 
-        <Route path="/host/register" element={
-          <PublicOnlyRoute><HostRegisterPage /></PublicOnlyRoute>
-        } />
+        <Route
+          path="/host/register"
+          element={
+            <PublicOnlyRoute>
+              <HostRegisterPage />
+            </PublicOnlyRoute>
+          }
+        />
 
-        <Route path="/forgot-password" element={
-          <PublicOnlyRoute><ForgotPasswordPage /></PublicOnlyRoute>
-        } />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicOnlyRoute>
+              <ForgotPasswordPage />
+            </PublicOnlyRoute>
+          }
+        />
 
         {/* Verificación y reset — sin PublicOnlyRoute, el usuario no está logueado */}
-        <Route path="/verify-email"    element={<VerifyEmailPage />} />
-        <Route path="/auth/verify"     element={<VerifyEmailPage />} />
-        <Route path="/reset-password"  element={<ResetPasswordPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/auth/verify" element={<VerifyEmailPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
         {/* ── Host ─────────────────────────────────────────────────────── */}
-        <Route path="/host/dashboard" element={
-          <HostRoute><HostDashboard /></HostRoute>
-        } />
+        <Route
+          path="/host/dashboard"
+          element={
+            <HostRoute>
+              <HostDashboard />
+            </HostRoute>
+          }
+        />
 
-        <Route path="/host/items/:id" element={
-          <HostRoute><HostItemEditor /></HostRoute>
-        } />
+        <Route
+          path="/host/items/:id"
+          element={
+            <HostRoute>
+              <HostItemEditor />
+            </HostRoute>
+          }
+        />
 
         {/* ── Perfil ───────────────────────────────────────────────────── */}
-        <Route path="/profile" element={
-          <PrivateRoute><ProfilePage /></PrivateRoute>
-        } />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
 
         <Route path="/403" element={<ForbiddenPage />} />
 
         {/* ── Admin ────────────────────────────────────────────────────── */}
-        <Route path="/admin" element={
-          <AdminRoute><AdminPanel /></AdminRoute>
-        }>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminPanel />
+            </AdminRoute>
+          }
+        >
           <Route index element={<Dashboard />} />
           <Route path="establishments" element={<AdminEstablishments />} />
-          <Route path="establishments/:id" element={<AdminEstablishmentDetail />} />
+          <Route
+            path="establishments/:id"
+            element={<AdminEstablishmentDetail />}
+          />
+          <Route path="items" element={<AdminItems />} />
           <Route path="items/:id" element={<ItemAdmin />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="users/:id" element={<AdminUserDetail />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
 
