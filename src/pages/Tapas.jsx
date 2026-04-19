@@ -45,22 +45,18 @@ const Lightbox = ({ images, startIndex, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={onClose}>
-      {/* Botón cerrar */}
       <div className="flex justify-end p-3 shrink-0">
         <button onClick={onClose}
           className="text-white bg-white/20 hover:bg-white/30 rounded-full p-2.5 transition-colors">
           <X size={22} />
         </button>
       </div>
-
-      {/* Imagen centrada */}
       <div className="flex-1 flex items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
         <img
           src={images[current]}
           alt={`Foto ${current + 1}`}
           className="max-w-full max-h-full object-contain sm:max-h-[80vh]"
         />
-        {/* Flechas superpuestas */}
         <button onClick={prev}
           className="absolute left-2 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/70 rounded-full p-2.5 transition-colors">
           <ChevronLeft size={24} />
@@ -70,8 +66,6 @@ const Lightbox = ({ images, startIndex, onClose }) => {
           <ChevronRight size={24} />
         </button>
       </div>
-
-      {/* Dots */}
       <div className="flex justify-center pb-6 pt-3 shrink-0">
         <div className="flex gap-2">
           {images.map((_, i) => (
@@ -181,14 +175,13 @@ export const Tapas = () => {
           </div>
         )}
 
-        {/* Barra superior — sin corazón */}
         <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
           <button onClick={() => navigate(-1)}
             className="bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center">
             <SquareArrowLeft />
           </button>
           <span className="text-white font-semibold">nexTapa</span>
-          <div className="w-10" /> {/* spacer para centrar el título */}
+          <div className="w-10" />
         </div>
 
         {lightboxUrls.length > 1 && (
@@ -198,7 +191,7 @@ export const Tapas = () => {
         )}
       </div>
 
-      {/* ── Galería thumbnails cuadrada ── */}
+      {/* ── Galería thumbnails ── */}
       {photos.length > 1 && (
         <div className="max-w-3xl mx-auto mt-3 px-2">
           <div className="flex gap-2 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -217,57 +210,92 @@ export const Tapas = () => {
       )}
 
       {/* ── Modalidades + disponibilidad ── */}
-      <div className="max-w-3xl mx-auto px-4 flex flex-col md:flex-row gap-3 p-4 items-center bg-neutral-900 border border-neutral-800 rounded-2xl mt-4 hover:border-orange-500/30 transition-colors duration-200">
-        {tapa.modalities?.length > 0 && (
-          <div className="flex flex-wrap gap-2 flex-1">
-            {tapa.modalities.map((mod, i) => (
-              <div key={i} className={`flex items-center gap-2 rounded-xl px-4 py-2.5 border ${
-                !mod.available ? "bg-neutral-900 border-neutral-700 opacity-50"
-                : mod.isFree ? "bg-green-500/10 border-green-500/30"
-                : "bg-neutral-900 border-neutral-700"
-              }`}>
-                <span className="text-sm text-neutral-200 font-medium">{mod.label}</span>
-                <span className="w-px h-3 bg-neutral-600" />
-                {mod.isFree ? (
-                  <span className="text-xs font-bold text-green-400 uppercase tracking-wide">Gratis</span>
-                ) : (
-                  <span className="text-sm font-bold text-orange-400">{mod.price}€</span>
-                )}
-                {!mod.available && <span className="text-[10px] text-neutral-500 italic">no disponible</span>}
-              </div>
-            ))}
-          </div>
-        )}
+      <div className="max-w-3xl mx-auto px-4 mt-4">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden hover:border-orange-500/20 transition-colors duration-200">
 
-        <div className="flex flex-col gap-2 bg-neutral-900 border border-neutral-800 rounded-2xl px-4 py-3 self-start">
-          <div className="flex items-center gap-2.5">
-            {isAvailableToday ? (
-              <><CheckCircle className="text-green-500 w-4 h-4 shrink-0" />
-              <span className="text-sm text-green-400 font-medium">Tapa disponible</span></>
-            ) : tapa.availableOnlyOn?.length > 0 ? (
-              <><XCircle className="text-red-400 w-4 h-4" />
-              <span className="text-sm text-red-400 font-medium">
-                Disponible los: {tapa.availableOnlyOn.map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(", ")}
-              </span></>
-            ) : (
-              <><XCircle className="text-red-500 w-4 h-4 shrink-0" />
-              <span className="text-sm text-red-400 font-medium">Tapa no disponible</span></>
-            )}
-          </div>
-          <div className="flex items-center gap-2.5">
-            {tapa.establishment?.isOpen ? (
-              <><CheckCircle className="text-green-500 w-4 h-4 shrink-0" />
-              <span className="text-sm text-green-400 font-medium">Local abierto ahora</span></>
-            ) : (
-              <><XCircle className="text-red-500 w-4 h-4 shrink-0" />
-              <span className="text-sm text-red-400 font-medium">Local cerrado ahora</span></>
-            )}
-          </div>
-          {isAvailableToday && !tapa.establishment?.isOpen && (
-            <p className="text-[11px] text-yellow-400/80 border-t border-neutral-800 pt-2 mt-1">
-              ⚠️ Disponible pero el local está cerrado
-            </p>
+          {/* Fila superior: modalidades */}
+          {tapa.modalities?.length > 0 && (
+            <div className="px-5 pt-5 pb-4 border-b border-neutral-800">
+              <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-3 font-medium">Modalidades</p>
+              <div className="flex flex-wrap gap-2">
+                {tapa.modalities.map((mod, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-2.5 rounded-xl px-4 py-2.5 border transition-opacity ${
+                      !mod.available
+                        ? "opacity-35 bg-neutral-800/40 border-neutral-700/30"
+                        : mod.isFree
+                        ? "bg-green-950/50 border-green-800/40"
+                        : "bg-neutral-800/60 border-neutral-700/50"
+                    }`}
+                  >
+                    <span className="text-sm text-neutral-200 font-medium">{mod.label}</span>
+                    <span className="w-px h-3.5 bg-neutral-600" />
+                    {mod.isFree ? (
+                      <span className="text-xs font-semibold text-green-400/70 uppercase tracking-wide">Gratis</span>
+                    ) : (
+                      <span className="text-sm font-bold text-orange-300">{mod.price}€</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
+
+          {/* Fila inferior: estado */}
+          <div className="px-5 py-4 flex flex-wrap items-center gap-4">
+            {/* Tapa disponible */}
+            <div className="flex items-center gap-2">
+              {isAvailableToday ? (
+                <>
+                  <CheckCircle className="text-green-500/70 w-4 h-4 shrink-0" />
+                  <span className="text-sm text-green-400/70 font-medium">Tapa disponible</span>
+                </>
+              ) : tapa.availableOnlyOn?.length > 0 ? (
+                <>
+                  <XCircle className="text-red-400/60 w-4 h-4 shrink-0" />
+                  <span className="text-sm text-red-400/60 font-medium">
+                    Solo {tapa.availableOnlyOn.map((d) => d.charAt(0).toUpperCase() + d.slice(1)).join(", ")}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="text-red-400/60 w-4 h-4 shrink-0" />
+                  <span className="text-sm text-red-400/60 font-medium">No disponible</span>
+                </>
+              )}
+            </div>
+
+            {/* Separador vertical */}
+            <span className="w-px h-4 bg-neutral-700 hidden sm:block" />
+
+            {/* Local abierto */}
+            <div className="flex items-center gap-2">
+              {tapa.establishment?.isOpen ? (
+                <>
+                  <CheckCircle className="text-green-500/70 w-4 h-4 shrink-0" />
+                  <span className="text-sm text-green-400/70 font-medium">Local abierto</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="text-red-400/60 w-4 h-4 shrink-0" />
+                  <span className="text-sm text-red-400/60 font-medium">Local cerrado</span>
+                </>
+              )}
+            </div>
+
+            {/* Aviso combinado */}
+            {isAvailableToday && !tapa.establishment?.isOpen && (
+              <>
+                <span className="w-px h-4 bg-neutral-700 hidden sm:block" />
+                <p className="text-xs text-yellow-600/60 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  Disponible pero el local está cerrado
+                </p>
+              </>
+            )}
+          </div>
+
         </div>
       </div>
 

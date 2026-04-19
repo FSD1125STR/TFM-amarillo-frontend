@@ -42,6 +42,11 @@ export const ItemGallery = ({
     return null;
   }
 
+  const getImageSrc = (mainImage) => {
+    if (!mainImage) return DEFAULT_IMAGE;
+    return cloudinaryPresets.thumbnail(mainImage);
+  };
+
   return (
     <Section title={`Tapas de ${establishmentName}`}>
       <div className="flex gap-2 mt-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -54,14 +59,14 @@ export const ItemGallery = ({
             className="group relative flex-none w-24 h-24 overflow-hidden rounded-lg bg-neutral-800"
           >
             <img
-              src={cloudinaryPresets.thumbnail(item.mainImage || DEFAULT_IMAGE)}
+              src={getImageSrc(item.mainImage)}
               alt={item.name}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
               onError={(e) => {
                 e.currentTarget.src = DEFAULT_IMAGE;
               }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+            <div className="absolute inset-0 bg-linear-to-t from-black/70 to-transparent flex items-end">
               <p className="text-white text-[9px] font-medium p-1.5 line-clamp-1 w-full text-left leading-tight">
                 {item.name}
               </p>
