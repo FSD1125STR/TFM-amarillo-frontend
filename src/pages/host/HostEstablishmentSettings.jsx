@@ -113,10 +113,10 @@ const SOCIAL_FIELDS = [
 ];
 
 const cardClass =
-  "rounded-2xl border border-[#243247] bg-gradient-to-b from-[#111825]/95 to-[#0a0f18]/95 p-5";
+  "rounded-2xl border border-[#262626] bg-gradient-to-b from-[#111111]/95 to-[#080808]/95 p-3 sm:p-5";
 const labelClass = "mb-1 block text-sm font-medium text-slate-400";
 const inputClass =
-  "w-full rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2.5 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-[#f77827]/60 focus:ring-2 focus:ring-[#f77827]/20";
+  "w-full rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2.5 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-[#f77827]/60 focus:ring-2 focus:ring-[#f77827]/20";
 
 const makeDay = (closed = false, open = "09:00", close = "00:00") => ({
   open,
@@ -218,9 +218,11 @@ const geocodeAddress = async (address) => {
 function HostCard({ title, children, action }) {
   return (
     <section className={cardClass}>
-      <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#1f2a3d] pb-2">
-        <h2 className="m-0 text-lg font-semibold text-slate-100">{title}</h2>
-        {action || null}
+      <div className="mb-3 flex flex-col gap-2 border-b border-[#262626] pb-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <h2 className="m-0 max-w-full break-words text-base font-semibold leading-tight whitespace-normal text-slate-100 sm:text-lg">
+          {title}
+        </h2>
+        {action ? <div className="w-full self-start sm:w-auto sm:self-auto">{action}</div> : null}
       </div>
       {children}
     </section>
@@ -270,7 +272,7 @@ function HostTagSection({
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <input
           className={inputClass}
           value={input}
@@ -286,9 +288,9 @@ function HostTagSection({
         <button
           type="button"
           onClick={addTag}
-          className="rounded-xl border border-[#2a374f] bg-[#111827] px-3 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-[#172033]"
+          className="w-full rounded-xl border border-[#2a2a2a] bg-[#111111] px-3 py-2 text-sm font-semibold text-slate-200 transition-colors hover:bg-[#191919] sm:w-auto"
         >
-          Add
+          Anadir
         </button>
       </div>
     </HostCard>
@@ -439,7 +441,7 @@ function HostMapPickerSection({ coordinates, onChange, onAddressChange }) {
 
   return (
     <HostCard
-      title="Ubicacion en el mapa"
+      title="Mapa y ubicacion"
       action={
         geocoding ? (
           <span className="text-xs font-medium text-slate-400">Geocodificando...</span>
@@ -448,11 +450,11 @@ function HostMapPickerSection({ coordinates, onChange, onAddressChange }) {
     >
       <div
         ref={mapContainerRef}
-        className="h-72 w-full overflow-hidden rounded-xl border border-[#2a374f]"
+        className="h-56 w-full overflow-hidden rounded-xl border border-[#2a2a2a] sm:h-72"
       />
 
       <p className="mt-2 text-xs text-slate-500">
-        Haz click en el mapa o arrastra el marcador para actualizar la direccion.
+        Pulsa el mapa o arrastra el pin para ajustar la direccion.
       </p>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -503,8 +505,8 @@ function HostSortablePhotoThumb({ photo, deletingId, onDelete, onSetPrimary }) {
       ref={setNodeRef}
       style={style}
       className={`group relative aspect-square overflow-hidden rounded-lg border ${
-        photo.isPrimary ? "border-[#f77827]" : "border-[#2a374f]"
-      } bg-[#0d1219]`}
+        photo.isPrimary ? "border-[#f77827]" : "border-[#2a2a2a]"
+      } bg-[#080808]`}
       {...attributes}
       {...listeners}
     >
@@ -521,7 +523,7 @@ function HostSortablePhotoThumb({ photo, deletingId, onDelete, onSetPrimary }) {
         </span>
       )}
 
-      <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute inset-x-1.5 bottom-1.5 flex items-center justify-center gap-2 rounded-md bg-black/60 p-1 opacity-100 md:inset-0 md:rounded-none md:p-0 md:opacity-0 md:transition-opacity md:group-hover:opacity-100">
         {!photo.isPrimary && (
           <button
             type="button"
@@ -687,15 +689,15 @@ function HostPhotosSection({ establishmentId, mainImage, onMainImageChange }) {
 
   return (
     <HostCard
-      title={`Fotos (${photos.length})`}
+      title={`Galeria (${photos.length})`}
       action={
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
           {orderChanged && (
             <button
               type="button"
               onClick={handleSaveOrder}
               disabled={savingOrder}
-              className="rounded-xl border border-[#2a374f] bg-[#111827] px-3 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#172033] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl border border-[#2a2a2a] bg-[#111111] px-3 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#191919] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
               {savingOrder ? "Guardando..." : "Guardar orden"}
             </button>
@@ -704,7 +706,7 @@ function HostPhotosSection({ establishmentId, mainImage, onMainImageChange }) {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            className="inline-flex items-center gap-1 rounded-xl bg-[#f77827] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#e06a1e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-1 rounded-xl bg-[#f77827] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#e06a1e] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             <ImagePlus size={14} />
             {uploading ? "Subiendo..." : "Anadir foto"}
@@ -734,7 +736,7 @@ function HostPhotosSection({ establishmentId, mainImage, onMainImageChange }) {
         <p className="text-sm text-slate-400">Cargando fotos...</p>
       ) : (
         <div className="space-y-3">
-          <div className="h-52 overflow-hidden rounded-xl border border-[#2a374f] bg-[#0d1219]">
+          <div className="h-44 overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#080808] sm:h-52">
             {displayImage ? (
               <img
                 src={cloudinaryPresets.gallery(displayImage)}
@@ -749,7 +751,7 @@ function HostPhotosSection({ establishmentId, mainImage, onMainImageChange }) {
           </div>
 
           {photos.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[#2a374f] px-4 py-6 text-center text-sm text-slate-500">
+            <div className="rounded-xl border border-dashed border-[#2a2a2a] px-4 py-6 text-center text-sm text-slate-500">
               No hay fotos todavia. Anade la primera con el boton superior.
             </div>
           ) : (
@@ -763,7 +765,7 @@ function HostPhotosSection({ establishmentId, mainImage, onMainImageChange }) {
                   items={nonPrimaryPhotos.map((photo) => photo._id)}
                   strategy={rectSortingStrategy}
                 >
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                  <div className="grid grid-cols-2 gap-2 min-[420px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-5">
                     {nonPrimaryPhotos.map((photo) => (
                       <HostSortablePhotoThumb
                         key={photo._id}
@@ -820,11 +822,11 @@ function HostSortableItemRow({
       const modality = item.modalities[0];
       return (
         <span>
-          {modality.label} ·{" "}
+          {modality.label} -{" "}
           {modality.isFree || modality.price === 0 ? (
             <span className="font-semibold text-emerald-400">Gratis</span>
           ) : (
-            `${modality.price}€`
+            `${modality.price} EUR`
           )}
         </span>
       );
@@ -832,7 +834,7 @@ function HostSortableItemRow({
 
     return (
       <select
-        className="rounded-lg border border-[#2a374f] bg-[#0d1219] px-2 py-1 text-xs text-slate-300"
+        className="rounded-lg border border-[#2a2a2a] bg-[#080808] px-2 py-1 text-xs text-slate-300"
         defaultValue=""
         onChange={(event) => {
           event.target.value = "";
@@ -843,10 +845,10 @@ function HostSortableItemRow({
         </option>
         {item.modalities.map((modality, index) => (
           <option key={`${item._id}-${index}`} disabled>
-            {modality.label} ·{" "}
+            {modality.label} -{" "}
             {modality.isFree || modality.price === 0
               ? "Gratis"
-              : `${modality.price}€`}
+              : `${modality.price} EUR`}
           </option>
         ))}
       </select>
@@ -858,7 +860,7 @@ function HostSortableItemRow({
       <td className="px-3 py-3">
         <button
           type="button"
-          className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-[#172033] hover:text-slate-200"
+          className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-[#191919] hover:text-slate-200"
           title="Arrastrar"
           {...attributes}
           {...listeners}
@@ -903,7 +905,7 @@ function HostSortableItemRow({
           <button
             type="button"
             onClick={() => onEdit(item._id)}
-            className="inline-flex items-center gap-1 rounded-lg border border-[#2a374f] bg-[#111827] px-2.5 py-1 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#172033]"
+            className="inline-flex items-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#111111] px-2.5 py-1 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#191919]"
           >
             <Pencil size={12} /> Editar
           </button>
@@ -917,6 +919,86 @@ function HostSortableItemRow({
         </div>
       </td>
     </tr>
+  );
+}
+
+function HostItemMobileCard({
+  item,
+  onToggleAvailable,
+  onToggleFeatured,
+  onDelete,
+  onEdit,
+}) {
+  const getModalitiesSummary = () => {
+    if (!item.modalities?.length) {
+      return "Sin modalidades";
+    }
+
+    if (item.modalities.length === 1) {
+      const modality = item.modalities[0];
+      const priceLabel =
+        modality.isFree || modality.price === 0
+          ? "Gratis"
+          : `${modality.price} EUR`;
+      return `${modality.label} - ${priceLabel}`;
+    }
+
+    return `${item.modalities.length} opciones`;
+  };
+
+  return (
+    <article className="rounded-xl border border-[#2a2a2a] bg-[#080808] p-3.5">
+      <div className="flex flex-col gap-2 min-[390px]:flex-row min-[390px]:items-start min-[390px]:justify-between">
+        <div className="min-w-0">
+          <p className="break-words text-sm font-semibold text-slate-100">{item.name}</p>
+          <p className="mt-1 text-xs text-slate-400">{getModalitiesSummary()}</p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => onEdit(item._id)}
+          className="inline-flex w-full items-center justify-center gap-1 rounded-lg border border-[#2a2a2a] bg-[#111111] px-2.5 py-1.5 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#191919] min-[390px]:w-auto"
+        >
+          <Pencil size={12} />
+          Editar
+        </button>
+      </div>
+
+      <div className="mt-3 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2">
+        <button
+          type="button"
+          onClick={() => onToggleAvailable(item._id, item.available)}
+          className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+            item.available
+              ? "bg-emerald-500/15 text-emerald-300"
+              : "bg-rose-500/15 text-rose-300"
+          }`}
+        >
+          {item.available ? "Disponible" : "No disponible"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => onToggleFeatured(item._id, item.featured)}
+          className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+            item.featured
+              ? "bg-emerald-500/15 text-emerald-300"
+              : "bg-rose-500/15 text-rose-300"
+          }`}
+        >
+          {item.featured ? "Destacada" : "No destacada"}
+        </button>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => onDelete(item._id, item.name)}
+        className="mt-3 inline-flex w-full items-center justify-center gap-1 rounded-lg bg-rose-500/15 px-3 py-2 text-xs font-semibold text-rose-300 transition-colors hover:bg-rose-500/25"
+      >
+        <Trash2 size={12} />
+        Borrar tapa
+      </button>
+    </article>
   );
 }
 
@@ -1032,15 +1114,15 @@ function HostItemsSection({ establishmentId, itemEditorBasePath = "/host/items" 
 
   return (
     <HostCard
-      title={`Tapas (${items.length})`}
+      title={`Carta de tapas (${items.length})`}
       action={
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:items-center">
           {orderChanged && (
             <button
               type="button"
               onClick={handleSaveOrder}
               disabled={savingOrder}
-              className="rounded-xl border border-[#2a374f] bg-[#111827] px-3 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#172033] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl border border-[#2a2a2a] bg-[#111111] px-3 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-[#191919] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             >
               {savingOrder ? "Guardando..." : "Guardar orden"}
             </button>
@@ -1050,7 +1132,7 @@ function HostItemsSection({ establishmentId, itemEditorBasePath = "/host/items" 
             onClick={() =>
               navigate(`${itemEditorPrefix}/new`, { state: { establishmentId } })
             }
-            className="inline-flex items-center gap-1 rounded-xl bg-[#2563eb] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1d4ed8]"
+            className="inline-flex w-full items-center justify-center gap-1 rounded-xl bg-[#2563eb] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-[#1d4ed8] sm:w-auto"
           >
             + Anadir tapa
           </button>
@@ -1071,47 +1153,64 @@ function HostItemsSection({ establishmentId, itemEditorBasePath = "/host/items" 
       {loading ? (
         <p className="text-sm text-slate-400">Cargando tapas...</p>
       ) : items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#2a374f] px-4 py-6 text-center text-sm text-slate-500">
+        <div className="rounded-xl border border-dashed border-[#2a2a2a] px-4 py-6 text-center text-sm text-slate-500">
           No hay tapas registradas para este establecimiento.
         </div>
       ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={items.map((item) => item._id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="overflow-x-auto rounded-xl border border-[#243247] bg-[#0b121a]">
-              <table className="min-w-180 w-full border-collapse text-sm">
-                <thead className="border-b border-[#243247] bg-[#131d2a]">
-                  <tr>
-                    <th className="w-8 px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400" />
-                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Nombre</th>
-                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Opciones</th>
-                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Disponible</th>
-                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Destacada</th>
-                    <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item) => (
-                    <HostSortableItemRow
-                      key={item._id}
-                      item={item}
-                      onToggleAvailable={handleToggleAvailable}
-                      onToggleFeatured={handleToggleFeatured}
-                      onDelete={handleDelete}
-                      onEdit={(id) => navigate(`${itemEditorPrefix}/${id}`)}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </SortableContext>
-        </DndContext>
+        <>
+          <div className="space-y-2.5 md:hidden">
+            {items.map((item) => (
+              <HostItemMobileCard
+                key={item._id}
+                item={item}
+                onToggleAvailable={handleToggleAvailable}
+                onToggleFeatured={handleToggleFeatured}
+                onDelete={handleDelete}
+                onEdit={(id) => navigate(`${itemEditorPrefix}/${id}`)}
+              />
+            ))}
+          </div>
+
+          <div className="hidden md:block">
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={items.map((item) => item._id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="overflow-x-auto rounded-xl border border-[#262626] bg-[#0b0b0b]">
+                  <table className="w-full min-w-[760px] border-collapse text-sm">
+                    <thead className="border-b border-[#262626] bg-[#111111]">
+                      <tr>
+                        <th className="w-8 px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400" />
+                        <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Nombre</th>
+                        <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Opciones</th>
+                        <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Disponible</th>
+                        <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Destacada</th>
+                        <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-slate-400">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.map((item) => (
+                        <HostSortableItemRow
+                          key={item._id}
+                          item={item}
+                          onToggleAvailable={handleToggleAvailable}
+                          onToggleFeatured={handleToggleFeatured}
+                          onDelete={handleDelete}
+                          onEdit={(id) => navigate(`${itemEditorPrefix}/${id}`)}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
+        </>
       )}
     </HostCard>
   );
@@ -1242,17 +1341,22 @@ export function HostEstablishmentSettings({
   }
 
   return (
-    <section className="rounded-[22px] border border-[#2a374f] bg-[#0a1018]/60 p-4 sm:p-5">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="m-0 text-lg font-bold text-slate-100">
-          Configuracion de tu establecimiento
-        </h3>
+    <section className="rounded-[22px] border border-[#2a2a2a] bg-[#090909]/90 p-3 sm:p-5">
+      <div className="mb-3 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="m-0 max-w-full break-words text-base font-bold leading-tight whitespace-normal text-slate-100 sm:text-lg">
+            Ajustes del local
+          </h3>
+          <p className="mt-1 text-xs text-slate-400">
+            Estructura optimizada para movil y bloques en negro.
+          </p>
+        </div>
 
         <button
           type="submit"
           form="host-establishment-form"
           disabled={!canSave}
-          className="rounded-xl bg-[#f77827] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#e06a1e] disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl bg-[#f77827] px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-[#e06a1e] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {saving ? "Guardando..." : "Guardar cambios"}
         </button>
@@ -1271,13 +1375,13 @@ export function HostEstablishmentSettings({
       )}
 
       <form id="host-establishment-form" onSubmit={handleSubmit}>
-        <div className="grid gap-3 lg:grid-cols-2">
-          <div className="space-y-3">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="space-y-4">
             <HostCard title="Estado de tu local">
               <div className="grid gap-2.5">
                 <label
                   htmlFor="host-active-status"
-                  className="flex items-center justify-between gap-3 rounded-xl border border-[#243247] bg-[#0d1219] px-3 py-2.5"
+                  className="flex flex-col gap-2 rounded-xl border border-[#262626] bg-[#080808] px-3 py-2.5 sm:flex-row sm:items-center"
                 >
                   <span className="inline-flex items-center gap-2 text-sm text-slate-200">
                     <input
@@ -1293,7 +1397,7 @@ export function HostEstablishmentSettings({
                   </span>
 
                   <span
-                    className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${
+                    className={`self-start rounded-full border px-2.5 py-0.5 text-xs font-bold sm:ml-auto sm:self-auto ${
                       form.active
                         ? "border-emerald-400/35 bg-emerald-500/15 text-emerald-300"
                         : "border-rose-400/35 bg-rose-500/15 text-rose-300"
@@ -1303,10 +1407,10 @@ export function HostEstablishmentSettings({
                   </span>
                 </label>
 
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-[#243247] bg-[#0d1219] px-3 py-2.5">
+                <div className="flex flex-col gap-2 rounded-xl border border-[#262626] bg-[#080808] px-3 py-2.5 sm:flex-row sm:items-center">
                   <span className="text-sm text-slate-200">Verificacion</span>
                   <span
-                    className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${
+                    className={`self-start rounded-full border px-2.5 py-0.5 text-xs font-bold sm:ml-auto sm:self-auto ${
                       form.verified
                         ? "border-blue-400/35 bg-blue-500/15 text-blue-300"
                         : "border-amber-400/35 bg-amber-500/15 text-amber-300"
@@ -1352,7 +1456,7 @@ export function HostEstablishmentSettings({
               </div>
             </HostCard>
 
-            <HostCard title={`Informacion basica de ${form.name || "tu local"}`}>
+            <HostCard title="Informacion basica">
               <div className="space-y-3">
                 <div>
                   <label className={labelClass}>Nombre *</label>
@@ -1532,7 +1636,7 @@ export function HostEstablishmentSettings({
             />
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <HostCard title="Redes sociales">
               <div className="grid gap-3 sm:grid-cols-2">
                 {SOCIAL_FIELDS.map(({ key, label, placeholder, Icon }) => (
@@ -1574,7 +1678,7 @@ export function HostEstablishmentSettings({
                 {DAY_KEYS.map((day) => {
                   const dayConfig = form.schedule[day] || makeDay(true);
                   return (
-                    <div key={day} className="rounded-xl border border-[#243247] bg-[#0d1219] p-3">
+                    <div key={day} className="rounded-xl border border-[#262626] bg-[#080808] p-3">
                       <div className="mb-2 flex flex-wrap items-center gap-2">
                         <span className="min-w-20 text-sm font-semibold text-slate-200">
                           {DAY_LABELS[day]}
@@ -1599,22 +1703,22 @@ export function HostEstablishmentSettings({
                         <p className="text-sm text-slate-500">Cerrado</p>
                       ) : (
                         <div className="space-y-2">
-                          <div className="flex flex-wrap items-center gap-2">
+                          <div className="grid gap-2 min-[420px]:grid-cols-[1fr_auto_1fr] min-[420px]:items-center">
                             {dayConfig.split && (
-                              <span className="text-xs text-slate-400">Manana</span>
+                              <span className="text-xs text-slate-400 min-[420px]:col-span-3">Manana</span>
                             )}
                             <input
                               type="time"
-                              className="rounded-lg border border-[#2a374f] bg-[#0b1018] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
+                              className="w-full rounded-lg border border-[#2a2a2a] bg-[#080808] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
                               value={dayConfig.open || ""}
                               onChange={(event) =>
                                 handleScheduleChange(day, "open", event.target.value)
                               }
                             />
-                            <span className="text-slate-500">-</span>
+                            <span className="hidden text-slate-500 min-[420px]:inline">-</span>
                             <input
                               type="time"
-                              className="rounded-lg border border-[#2a374f] bg-[#0b1018] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
+                              className="w-full rounded-lg border border-[#2a2a2a] bg-[#080808] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
                               value={dayConfig.close || ""}
                               onChange={(event) =>
                                 handleScheduleChange(day, "close", event.target.value)
@@ -1623,11 +1727,11 @@ export function HostEstablishmentSettings({
                           </div>
 
                           {dayConfig.split && (
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-xs text-slate-400">Tarde</span>
+                            <div className="grid gap-2 min-[420px]:grid-cols-[1fr_auto_1fr] min-[420px]:items-center">
+                              <span className="text-xs text-slate-400 min-[420px]:col-span-3">Tarde</span>
                               <input
                                 type="time"
-                                className="rounded-lg border border-[#2a374f] bg-[#0b1018] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
+                                className="w-full rounded-lg border border-[#2a2a2a] bg-[#080808] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
                                 value={dayConfig.afternoon?.open || ""}
                                 onChange={(event) =>
                                   handleScheduleChange(day, "afternoon", {
@@ -1635,10 +1739,10 @@ export function HostEstablishmentSettings({
                                   })
                                 }
                               />
-                              <span className="text-slate-500">-</span>
+                              <span className="hidden text-slate-500 min-[420px]:inline">-</span>
                               <input
                                 type="time"
-                                className="rounded-lg border border-[#2a374f] bg-[#0b1018] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
+                                className="w-full rounded-lg border border-[#2a2a2a] bg-[#080808] px-2.5 py-1.5 text-sm text-slate-200 outline-none focus:border-[#f77827]/60"
                                 value={dayConfig.afternoon?.close || ""}
                                 onChange={(event) =>
                                   handleScheduleChange(day, "afternoon", {

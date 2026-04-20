@@ -1,36 +1,36 @@
-﻿import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const CITIES = [
    {
-      name: "Madrid",
+      name: "Málaga",
       img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=900&q=80",
-      subtitle: "Mucho tapeo"
-   },
-   {
-      name: "Barcelona",
-      img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=900&q=80",
-      subtitle: "Plan urbano"
-   },
-   {
-      name: "Sevilla",
-      img: "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?w=900&q=80",
-      subtitle: "Centro histórico"
+      subtitle: "Sol y barra"
    },
    {
       name: "Valencia",
-      img: "https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=900&q=80",
+      img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=900&q=80",
       subtitle: "Sabor mediterráneo"
    },
    {
       name: "Granada",
-      img: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=900&q=80",
+      img: "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?w=900&q=80",
       subtitle: "Tapas con encanto"
    },
    {
-      name: "Málaga",
+      name: "Sevilla",
+      img: "https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=900&q=80",
+      subtitle: "Centro histórico"
+   },
+   {
+      name: "Madrid",
+      img: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=900&q=80",
+      subtitle: "Mucho tapeo"
+   },
+   {
+      name: "Barcelona",
       img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=900&q=80",
-      subtitle: "Sol y barra"
+      subtitle: "Plan urbano"
    }
 ];
 

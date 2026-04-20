@@ -41,7 +41,7 @@ export default function Header({ showSearch = true }) {
 
    return (
       <header className="mx-auto max-w-5xl bg-transparent px-4 pb-3 pt-4">
-         <div className={`flex items-center justify-between ${showSearch ? "mb-3" : "mb-0"}`}>
+         <div className={`relative z-[60] flex items-center justify-between ${showSearch ? "mb-3" : "mb-0"}`}>
             <Link to="/" className="flex items-center gap-2.5 no-underline">
                <img
                   src="/Logo.png"
@@ -62,7 +62,7 @@ export default function Header({ showSearch = true }) {
                   Login
                </Link>
             ) : (
-               <div className="relative" ref={menuRef}>
+               <div className="relative z-[120]" ref={menuRef}>
                   <button
                      type="button"
                      onClick={() => setMenuOpen((prev) => !prev)}
@@ -105,7 +105,12 @@ export default function Header({ showSearch = true }) {
             )}
          </div>
 
-         {showSearch && <SearchDropdown placeholder="Tu próxima tapa aquí..." />}
+         {showSearch && (
+            <div className="relative z-40">
+               <SearchDropdown placeholder="Tu próxima tapa aquí..." />
+            </div>
+         )}
       </header>
    );
 }
+

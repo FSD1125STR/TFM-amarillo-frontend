@@ -200,6 +200,7 @@ export function HostRegisterPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
+                  placeholder="********"
                   value={form.password}
                   onChange={handleChange}
                   className="auth-input w-full bg-transparent text-lg outline-none"
@@ -219,6 +220,7 @@ export function HostRegisterPage() {
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   name="confirmPassword"
+                  placeholder="********"
                   value={form.confirmPassword}
                   onChange={handleChange}
                   className="auth-input w-full bg-transparent text-lg outline-none"
@@ -241,6 +243,7 @@ export function HostRegisterPage() {
               <input
                 type="text"
                 name="businessName"
+                placeholder="Nombre del local"
                 value={form.businessName}
                 onChange={handleChange}
                 className="auth-input w-full bg-transparent text-lg outline-none"

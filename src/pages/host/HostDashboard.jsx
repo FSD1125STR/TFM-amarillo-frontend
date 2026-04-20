@@ -34,7 +34,7 @@ const formatTime = (ts) => {
   return new Date(ts).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
 };
 
-const inputClass = "w-full rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2.5 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-[#f77827]/60 focus:ring-2 focus:ring-[#f77827]/20";
+const inputClass = "w-full rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2.5 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-[#f77827]/60 focus:ring-2 focus:ring-[#f77827]/20";
 const labelClass = "mb-1 block text-sm font-medium text-slate-400";
 
 // ─────────────────────────────────────────────
@@ -43,7 +43,7 @@ const labelClass = "mb-1 block text-sm font-medium text-slate-400";
 
 function WsStatusBadge({ connected }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold tracking-wide transition-colors ${
+    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[11px] font-bold tracking-wide transition-colors sm:text-xs ${
       connected
         ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
         : "border-rose-500/40 bg-rose-500/15 text-rose-300"
@@ -114,19 +114,19 @@ function CreateEstablishmentForm({ user, onCreated }) {
 
   return (
     <section
-      className="rounded-[22px] border border-[#2a374f] p-6"
-      style={{ background: "linear-gradient(180deg, rgba(21, 29, 44, 0.84), rgba(16, 21, 32, 0.84))" }}
+      className="rounded-[22px] border border-[#2a2a2a] p-4 sm:p-6"
+      style={{ background: "linear-gradient(180deg, rgba(14, 14, 14, 0.96), rgba(8, 8, 8, 0.96))" }}
     >
-      <div className="mb-6">
-        <h2 className="m-0 text-2xl font-bold tracking-tight text-slate-100">
-          Crea tu establecimiento
+      <div className="mb-4 sm:mb-6">
+        <h2 className="m-0 text-xl font-bold tracking-tight text-slate-100 sm:text-2xl">
+          Da de alta tu local
         </h2>
         <p className="mt-1.5 text-sm text-slate-400">
-          Rellena los datos básicos para dar de alta tu local. Una vez enviado, el admin lo revisará y verificará.
+          Completa estos datos para activar tu panel de gestion.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
 
         {/* Nombre y descripción */}
         <div className="grid gap-4 sm:grid-cols-2">
@@ -221,11 +221,11 @@ function CreateEstablishmentForm({ user, onCreated }) {
           </p>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-xl bg-[#f77827] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#e06a1e] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-xl bg-[#f77827] px-6 py-2.5 text-sm font-bold text-white transition hover:bg-[#e06a1e] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
             {submitting ? "Creando..." : "Crear establecimiento"}
           </button>
@@ -258,12 +258,12 @@ function ReservationCard({ reservation, onConfirm, onReject, onComplete, onCance
   const cfg = statusConfig[reservation.status] || statusConfig.pending;
 
   return (
-    <div className="rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 transition-all">
+    <div className="rounded-2xl border border-[#2a2a2a] bg-[#080808]/80 transition-all">
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left"
+        className="flex w-full flex-col gap-2 px-4 py-3.5 text-left sm:flex-row sm:items-center sm:justify-between"
       >
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex min-w-0 items-start gap-3">
           {reservation._isNew && (
             <span className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#f77827]" />
           )}
@@ -271,13 +271,13 @@ function ReservationCard({ reservation, onConfirm, onReject, onComplete, onCance
             <p className="truncate font-semibold text-slate-100">
               {reservation.client?.name || reservation.clientName || "Cliente"}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-[11px] uppercase tracking-wide text-slate-500">
               {formatDate(reservation.date)} · {reservation.time} · {reservation.guests}{" "}
               {reservation.guests === 1 ? "persona" : "personas"}
             </p>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex w-full items-center justify-between gap-1.5 sm:w-auto sm:justify-end sm:gap-2">
           <span className={`rounded-full border px-2.5 py-0.5 text-xs font-bold ${cfg.color}`}>
             {cfg.label}
           </span>
@@ -286,28 +286,28 @@ function ReservationCard({ reservation, onConfirm, onReject, onComplete, onCance
       </button>
 
       {expanded && (
-        <div className="border-t border-[#1e2d42] px-4 pb-4 pt-3">
-          <div className="mb-3 grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <p className="text-xs text-slate-500">Fecha</p>
+        <div className="border-t border-[#232323] px-4 pb-4 pt-3">
+          <div className="mb-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+            <div className="rounded-xl border border-[#232323] bg-[#0c0c0c] px-3 py-2">
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Fecha</p>
               <p className="font-medium text-slate-200">{formatDate(reservation.date)}</p>
             </div>
-            <div>
-              <p className="text-xs text-slate-500">Hora</p>
+            <div className="rounded-xl border border-[#232323] bg-[#0c0c0c] px-3 py-2">
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Hora</p>
               <p className="font-medium text-slate-200">{reservation.time}</p>
             </div>
-            <div>
-              <p className="text-xs text-slate-500">Comensales</p>
+            <div className="rounded-xl border border-[#232323] bg-[#0c0c0c] px-3 py-2">
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Comensales</p>
               <p className="font-medium text-slate-200">{reservation.guests}</p>
             </div>
-            <div>
-              <p className="text-xs text-slate-500">Recibida</p>
+            <div className="rounded-xl border border-[#232323] bg-[#0c0c0c] px-3 py-2">
+              <p className="text-[11px] uppercase tracking-wide text-slate-500">Recibida</p>
               <p className="font-medium text-slate-200">{formatTime(reservation.timestamp || reservation.createdAt)}</p>
             </div>
           </div>
 
           {reservation.notes && (
-            <div className="mb-3 rounded-xl border border-[#1e2d42] bg-[#080d13] px-3 py-2 text-sm text-slate-300">
+            <div className="mb-3 rounded-xl border border-[#232323] bg-[#0c0c0c] px-3 py-2 text-sm text-slate-300">
               <p className="mb-0.5 text-xs text-slate-500">Nota del cliente</p>
               {reservation.notes}
             </div>
@@ -323,27 +323,27 @@ function ReservationCard({ reservation, onConfirm, onReject, onComplete, onCance
                     value={reason}
                     onChange={(e) => setReason(e.target.value)}
                     rows={2}
-                    className="w-full resize-none rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2 text-sm text-slate-100 outline-none focus:border-rose-500/50"
+                    className="w-full resize-none rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2 text-sm text-slate-100 outline-none focus:border-rose-500/50"
                   />
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <button onClick={() => setRejecting(false)}
-                      className="flex-1 rounded-xl border border-[#2a374f] py-2 text-sm text-slate-400 hover:bg-[#1a2235]">
+                      className="w-full rounded-xl border border-[#2a2a2a] py-2 text-sm text-slate-400 hover:bg-[#171717] sm:flex-1">
                       Volver
                     </button>
                     <button onClick={() => onReject(reservation._id, reason)}
-                      className="flex-1 rounded-xl border border-rose-500/50 bg-rose-500/10 py-2 text-sm font-semibold text-rose-400 hover:bg-rose-500/20">
+                      className="w-full rounded-xl border border-rose-500/50 bg-rose-500/10 py-2 text-sm font-semibold text-rose-400 hover:bg-rose-500/20 sm:flex-1">
                       Confirmar rechazo
                     </button>
                   </div>
                 </div>
               ) : (
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <button onClick={() => setRejecting(true)}
-                    className="flex items-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-400 hover:bg-rose-500/20">
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-400 hover:bg-rose-500/20 sm:w-auto">
                     <X size={14} /> Rechazar
                   </button>
                   <button onClick={() => onConfirm(reservation._id)}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#f77827] py-2 text-sm font-bold text-white hover:bg-[#e06a1e]">
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#f77827] py-2 text-sm font-bold text-white hover:bg-[#e06a1e] sm:flex-1">
                     <CheckCheck size={14} /> Confirmar reserva
                   </button>
                 </div>
@@ -355,13 +355,13 @@ function ReservationCard({ reservation, onConfirm, onReject, onComplete, onCance
           {reservation.status === "confirmed" && (
             <div className="space-y-2">
               <p className="mb-1 text-xs text-slate-500">Gestión del cupón:</p>
-              <div className="flex gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <button onClick={() => onCancelHost(reservation._id)}
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-600/40 bg-slate-600/10 px-3 py-2 text-sm font-semibold text-slate-400 hover:bg-slate-600/20">
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-slate-600/40 bg-slate-600/10 px-3 py-2 text-sm font-semibold text-slate-400 hover:bg-slate-600/20 sm:w-auto">
                   <Ban size={14} /> Cancelar
                 </button>
                 <button onClick={() => onComplete(reservation._id)}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2 text-sm font-bold text-white hover:bg-emerald-500">
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2 text-sm font-bold text-white hover:bg-emerald-500 sm:flex-1">
                   <Gift size={14} /> Finalizar y enviar cupón 5%
                 </button>
               </div>
@@ -503,27 +503,27 @@ export function HostDashboard() {
   const confirmedCount = reservations.filter((r) => r.status === "confirmed").length;
 
   return (
-    <section className="min-h-screen px-4 pb-10 pt-8 text-slate-100">
-      <div className="mx-auto w-full max-w-4xl">
+    <section className="min-h-screen overflow-x-clip px-2.5 pb-32 pt-4 text-slate-100 sm:px-4 sm:pb-14 sm:pt-8">
+      <div className="mx-auto w-full max-w-5xl">
 
         {/* Header */}
-        <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <header className="mb-4 flex flex-col items-start gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div>
-            <h1 className="m-0 text-3xl font-bold tracking-tight sm:text-4xl">Dashboard Hostelero</h1>
-            <p className="mt-1.5 text-slate-400">Hola {user?.name}. Este es tu panel de gestión.</p>
+            <h1 className="m-0 max-w-full break-words text-[1.65rem] font-bold leading-tight tracking-tight sm:text-4xl">Panel Hostelero</h1>
+            <p className="mt-1 text-sm text-slate-400 sm:text-base">Hola {user?.name}. Gestiona local, tapas y reservas.</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-2.5">
             <WsStatusBadge connected={connected} />
             <Link to="/"
-              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#33405e] bg-[#171d2b] px-3.5 text-sm font-semibold text-slate-200 no-underline">
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-xl border border-[#3a3a3a] bg-[#101010] px-3.5 text-sm font-semibold text-slate-200 no-underline sm:w-auto">
               <House size={16} className="mr-1.5" />
-              Ver zona pública
+              Ir a zona publica
             </Link>
           </div>
         </header>
 
         {/* Badge estado local */}
-        <div className="mb-4 rounded-2xl border border-[#2a374f] bg-[#131823]/70 p-4">
+        <div className="mb-4 rounded-2xl border border-[#2a2a2a] bg-[#101010]/70 p-4">
           <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-bold tracking-wide ${
             establishment
               ? "border-emerald-500/40 bg-emerald-500/20 text-emerald-300"
@@ -555,60 +555,71 @@ export function HostDashboard() {
 
             {/* Info establecimiento */}
             <section
-              className="rounded-[22px] border border-[#273752] p-6"
-              style={{ background: "linear-gradient(180deg, rgba(21, 29, 44, 0.84), rgba(16, 21, 32, 0.84))" }}
+              className="rounded-[22px] border border-[#2b2b2b] p-3.5 sm:p-6"
+              style={{ background: "linear-gradient(180deg, rgba(14, 14, 14, 0.96), rgba(8, 8, 8, 0.96))" }}
             >
-              <h2 className="m-0 text-3xl font-bold tracking-tight">{establishment.name}</h2>
-              <div className="mt-3.5 grid gap-2.5 text-slate-200">
-                <div><strong>Dirección:</strong> {formatLocation(establishment.address)}</div>
-                <div><strong>Teléfono:</strong> {establishment.phone || "Pendiente"}</div>
-                <div>
-                  <strong>Estado:</strong> {establishment.active ? "Activo" : "Desactivado"} ·{" "}
-                  {establishment.verified ? "Verificado" : "Pendiente de validación"}
+              <h2 className="m-0 max-w-full break-words text-xl font-bold tracking-tight sm:text-3xl">{establishment.name}</h2>
+              <p className="mt-1 text-[11px] uppercase tracking-[0.15em] text-slate-500">Resumen rapido</p>
+              <dl className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                <div className="rounded-xl border border-[#2a2a2a] bg-[#0b0b0b]/80 px-3 py-2.5">
+                  <dt className="text-[11px] uppercase tracking-wide text-slate-500">Direccion</dt>
+                  <dd className="mt-1 break-words text-sm text-slate-100">{formatLocation(establishment.address)}</dd>
                 </div>
-              </div>
+                <div className="rounded-xl border border-[#2a2a2a] bg-[#0b0b0b]/80 px-3 py-2.5">
+                  <dt className="text-[11px] uppercase tracking-wide text-slate-500">Telefono</dt>
+                  <dd className="mt-1 text-sm text-slate-100">{establishment.phone || "Pendiente"}</dd>
+                </div>
+                <div className="rounded-xl border border-[#2a2a2a] bg-[#0b0b0b]/80 px-3 py-2.5 sm:col-span-2">
+                  <dt className="text-[11px] uppercase tracking-wide text-slate-500">Estado</dt>
+                  <dd className="mt-1 text-sm text-slate-100">
+                    {establishment.active ? "Activo" : "Desactivado"} · {establishment.verified ? "Verificado" : "Pendiente"}
+                  </dd>
+                </div>
+              </dl>
             </section>
 
             {/* Métricas */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 sm:grid-cols-3">
               {[
                 { icon: <BellRing size={18} />,     label: "Pendientes",  value: pendingCount,        color: "text-amber-400" },
                 { icon: <CalendarClock size={18} />, label: "Confirmadas", value: confirmedCount,      color: "text-emerald-400" },
                 { icon: <Users size={18} />,         label: "Total",       value: reservations.length, color: "text-[#f77827]" },
               ].map(({ icon, label, value, color }) => (
-                <div key={label} className="rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 px-4 py-3">
+                <div key={label} className="rounded-2xl border border-[#2a2a2a] bg-[#080808]/90 px-3.5 py-3.5">
                   <div className={`mb-1 ${color}`}>{icon}</div>
                   <p className="text-2xl font-bold text-slate-100">{value}</p>
-                  <p className="text-xs text-slate-500">{label}</p>
+                  <p className="text-[11px] uppercase tracking-wide text-slate-500">{label}</p>
                 </div>
               ))}
             </div>
 
             {/* Reservas */}
-            <section className="rounded-[22px] border border-[#2a374f] bg-[#0a1018]/60 p-5">
+            <section className="rounded-[22px] border border-[#2a2a2a] bg-[#090909]/90 p-3.5 sm:p-5">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h3 className="m-0 flex items-center gap-2 text-lg font-bold text-slate-100">
+                <h3 className="m-0 flex items-center gap-2 text-base font-bold text-slate-100 sm:text-lg">
                   <Clock size={18} className="text-[#f77827]" />
-                  Reservas en tiempo real
+                  Reservas activas
                   {pendingCount > 0 && (
                     <span className="rounded-full bg-[#f77827] px-2 py-0.5 text-xs font-bold text-white">
                       {pendingCount}
                     </span>
                   )}
                 </h3>
-                <div className="flex rounded-xl border border-[#2a374f] bg-[#0d1219] p-0.5 text-xs font-semibold">
-                  {[
-                    { key: "pending",   label: "Pendientes" },
-                    { key: "confirmed", label: "Confirmadas" },
-                    { key: "all",       label: "Todas" },
-                  ].map(({ key, label }) => (
-                    <button key={key} onClick={() => setFilter(key)}
-                      className={`rounded-[10px] px-3 py-1.5 transition-colors ${
-                        filter === key ? "bg-[#f77827] text-white" : "text-slate-400 hover:text-slate-200"
-                      }`}>
-                      {label}
-                    </button>
-                  ))}
+                <div className="w-full overflow-x-auto sm:w-auto">
+                  <div className="inline-flex min-w-max rounded-xl border border-[#2a2a2a] bg-[#080808] p-0.5 text-xs font-semibold">
+                    {[
+                      { key: "pending",   label: "Pendientes" },
+                      { key: "confirmed", label: "Confirmadas" },
+                      { key: "all",       label: "Todas" },
+                    ].map(({ key, label }) => (
+                      <button key={key} onClick={() => setFilter(key)}
+                        className={`rounded-[10px] px-3 py-1.5 transition-colors ${
+                          filter === key ? "bg-[#f77827] text-white" : "text-slate-400 hover:text-slate-200"
+                        }`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 

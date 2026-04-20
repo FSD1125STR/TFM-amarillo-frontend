@@ -1,5 +1,5 @@
 // src/pages/profile/ProfilePage.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AtSign, Camera, Mail, Phone, Save, UserRound,
   Ticket, CheckCircle2, Clock3, XCircle, Sparkles,
@@ -9,6 +9,7 @@ import Header from "../../components/layout/Header";
 import { Footer } from "../../components/layout/Footer";
 import { useAuth } from "../../context/AuthContext";
 import { userService } from "../../services/userService";
+import { photoService } from "../../services/photoService";
 import { useWebSocket } from "../../hooks/useWebSocket";
 import { couponService } from "../../services/couponService";
 
@@ -168,8 +169,10 @@ export function ProfilePage() {
   const [form, setForm] = useState({ name: "", username: "", phone: "", avatar: "" });
   const [avatarBroken, setAvatarBroken] = useState(false);
   const [submitting, setSubmitting]     = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const [success, setSuccess]           = useState("");
   const [error, setError]               = useState("");
+  const avatarInputRef = useRef(null);
 
   // ── Cupones ───────────────────────────────────────────────────────────────
   const [coupons, setCoupons]         = useState([]);
@@ -272,6 +275,47 @@ export function ProfilePage() {
     setError("");
   };
 
+  const handleAvatarFileChange = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setSuccess("");
+    setError("");
+
+    if (!file.type.startsWith("image/")) {
+      setError("Selecciona un archivo de imagen valido.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("La imagen no puede superar los 5MB.");
+      event.target.value = "";
+      return;
+    }
+
+    try {
+      setAvatarUploading(true);
+      const uploadResponse = await photoService.uploadTemporary(file, {
+        folder: "nextapa/avatars",
+      });
+      const uploadedUrl = uploadResponse?.data?.url;
+
+      if (!uploadedUrl) {
+        throw new Error("No se obtuvo URL de la imagen subida.");
+      }
+
+      setForm((prev) => ({ ...prev, avatar: uploadedUrl }));
+      setAvatarBroken(false);
+      setSuccess("Imagen cargada. Pulsa Guardar cambios para confirmar.");
+    } catch (uploadError) {
+      setError(uploadError?.response?.data?.message || "No se pudo subir la imagen.");
+    } finally {
+      setAvatarUploading(false);
+      event.target.value = "";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSuccess("");
@@ -323,7 +367,7 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-screen text-white" style={shellStyle}>
-      <Header />
+      <Header showSearch={false} />
 
       <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-5">
 
@@ -386,12 +430,26 @@ export function ProfilePage() {
             </label>
 
             <label className="flex flex-col gap-2">
-              <span className="text-sm font-semibold text-neutral-200">Avatar (URL)</span>
-              <div className="relative">
-                <Camera className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
-                <input type="url" name="avatar" value={form.avatar} onChange={handleChange}
-                  placeholder="https://..." className={`${inputClassName} pl-10`} />
-              </div>
+              <span className="text-sm font-semibold text-neutral-200">Avatar</span>
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleAvatarFileChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-900 px-4 text-sm font-semibold text-neutral-200 transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                <Camera className="h-4 w-4 text-neutral-400" />
+                {avatarUploading ? "Subiendo imagen..." : "Seleccionar imagen del ordenador"}
+              </button>
+              <small className="text-xs text-neutral-500">
+                Formatos permitidos: JPG, PNG o WEBP. Maximo 5MB.
+              </small>
             </label>
 
             <label className="flex flex-col gap-2">

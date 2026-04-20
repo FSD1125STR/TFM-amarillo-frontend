@@ -31,10 +31,10 @@ import {
 } from "../admin/utils/sortableOrder";
 
 const cardClass =
-  "rounded-2xl border border-[#243247] bg-gradient-to-b from-[#111825]/95 to-[#0a0f18]/95 p-5";
+  "rounded-2xl border border-[#262626] bg-gradient-to-b from-[#111111]/95 to-[#080808]/95 p-5";
 const labelClass = "mb-1 block text-sm font-medium text-slate-400";
 const inputClass =
-  "w-full rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2.5 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-[#f77827]/60 focus:ring-2 focus:ring-[#f77827]/20";
+  "w-full rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2.5 text-slate-100 outline-none transition-colors placeholder:text-slate-500 focus:border-[#f77827]/60 focus:ring-2 focus:ring-[#f77827]/20";
 
 const DAY_OPTIONS = [
   { value: "lunes", label: "Lunes" },
@@ -160,7 +160,7 @@ const normalizeIncomingItem = (itemData) => ({
 function HostCard({ title, children, action }) {
   return (
     <section className={cardClass}>
-      <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#1f2a3d] pb-2">
+      <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#232323] pb-2">
         <h2 className="m-0 text-lg font-semibold text-slate-100">{title}</h2>
         {action || null}
       </div>
@@ -209,7 +209,7 @@ function ChipSelector({ options, selected = [], onChange, hint }) {
               className={`rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${
                 isSelected
                   ? "border-[#f77827]/60 bg-[#f77827]/20 text-orange-200"
-                  : "border-[#2a374f] bg-[#0d1219] text-slate-300 hover:border-[#f77827]/60 hover:text-orange-200"
+                  : "border-[#2a2a2a] bg-[#080808] text-slate-300 hover:border-[#f77827]/60 hover:text-orange-200"
               }`}
             >
               {option.label}
@@ -235,7 +235,7 @@ function HostSortablePhotoThumb({ photo, deleting, onDelete, onSetPrimary }) {
     <article
       ref={setNodeRef}
       style={style}
-      className={`overflow-hidden rounded-xl border border-[#2a374f] bg-[#0d1219] ${
+      className={`overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#080808] ${
         isDragging ? "opacity-60" : ""
       }`}
     >
@@ -257,7 +257,7 @@ function HostSortablePhotoThumb({ photo, deleting, onDelete, onSetPrimary }) {
           type="button"
           {...attributes}
           {...listeners}
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-[#162033] hover:text-slate-200"
+          className="rounded-lg p-1.5 text-slate-400 hover:bg-[#171717] hover:text-slate-200"
           aria-label="Reordenar foto"
         >
           <GripVertical size={14} />
@@ -267,7 +267,7 @@ function HostSortablePhotoThumb({ photo, deleting, onDelete, onSetPrimary }) {
           <button
             type="button"
             onClick={() => onSetPrimary(photo)}
-            className="rounded-lg p-1.5 text-amber-300 hover:bg-[#162033]"
+            className="rounded-lg p-1.5 text-amber-300 hover:bg-[#171717]"
             aria-label="Marcar principal"
           >
             <Star size={14} />
@@ -278,7 +278,7 @@ function HostSortablePhotoThumb({ photo, deleting, onDelete, onSetPrimary }) {
           type="button"
           onClick={() => onDelete(photo._id)}
           disabled={deleting}
-          className="rounded-lg p-1.5 text-rose-300 hover:bg-[#162033] disabled:opacity-50"
+          className="rounded-lg p-1.5 text-rose-300 hover:bg-[#171717] disabled:opacity-50"
           aria-label="Eliminar foto"
         >
           <Trash2 size={14} />
@@ -424,7 +424,7 @@ function HostItemPhotoSection({ itemId, mainImage, onMainImageChange }) {
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-[1.2fr_1fr]">
         <div className="space-y-2">
-          <div className="overflow-hidden rounded-xl border border-[#2a374f] bg-[#0d1219]">
+          <div className="overflow-hidden rounded-xl border border-[#2a2a2a] bg-[#080808]">
             <div className="aspect-[16/10]">
               {displayImage ? (
                 <img
@@ -461,11 +461,11 @@ function HostItemPhotoSection({ itemId, mainImage, onMainImageChange }) {
 
         <div className="space-y-2">
           {loading ? (
-            <div className="rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-6 text-center text-sm text-slate-400">
+            <div className="rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-6 text-center text-sm text-slate-400">
               Cargando fotos...
             </div>
           ) : photos.length === 0 ? (
-            <div className="rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-6 text-center text-sm text-slate-500">
+            <div className="rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-6 text-center text-sm text-slate-500">
               Las fotos apareceran aqui
             </div>
           ) : (
@@ -671,7 +671,7 @@ export function HostItemEditor() {
   if (loading) {
     return (
       <section className="mx-auto w-full max-w-[1180px] px-4 py-6 md:px-6">
-        <div className="rounded-2xl border border-[#243247] bg-[#0d1219] px-4 py-5 text-sm text-slate-300">
+        <div className="rounded-2xl border border-[#262626] bg-gradient-to-b from-[#111111]/95 to-[#080808]/95 px-4 py-5 text-sm text-slate-300">
           Cargando tapa...
         </div>
       </section>
@@ -686,7 +686,7 @@ export function HostItemEditor() {
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="inline-flex items-center gap-1 rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-[#182235]"
+              className="inline-flex items-center gap-1 rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-[#171717]"
             >
               <ArrowLeft size={15} />
               Volver
@@ -790,8 +790,8 @@ export function HostItemEditor() {
                     key={`${index}-${modality.label}`}
                     className={`rounded-xl border p-3 ${
                       modality.available
-                        ? "border-[#2a374f] bg-[#0d1219]"
-                        : "border-[#334562] bg-[#0d1219]/50 opacity-70"
+                        ? "border-[#2a2a2a] bg-[#080808]"
+                        : "border-[#3a3a3a] bg-[#080808]/50 opacity-70"
                     }`}
                   >
                     <div className="grid gap-2 sm:grid-cols-[1fr_120px_auto_auto] sm:items-center">
@@ -812,7 +812,7 @@ export function HostItemEditor() {
                         </datalist>
                       </div>
 
-                      <div className="flex items-center gap-2 rounded-xl border border-[#2a374f] bg-[#111823] px-2.5">
+                      <div className="flex items-center gap-2 rounded-xl border border-[#2a2a2a] bg-[#0b0b0b] px-2.5">
                         <span className="text-sm text-slate-400">EUR</span>
                         <input
                           className="w-full bg-transparent py-2 text-sm text-slate-100 outline-none"
@@ -861,7 +861,7 @@ export function HostItemEditor() {
               <button
                 type="button"
                 onClick={addModality}
-                className="mt-3 rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-[#182235]"
+                className="mt-3 rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-[#171717]"
               >
                 + Anadir modalidad
               </button>
@@ -880,7 +880,7 @@ export function HostItemEditor() {
           <div className="space-y-3">
             <HostCard title="Estado y visibilidad">
               <div className="space-y-2.5">
-                <div className="flex items-center justify-between gap-2 rounded-xl border border-[#243247] bg-[#0d1219] px-3 py-2.5">
+                <div className="flex items-center justify-between gap-2 rounded-xl border border-[#2a2a2a] bg-[#0b0b0b] px-3 py-2.5">
                   <div>
                     <p className="text-sm font-semibold text-slate-200">Disponible</p>
                     <p className="text-xs text-slate-500">
@@ -895,7 +895,7 @@ export function HostItemEditor() {
                   </button>
                 </div>
 
-                <div className="flex items-center justify-between gap-2 rounded-xl border border-[#243247] bg-[#0d1219] px-3 py-2.5">
+                <div className="flex items-center justify-between gap-2 rounded-xl border border-[#2a2a2a] bg-[#0b0b0b] px-3 py-2.5">
                   <div>
                     <p className="text-sm font-semibold text-slate-200">Destacada</p>
                     <p className="text-xs text-slate-500">
@@ -924,7 +924,7 @@ export function HostItemEditor() {
                         className={`rounded-full border px-3 py-1 text-xs font-semibold ${
                           selected
                             ? "border-[#f77827]/60 bg-[#f77827]/20 text-orange-200"
-                            : "border-[#2a374f] bg-[#0d1219] text-slate-300 hover:border-[#f77827]/60 hover:text-orange-200"
+                            : "border-[#2a2a2a] bg-[#080808] text-slate-300 hover:border-[#f77827]/60 hover:text-orange-200"
                         }`}
                       >
                         {day.label}
@@ -962,7 +962,7 @@ export function HostItemEditor() {
               href={viewLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-xl border border-[#2a374f] bg-[#0d1219] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-[#182235]"
+              className="inline-flex items-center gap-1 rounded-xl border border-[#2a2a2a] bg-[#080808] px-3 py-2 text-sm font-semibold text-slate-200 hover:bg-[#171717]"
             >
               <Eye size={15} />
               Ver en la app
