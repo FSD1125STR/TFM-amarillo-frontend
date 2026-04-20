@@ -56,31 +56,17 @@ export function HostRegisterPage() {
 
   const validateForm = () => {
     const requiredFields = [
-      "name",
-      "email",
-      "password",
-      "confirmPassword",
-      "businessName",
-      "phone",
-      "cif",
+      "name", "email", "password", "confirmPassword",
+      "businessName", "phone", "cif",
     ];
 
     const hasEmptyRequired = requiredFields.some(
       (field) => !String(form[field] || "").trim(),
     );
 
-    if (hasEmptyRequired) {
-      return "Completa los campos obligatorios del registro hostelero";
-    }
-
-    if (form.password.length < 6) {
-      return "La contraseña debe tener al menos 6 caracteres";
-    }
-
-    if (form.password !== form.confirmPassword) {
-      return "Las contraseñas no coinciden";
-    }
-
+    if (hasEmptyRequired) return "Completa los campos obligatorios del registro hostelero";
+    if (form.password.length < 6) return "La contraseña debe tener al menos 6 caracteres";
+    if (form.password !== form.confirmPassword) return "Las contraseñas no coinciden";
     return "";
   };
 
@@ -89,7 +75,6 @@ export function HostRegisterPage() {
     setError("");
 
     const validationError = validateForm();
-
     if (validationError) {
       setError(validationError);
       toastService.error(validationError);
@@ -98,7 +83,6 @@ export function HostRegisterPage() {
 
     try {
       setSubmitting(true);
-
       const response = await register({
         role: "hostelero",
         name: form.name,
@@ -113,18 +97,12 @@ export function HostRegisterPage() {
       });
 
       const role = response?.data?.role;
-
       toastService.success("Registro de hostelero completado");
       navigate(getDefaultRouteByRole(role), { replace: true });
-
     } catch (err) {
-      const message =
-        err?.response?.data?.message ||
-        "No se pudo completar el registro";
-
+      const message = err?.response?.data?.message || "No se pudo completar el registro";
       setError(message);
       toastService.error(message);
-
     } finally {
       setSubmitting(false);
     }
@@ -134,10 +112,7 @@ export function HostRegisterPage() {
     <section className="min-h-screen px-4 pb-9 pt-7 text-slate-100">
       <div className="mx-auto w-full max-w-107.5">
 
-        <Link
-          to="/login"
-          className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline"
-        >
+        <Link to="/login" className="mb-4 inline-flex items-center gap-2 text-sm text-slate-300 no-underline">
           <ArrowLeft size={18} />
           Volver al login
         </Link>
@@ -145,7 +120,6 @@ export function HostRegisterPage() {
         <h1 className="m-0 text-4xl font-bold tracking-tight sm:text-5xl">
           Registro hostelero
         </h1>
-
         <p className="mb-6 mt-2 text-lg text-slate-400">
           Crea tu cuenta y prepara tu local para publicarlo
         </p>
@@ -154,43 +128,28 @@ export function HostRegisterPage() {
 
           {/* Nombre */}
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">
-              Nombre del responsable
-            </span>
+            <span className="text-base font-semibold text-slate-300">Nombre del responsable</span>
             <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25" style={inputWrapStyle}>
               <User size={20} className="text-[#7787ab]" />
-              <input
-                type="text"
-                name="name"
-                placeholder="Ej. Marta Ruiz"
-                value={form.name}
-                onChange={handleChange}
-                className="auth-input w-full bg-transparent text-lg text-slate-200 outline-none"
-              />
+              <input type="text" name="name" placeholder="Ej. Marta Ruiz"
+                value={form.name} onChange={handleChange}
+                className="w-full bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]" />
             </span>
           </label>
 
           {/* Email */}
           <label className="flex flex-col gap-2">
-            <span className="text-base font-semibold text-slate-300">
-              Email
-            </span>
-            <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5" style={inputWrapStyle}>
+            <span className="text-base font-semibold text-slate-300">Email</span>
+            <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25" style={inputWrapStyle}>
               <Mail size={20} className="text-[#7787ab]" />
-              <input
-                type="email"
-                name="email"
-                placeholder="responsable@local.com"
-                value={form.email}
-                onChange={handleChange}
-                className="auth-input w-full bg-transparent text-lg text-slate-200 outline-none"
-              />
+              <input type="email" name="email" placeholder="responsable@local.com"
+                value={form.email} onChange={handleChange}
+                className="w-full bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]" />
             </span>
           </label>
 
           {/* Passwords */}
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-
             <label className="flex flex-col gap-2">
               <span className="text-base font-semibold text-slate-300">
                 Contraseña
@@ -230,10 +189,9 @@ export function HostRegisterPage() {
                 </button>
               </span>
             </label>
-
           </div>
 
-          {/* Negocio */}
+          {/* Nombre del local */}
           <label className="flex flex-col gap-2">
             <span className="text-base font-semibold text-slate-300">
               Nombre del local
@@ -259,48 +217,54 @@ export function HostRegisterPage() {
 
           {/* Teléfono + CIF */}
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+            <label className="flex flex-col gap-2">
+              <span className="text-base font-semibold text-slate-300">Teléfono</span>
+              <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25" style={inputWrapStyle}>
+                <Phone size={20} className="text-[#7787ab]" />
+                <input type="text" name="phone" placeholder="699 123 456"
+                  value={form.phone} onChange={handleChange}
+                  className="w-full bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]" />
+              </span>
+            </label>
 
-            <input
-              type="text"
-              name="phone"
-              placeholder="Teléfono"
-              value={form.phone}
-              onChange={handleChange}
-              className="auth-input"
-            />
-
-            <input
-              type="text"
-              name="cif"
-              placeholder="CIF"
-              value={form.cif}
-              onChange={handleChange}
-              className="auth-input"
-            />
-
+            <label className="flex flex-col gap-2">
+              <span className="text-base font-semibold text-slate-300">CIF</span>
+              <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25" style={inputWrapStyle}>
+                <IdCard size={20} className="text-[#7787ab]" />
+                <input type="text" name="cif" placeholder="B12345678"
+                  value={form.cif} onChange={handleChange}
+                  className="w-full bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]" />
+              </span>
+            </label>
           </div>
 
           {/* Dirección */}
-          <input
-            type="text"
-            name="businessAddress"
-            placeholder="Dirección (opcional)"
-            value={form.businessAddress}
-            onChange={handleChange}
-            className="auth-input"
-          />
+          <label className="flex flex-col gap-2">
+            <span className="text-base font-semibold text-slate-300">Dirección (opcional)</span>
+            <span className="flex min-h-15 items-center gap-2.5 rounded-2xl border border-[#2f3f66] px-3.5 transition focus-within:border-[#f77827] focus-within:ring-2 focus-within:ring-[#f77827]/25" style={inputWrapStyle}>
+              <MapPin size={20} className="text-[#7787ab]" />
+              <input type="text" name="businessAddress" placeholder="Calle, número, ciudad"
+                value={form.businessAddress} onChange={handleChange}
+                className="w-full bg-transparent text-lg text-slate-200 outline-none placeholder:text-[#7181a3]" />
+            </span>
+          </label>
 
-          {error && <p className="text-rose-300">{error}</p>}
+          {error && <p className="m-0 text-sm text-rose-300">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={submitting}
-            style={primaryButtonStyle}
-            className="rounded-2xl py-4 text-xl font-bold"
-          >
-            {submitting ? "Creando..." : "Crear cuenta"}
+          <button type="submit" disabled={submitting} style={primaryButtonStyle}
+            className="inline-flex min-h-16 items-center justify-center rounded-2xl border-0 text-2xl font-bold tracking-tight text-white transition active:translate-y- disabled:cursor-not-allowed disabled:opacity-75 sm:text-3xl">
+            {submitting ? "Creando..." : "Crear cuenta hostelero"}
           </button>
+
         </form>
+
+        <p className="mb-0 mt-5 text-center text-lg text-slate-400">
+          ¿Ya tienes cuenta?{" "}
+          <Link to="/login" className="font-bold text-[#ff7a2f] no-underline">
+            Inicia sesión
+          </Link>
+        </p>
+
       </div>
     </section>
   );
