@@ -721,6 +721,16 @@ textarea.admin-input {
 /* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
+/* ── Desktop: topnav sin links (van en sidebar) ── */
+@media (min-width: 969px) {
+  .admin-topnav-links {
+    display: none;
+  }
+  .admin-topnav-brand {
+    display: none;
+  }
+}
+
 @media (max-width: 968px) {
   /* Sidebar oculto por defecto, aparece con .is-open */
   .admin-sidebar {
