@@ -188,9 +188,8 @@ export default function NearbySection() {
     () =>
       establishments
         .map((establishment, index) => ({ establishment, index }))
-        .filter(({ index }) => index !== currentIndex)
         .slice(0, 3),
-    [currentIndex, establishments],
+    [establishments],
   );
 
   if (geoLoading || (loading && establishments.length === 0)) {

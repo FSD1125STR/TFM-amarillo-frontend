@@ -4,27 +4,27 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const CITIES = [
    {
       name: "Málaga",
-      img: "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=900&q=80",
+      img: "/topcities/malaga.webp",
       subtitle: "Sol y barra"
    },
    {
       name: "Valencia",
-      img: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=900&q=80",
+      img: "/topcities/valencia.jpg",
       subtitle: "Sabor mediterráneo"
    },
    {
       name: "Granada",
-      img: "https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?w=900&q=80",
+      img: "/topcities/granada.jpg",
       subtitle: "Tapas con encanto"
    },
    {
       name: "Sevilla",
-      img: "https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=900&q=80",
+      img: "/topcities/sevilla.jpg",
       subtitle: "Centro histórico"
    },
    {
       name: "Madrid",
-      img: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=900&q=80",
+      img: "/topcities/madrid.jpg",
       subtitle: "Mucho tapeo"
    },
    {
@@ -149,3 +149,4 @@ export default function TopCities({ onCitySelect, className = "" }) {
       </section>
    );
 }
+
