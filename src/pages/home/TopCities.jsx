@@ -3,14 +3,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const CITIES = [
    {
-      name: "Málaga",
-      img: "/topcities/malaga.webp",
-      subtitle: "Sol y barra"
+      name: "Barcelona",
+      img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=900&q=80",
+      subtitle: "Plan urbano"
    },
    {
       name: "Valencia",
       img: "/topcities/valencia.jpg",
       subtitle: "Sabor mediterráneo"
+   },
+   {
+      name: "Málaga",
+      img: "/topcities/malaga.webp",
+      subtitle: "Sol y barra"
    },
    {
       name: "Granada",
@@ -26,11 +31,6 @@ const CITIES = [
       name: "Madrid",
       img: "/topcities/madrid.jpg",
       subtitle: "Mucho tapeo"
-   },
-   {
-      name: "Barcelona",
-      img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=900&q=80",
-      subtitle: "Plan urbano"
    }
 ];
 

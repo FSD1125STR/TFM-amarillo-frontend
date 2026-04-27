@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { getDefaultRouteByRole } from "../../utils/authRedirect";
+import { getApiErrorMessage } from "../../utils/getApiErrorMessage";
 import { ImageDropInput } from "../../components/common/ImageDropInput";
 import { toastService } from "../../services/toastService";
 
@@ -100,7 +101,7 @@ export function HostRegisterPage() {
       toastService.success("Registro de hostelero completado");
       navigate(getDefaultRouteByRole(role), { replace: true });
     } catch (err) {
-      const message = err?.response?.data?.message || "No se pudo completar el registro";
+      const message = getApiErrorMessage(err, "No se pudo completar el registro");
       setError(message);
       toastService.error(message);
     } finally {
