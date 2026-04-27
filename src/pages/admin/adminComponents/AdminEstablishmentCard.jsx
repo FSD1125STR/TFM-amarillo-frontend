@@ -14,20 +14,26 @@ export function AdminEstablishmentCard({ notif, onVerify, onReject, onDismiss })
 
   const handleVerify = async () => {
     setLoading(true);
-    await onVerify(notif);
-    setLoading(false);
+    try {
+      await onVerify(notif); // llama a verify en backend + elimina de la lista
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReject = async () => {
     setLoading(true);
-    await onReject(notif);
-    setLoading(false);
+    try {
+      await onReject(notif); // llama a reject en backend + elimina de la lista
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 overflow-hidden">
 
-      {/* ── Cabecera ─────────────────────────────────────────────────────── */}
+      {/* ── Cabecera ── */}
       <button
         onClick={() => setExpanded((v) => !v)}
         className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left"
@@ -52,7 +58,7 @@ export function AdminEstablishmentCard({ notif, onVerify, onReject, onDismiss })
         </div>
       </button>
 
-      {/* ── Detalle expandible ────────────────────────────────────────────── */}
+      {/* ── Detalle expandible ── */}
       {expanded && (
         <div className="border-t border-[#1e2d42] px-4 pb-4 pt-3 space-y-3">
           <div className="grid grid-cols-2 gap-2 text-sm">
@@ -94,7 +100,8 @@ export function AdminEstablishmentCard({ notif, onVerify, onReject, onDismiss })
               <div className="flex gap-2">
                 <button
                   onClick={() => setRejecting(false)}
-                  className="flex-1 rounded-xl border border-[#2a374f] py-2 text-xs text-slate-400 hover:bg-[#1a2235] transition-colors"
+                  disabled={loading}
+                  className="flex-1 rounded-xl border border-[#2a374f] py-2 text-xs text-slate-400 hover:bg-[#1a2235] transition-colors disabled:opacity-60"
                 >
                   Volver
                 </button>

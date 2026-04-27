@@ -81,7 +81,7 @@ const QuickAction = ({
     className="group flex items-center gap-3 rounded-2xl border border-[#2a374f] bg-[#0d1219]/80 px-4 py-3 text-left w-full transition-all duration-200 hover:border-[#f77827]/40 hover:bg-[#0f1520] disabled:opacity-35 disabled:cursor-not-allowed"
   >
     <span
-      className={`rounded-xl p-2 flex-shrink-0 ${iconBg} transition-transform duration-200 group-hover:scale-110`}
+      className={`rounded-xl p-2 shrink-0 ${iconBg} transition-transform duration-200 group-hover:scale-110`}
     >
       <Icon size={14} className={iconColor} />
     </span>
@@ -99,10 +99,10 @@ const QuickAction = ({
     {!disabled ? (
       <ChevronRight
         size={13}
-        className="text-slate-600 flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+        className="text-slate-600 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
       />
     ) : (
-      <span className="text-[10px] font-semibold text-slate-600 flex-shrink-0">
+      <span className="text-[10px] font-semibold text-slate-600 shrink-0">
         Próximo
       </span>
     )}
@@ -150,7 +150,7 @@ export const Dashboard = () => {
     loadStats();
   }, [loadStats]);
 
-  /* ── Pendientes establecimientos (Juande — intacto) ── */
+  /* ── Pendientes establecimientos ── */
   useEffect(() => {
     const load = async () => {
       try {
@@ -173,7 +173,7 @@ export const Dashboard = () => {
     load();
   }, []);
 
-  /* ── Pendientes cupones (Juande — intacto) ── */
+  /* ── Pendientes cupones ── */
   useEffect(() => {
     const load = async () => {
       try {
@@ -199,7 +199,7 @@ export const Dashboard = () => {
     load();
   }, []);
 
-  /* ── WebSocket (Juande — intacto) ── */
+  /* ── WebSocket ── */
   useEffect(() => {
     notifications.forEach((notif) => {
       if (notif.type === "new_establishment_pending") {
@@ -221,18 +221,20 @@ export const Dashboard = () => {
     });
   }, [notifications, clearNotification]);
 
-  /* ── Acciones (Juande — intacto) ── */
+  /* ── Verificar establecimiento → llama al backend y elimina de la lista ── */
   const handleVerifyEstablishment = async (notif) => {
     try {
+      await establishmentService.verify(notif.establishmentId); // ← cambia verified:true en MongoDB
       setEstablishments((prev) =>
         prev.filter((n) => n.establishmentId !== notif.establishmentId),
       );
       loadStats();
     } catch (err) {
-      console.error(err);
+      console.error("Error al verificar establecimiento:", err);
     }
   };
 
+  /* ── Rechazar establecimiento ── */
   const handleRejectEstablishment = async (notif) => {
     try {
       await establishmentService.reject(notif.establishmentId);
@@ -497,6 +499,7 @@ export const Dashboard = () => {
                         key={notif.establishmentId || notif.id}
                         notif={notif}
                         onVerify={handleVerifyEstablishment}
+                        onReject={handleRejectEstablishment}
                         onDismiss={handleDismiss}
                       />
                     ))
