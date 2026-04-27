@@ -4,7 +4,7 @@
 // src/pages/AllEstablishment.jsx
 // Página que muestra todos los establecimientos disponibles, ordenados por proximidad al usuario
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -79,10 +79,12 @@ const MapPreview = ({ coordinates }) => {
 
 export const AllEstablishment = () => {
    const navigate = useNavigate();
+   const [searchParams] = useSearchParams();
    const [establishments, setEstablishments] = useState([]);
    const [loading, setLoading] = useState(true);
    const [usingFallback, setUsingFallback] = useState(false);
    const { coords, loading: geoLoading, error: geoError, clearCache } = useGeolocation();
+   const openNowOnly = searchParams.get("openNow") === "true";
 
    const loadNearby = useCallback(async () => {
       try {
@@ -119,6 +121,10 @@ export const AllEstablishment = () => {
       if (coords) {loadNearby();}
       else {loadFallback();}
    }, [coords, geoLoading, loadNearby, loadFallback]);
+
+   const visibleEstablishments = openNowOnly
+      ? establishments.filter((est) => est.isOpen === true)
+      : establishments;
 
    if (geoLoading || loading) {
       return (
@@ -157,8 +163,32 @@ export const AllEstablishment = () => {
                </div>
             )}
 
+            {openNowOnly && (
+               <div className="mt-2 flex items-center gap-2 py-1.5">
+                  <p className="text-xs text-orange-300">
+                     Filtro activo: mostrando solo locales abiertos ahora ({visibleEstablishments.length}).
+                  </p>
+                  <button
+                     onClick={() => navigate("/establishments")}
+                     className="text-xs text-orange-500 hover:text-orange-400 underline transition-colors shrink-0"
+                  >
+                     Quitar filtro
+                  </button>
+               </div>
+            )}
+
             <div className="space-y-4 py-4">
-               {establishments.map((est) => {
+               {visibleEstablishments.length === 0 && (
+                  <div className="rounded-2xl border border-neutral-800 bg-neutral-900/60 px-4 py-6 text-center">
+                     <p className="text-sm text-neutral-300">
+                        {openNowOnly
+                           ? "No hay establecimientos abiertos ahora en esta zona."
+                           : "No se encontraron establecimientos."}
+                     </p>
+                  </div>
+               )}
+
+               {visibleEstablishments.map((est) => {
                   const estCoords = est.location?.coordinates;
                   const isOpen = est.isOpen === true;
 

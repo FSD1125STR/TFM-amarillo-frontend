@@ -47,7 +47,7 @@ export default function QuickFilters({ onNavigate }) {
       }
 
       if (filterAction === "go-establishments") {
-         onNavigate?.("/establishments");
+         onNavigate?.("/establishments?openNow=true");
          return;
       }
 
